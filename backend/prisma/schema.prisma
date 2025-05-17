@@ -1,0 +1,16 @@
+// Define tu esquema de base de datos para Prisma aquí
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Ejemplo de modelo (ajusta según tu ERD):
+// model User {
+//   id    Int     @id @default(autoincrement())
+//   email String  @unique
+//   name  String?
+// } 

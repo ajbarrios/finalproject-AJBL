@@ -1,0 +1,1 @@
+// Índice principal del store (puede ser para combinar reducers o exportar el contexto) 

@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000" # Asumiendo que tu backend corre en el puerto 3000
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL} # Deberás configurar esto en un .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules # Evita que los node_modules locales sobreescriban los del contenedor
+    # command: npm run dev # O el comando que uses para iniciar en desarrollo
+
+  # Podrías añadir un servicio de base de datos aquí también, por ejemplo PostgreSQL
+  # db:
+  #   image: postgres:13
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: # Solo si usas el servicio db de arriba 
