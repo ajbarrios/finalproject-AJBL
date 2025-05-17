@@ -218,40 +218,31 @@ Implementar el flujo de recuperación de contraseña. Fase 1: generar y enviar u
 **ID del Ticket:** TB-004
 **Historia de Usuario Relacionada:** HU-004 - Cerrar Sesión del Profesional
 **Tipo:** Feature
-**Prioridad:** Baja (si es solo invalidación en cliente) / Media (si se implementa lista negra)
+**Prioridad:** Baja
 
 **Descripción:**
-Permitir que un profesional cierre su sesión. Principalmente es una operación del lado del cliente, pero el backend puede opcionalmente implementar una lista negra de tokens para mayor seguridad.
+Permitir que un profesional cierre su sesión. Para el MVP, esto será principalmente una operación del lado del cliente (eliminar el token). El backend no implementará una lista negra de tokens en esta fase.
 
 **Tareas Específicas (Backend):**
-1.  **(Opcional - Recomendado para mayor seguridad) Implementar Endpoint de Logout y Lista Negra de Tokens:**
-    *   Definir la ruta `POST /api/auth/logout` (protegida, requiere token válido).
-    *   Al recibir una petición a este endpoint:
-        *   Extraer el token JWT de la cabecera de autorización.
-        *   Añadir el identificador del token (ej. `jti` si está presente en el JWT, o el token completo) a una "lista negra" (ej. en Redis, Memcached, o una tabla de BD con expiración).
-        *   El token en la lista negra debe tener una expiración igual o ligeramente superior a la expiración original del JWT para que se limpie automáticamente.
-    *   Modificar el middleware de autenticación (que verifica tokens en rutas protegidas) para que, además de validar la firma y expiración del JWT, consulte si el token está en la lista negra. Si está, se considera inválido.
-    *   **Respuesta del API (Logout):**
-        *   **Éxito (200 OK):** Devolver un mensaje (ej. "Sesión cerrada exitosamente.").
-        *   **Error (401 Unauthorized):** Si no se proporciona token o es inválido antes de llegar a la lógica de logout.
-2.  **Si NO se implementa lista negra en backend:**
-    *   No se requiere un endpoint de logout específico. El cierre de sesión es manejado completamente por el cliente al descartar el token.
+1.  **Para MVP (Sin lista negra en backend):**
+    *   No se requiere un endpoint de logout específico en el backend.
+    *   El cierre de sesión es manejado completamente por el cliente al descartar el token.
     *   El backend sigue validando tokens como antes (firma y expiración) en cada petición a rutas protegidas.
 
-**Pruebas (Backend - si se implementa lista negra):**
+**Pruebas (Backend - No aplicable para MVP inicial si no se implementa lista negra):**
 *   Probar que al llamar a `/api/auth/logout`, el token se añade a la lista negra.
 *   Probar que un token añadido a la lista negra ya no puede usarse para acceder a endpoints protegidos (devuelve 401).
 *   Probar que la lista negra maneja correctamente la expiración de los tokens (se auto-limpian).
 
 **Criterios de Aceptación (Backend):**
-*   **Si se implementa lista negra:**
+*   **Para MVP:**
+    *   No se requieren cambios específicos en el backend para el logout; la seguridad del JWT (firma y expiración) sigue siendo el mecanismo principal.
+*   **(Post-MVP, si se implementa lista negra):**
     *   El endpoint `/api/auth/logout` funciona y añade tokens a la lista negra.
     *   Los tokens en lista negra son invalidados para accesos posteriores.
-*   **Si NO se implementa lista negra:**
-    *   No se requieren cambios específicos en el backend para el logout; la seguridad del JWT (firma y expiración) sigue siendo el mecanismo principal.
 
 **Consideraciones Técnicas (Backend):**
-*   Si se usa lista negra: elección de la tecnología de almacenamiento (Redis es común por su velocidad y expiraciones nativas).
+*   Si se usa lista negra (Post-MVP): elección de la tecnología de almacenamiento (Redis es común por su velocidad y expiraciones nativas).
 *   Impacto en el rendimiento del middleware de autenticación al tener que consultar la lista negra.
 
 **Etiquetas:** `backend`, `autenticación`, `logout`, `seguridad`, `jwt`, `HU-004`
@@ -458,7 +449,7 @@ Permitir que un profesional autenticado elimine (preferiblemente mediante soft d
 **Prioridad:** Alta
 
 **Descripción:**
-Proporcionar un endpoint para que el profesional autenticado pueda listar sus pacientes, con opciones de búsqueda, paginación y ordenación.
+Proporcionar un endpoint para que el profesional autenticado pueda listar sus pacientes, con opción de búsqueda. Para el MVP, se devolverán todos los pacientes del profesional que coincidan con la búsqueda, sin paginación ni ordenación avanzada por parte del backend.
 
 **Tareas Específicas (Backend):**
 1.  **Crear Endpoint de Listado de Pacientes:**
@@ -470,45 +461,31 @@ Proporcionar un endpoint para que el profesional autenticado pueda listar sus pa
 3.  **Implementar Búsqueda:**
     *   Aceptar un parámetro de query opcional `search` (ej. `/api/patients?search=John Doe`).
     *   Si se proporciona `search`, modificar la consulta a la BD para filtrar pacientes donde `firstName`, `lastName`, o `email` contengan el término de búsqueda (case-insensitive).
-4.  **Implementar Paginación:**
-    *   Aceptar parámetros de query opcionales `page` (número de página, default 1) y `limit` (resultados por página, default 10).
-    *   Modificar la consulta a la BD para aplicar `LIMIT` y `OFFSET` según estos parámetros.
-    *   Calcular el número total de pacientes que coinciden con la búsqueda (antes de aplicar limit/offset) para devolver información de paginación.
-5.  **Implementar Ordenación:**
-    *   Aceptar parámetros de query opcionales `sortBy` (campo por el cual ordenar, ej. `firstName`, `createdAt`) y `order` (`asc` o `desc`, default `asc`).
-    *   Modificar la consulta a la BD para aplicar `ORDER BY` según estos parámetros.
-    *   Validar los valores de `sortBy` para permitir solo campos válidos y seguros para ordenar.
-6.  **Definir Respuesta del API:**
+    *   La consulta devolverá todos los pacientes que coincidan, ordenados por un criterio por defecto (ej. nombre o fecha de creación).
+4.  **Definir Respuesta del API:**
     *   **Éxito (200 OK):**
-        *   Devolver un objeto `PatientListResponse` que contenga:
-            *   `data`: un array de objetos `PatientResponse` (o una versión simplificada para listas).
-            *   `pagination`: un objeto con `total` (total de resultados), `page`, `limit`, `totalPages`.
+        *   Devolver un array de objetos `PatientResponse` (o una versión simplificada para listas) directamente. Ejemplo: `[PatientResponse, PatientResponse, ...]`
     *   **No Autorizado (401 Unauthorized):**
         *   Si el token es inválido.
     *   **Error Interno del Servidor (500 Internal Server Error):**
         *   Para errores inesperados.
-7.  **Pruebas Unitarias y de Integración (Backend):**
+5.  **Pruebas Unitarias y de Integración (Backend):**
     *   Probar el listado básico de pacientes para un profesional.
     *   Probar la búsqueda con diferentes términos.
-    *   Probar la paginación (diferentes páginas y límites).
-    *   Probar la ordenación por diferentes campos y órdenes.
-    *   Probar combinaciones de búsqueda, paginación y ordenación.
-    *   Verificar que solo se devuelven pacientes del profesional autenticado y activos (si aplica soft delete).
+    *   Verificar que se devuelven todos los pacientes del profesional autenticado y activos (si aplica soft delete) que coinciden con la búsqueda, y que están en el orden por defecto esperado.
 
 **Criterios de Aceptación (Backend):**
 *   El endpoint `GET /api/patients` es funcional y está protegido.
 *   Devuelve solo los pacientes (activos) del profesional autenticado.
 *   La búsqueda por nombre/email funciona correctamente.
-*   La paginación devuelve la estructura y los datos correctos.
-*   La ordenación funciona correctamente.
-*   La respuesta del API coincide con el esquema `PatientListResponse`.
+*   La respuesta del API es un array de pacientes (o una estructura que contenga directamente el array) con el formato `PatientResponse`.
+*   Los pacientes se devuelven con un orden por defecto.
 
 **Consideraciones Técnicas (Backend):**
-*   Optimización de consultas a la BD, especialmente con búsqueda y ordenación.
-*   Seguridad en los parámetros de ordenación para evitar inyección SQL si se construyen queries dinámicamente (ORM generalmente maneja esto).
+*   Optimización de consultas a la BD, especialmente con búsqueda.
 *   Consistencia en el formato de `PatientResponse` devuelto aquí y en otros endpoints.
 
-**Etiquetas:** `backend`, `pacientes`, `dashboard`, `listado`, `búsqueda`, `paginación`, `ordenación`, `HU-008`
+**Etiquetas:** `backend`, `pacientes`, `dashboard`, `listado`, `búsqueda`, `HU-008`
 
 ---
 
@@ -1060,35 +1037,6 @@ Permitir que un profesional autenticado cree un nuevo plan de entrenamiento para
 **Estado:** Pendiente
 ---
 
-### Ticket: TB-SC01
-**Historia de Usuario Asociada:** N/A (Tarea de configuración inicial del proyecto)
-**Título del Ticket:** Configuración Inicial y Scaffolding del Proyecto Backend (Node.js, Express, TypeScript, Prisma)
-**Descripción:** Esta tarea se enfoca en establecer la base del servidor backend, incluyendo la configuración del framework, ORM, y herramientas de desarrollo. El objetivo es tener un API funcional mínima y una estructura organizada para el desarrollo futuro.
-**Tareas Específicas:**
-    1.  Inicializar un nuevo proyecto Node.js con TypeScript.
-    2.  Instalar y configurar Express.js para manejar rutas y middleware.
-    3.  Integrar Prisma ORM: inicializar Prisma, conectar a una base de datos PostgreSQL de desarrollo, y definir un `schema.prisma` básico inicial (puede ser solo una entidad de prueba para empezar).
-    4.  Configurar ESLint y Prettier para TypeScript en el backend.
-    5.  Establecer una estructura de carpetas base: `/src/api` (rutas, controladores), `/src/services` (lógica de negocio), `/src/config` (configuración de BD, auth, etc.), `/src/middleware`, `/src/utils`, `/prisma` (schema y migraciones).
-    6.  Implementar scripts de desarrollo (`npm run dev`) utilizando `nodemon` o `ts-node-dev` para reinicio automático y compilación en caliente.
-    7.  Implementar un script de compilación (`npm run build`) para transpilar TypeScript a JavaScript para producción.
-    8.  Configurar el manejo de variables de entorno utilizando `dotenv` y un archivo `.env.example`.
-    9.  Implementar un endpoint de prueba (ej. `GET /api/health`) para verificar que el servidor está funcionando.
-    10. Crear un archivo `README.md` dentro de la carpeta `/backend` con instrucciones básicas.
-**Criterios de Aceptación:**
-    *   El servidor backend se inicia sin errores con `npm run dev`.
-    *   El script de compilación `npm run build` funciona.
-    *   ESLint y Prettier están configurados y funcionales.
-    *   La estructura de carpetas inicial está implementada.
-    *   Prisma está configurado y puede conectarse a la BD de desarrollo.
-    *   El endpoint de prueba `GET /api/health` devuelve una respuesta exitosa.
-    *   El `README.md` del backend está presente.
-**Prioridad:** Crítica
-**Estado:** Pendiente
-**Estimación:** 6-8 horas
-**Responsable:** Por asignar
-**Etiquetas:** `backend`, `setup`, `scaffolding`, `nodejs`, `express`, `typescript`, `prisma`, `eslint`, `prettier`, `configuración`
----
 ### Ticket: TB-DB01
 **Historia de Usuario Asociada:** N/A (Tarea de configuración de la persistencia de datos)
 **Título del Ticket:** Definición del Esquema de BD, Migraciones Iniciales y Semillas

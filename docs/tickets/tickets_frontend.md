@@ -254,7 +254,6 @@ Como un profesional que ha iniciado sesión, quiero poder cerrar mi sesión de f
     *   Al hacer clic en "Cerrar Sesión":
         *   Eliminar el token JWT del almacenamiento del cliente (localStorage, sessionStorage, o invalidar cookie).
         *   Limpiar cualquier estado de la aplicación relacionado con el usuario autenticado (ej. datos de usuario en gestor de estado).
-        *   Opcionalmente, llamar a un endpoint de logout en el backend si se implementa una lista negra de tokens (`POST /api/auth/logout`).
         *   Redirigir al usuario a la página de inicio de sesión (`/login`) o a la página principal pública.
         *   Opcionalmente, mostrar un mensaje breve (ej. "Has cerrado sesión correctamente.") antes de la redirección.
 3.  **Asegurar Estado Post-Cierre de Sesión:**
@@ -473,7 +472,7 @@ Como profesional, quiero poder eliminar el registro de un paciente (soft delete 
 **Prioridad:** Alta
 
 **Descripción:**
-Como profesional, quiero ver un dashboard principal con una lista de mis pacientes, con opciones para buscar, filtrar y ordenar, para poder acceder y gestionar rápidamente la información de mis pacientes.
+Como profesional, quiero ver un dashboard principal con una lista de mis pacientes, con opción para buscar. Si la lista de pacientes excede un número determinado (ej. 20), se habilitará el scroll vertical. La paginación y ordenación avanzada se posponen para el MVP.
 
 **Tareas Específicas (Frontend):**
 1.  **Crear Página de Dashboard de Pacientes:**
@@ -484,46 +483,35 @@ Como profesional, quiero ver un dashboard principal con una lista de mis pacient
     *   Mostrar los pacientes en un formato claro (tabla, tarjetas, lista).
     *   Para cada paciente, mostrar información clave (ej. Nombre completo, Email, Teléfono, ¿última actividad/contacto?, ¿estado?).
     *   Incluir enlaces/botones para acciones comunes por paciente (ej. Ver Perfil, Editar, Eliminar - si ya implementado).
-3.  **Implementar Paginación:**
-    *   Si la lista de pacientes puede ser larga, implementar paginación (del lado del cliente o del servidor según la respuesta del API).
-    *   Permitir al usuario navegar entre páginas de resultados.
-4.  **Implementar Funcionalidad de Búsqueda:**
+    *   Si la lista de pacientes es larga (ej. > 20), asegurar que la lista sea escroleable verticalmente.
+3.  **Implementar Funcionalidad de Búsqueda:**
     *   Añadir un campo de búsqueda que permita al profesional buscar pacientes por nombre, apellido o email.
     *   Al ingresar un término de búsqueda, realizar una nueva petición `GET` a `/api/patients` con el parámetro `search`.
     *   Actualizar la lista de pacientes con los resultados.
-5.  **Implementar Funcionalidad de Ordenación (Opcional, pero Recomendado):**
-    *   Permitir al usuario hacer clic en las cabeceras de columna (si es una tabla) para ordenar la lista por ese campo (ej. Nombre, Fecha de registro).
-    *   Realizar una nueva petición `GET` con los parámetros `sortBy` y `order`.
-    *   Actualizar la lista.
-6.  **Implementar Filtros (Opcional):**
-    *   Considerar si se necesitan filtros adicionales (ej. por estado del paciente, por etiquetas, etc.).
-7.  **Botón "Añadir Nuevo Paciente":**
+4.  **Botón "Añadir Nuevo Paciente":**
     *   Asegurar que haya un botón prominente para "Añadir Nuevo Paciente" que lleve al formulario de TF-005.
-8.  **Manejo de Estados (Carga, Error, Vacío):**
+5.  **Manejo de Estados (Carga, Error, Vacío):**
     *   Mostrar indicadores de carga mientras se obtienen los datos.
     *   Mostrar un mensaje apropiado si ocurre un error al cargar los pacientes.
     *   Mostrar un mensaje si el profesional no tiene ningún paciente registrado aún, con una llamada a la acción para añadir uno.
-9.  **Pruebas (Frontend):**
-    *   Probar el listado de pacientes con diferentes cantidades de datos.
-    *   Probar la paginación.
+6.  **Pruebas (Frontend):**
+    *   Probar el listado de pacientes con diferentes cantidades de datos (pocos, ~20, >20 para probar scroll).
     *   Probar la búsqueda con diferentes términos (coincidencias, no coincidencias).
-    *   Probar la ordenación.
     *   Probar los estados de carga, error y vacío.
 
 **Criterios de Aceptación (Frontend):**
 *   El dashboard muestra una lista de los pacientes del profesional.
-*   La paginación funciona correctamente si hay muchos pacientes.
+*   Si hay muchos pacientes, la lista tiene scroll vertical.
 *   La búsqueda por nombre/email filtra la lista de pacientes.
-*   La ordenación (si se implementa) funciona.
 *   Se manejan adecuadamente los diferentes estados (carga, error, vacío).
 *   Hay acceso fácil para añadir un nuevo paciente.
 
 **Consideraciones Técnicas (Frontend):**
-*   Gestión del estado de la lista de pacientes, parámetros de búsqueda/paginación/ordenación.
+*   Gestión del estado de la lista de pacientes, parámetros de búsqueda.
 *   Componentes de tabla/lista reutilizables.
 *   Debouncing para la entrada de búsqueda para no sobrecargar el API.
 
-**Etiquetas:** `frontend`, `pacientes`, `dashboard`, `listado`, `búsqueda`, `paginación`, `HU-008`
+**Etiquetas:** `frontend`, `pacientes`, `dashboard`, `listado`, `búsqueda`, `HU-008`
 
 ---
 
@@ -810,9 +798,9 @@ Como profesional, quiero poder ver los detalles completos de un plan de dieta es
 4.  **Navegación y Acciones:**
     *   Botón para "Editar Plan de Dieta" (lleva a TF-014).
     *   Botón para "Eliminar Plan de Dieta" (requiere HU/ticket para eliminación).
-    *   Botón para "Duplicar Plan de Dieta" (funcionalidad avanzada, opcional).
     *   Botón para "Exportar a PDF" (relacionado con HU-007).
     *   Enlace para volver al perfil del paciente o a la lista de planes.
+    *   (Botón para "Duplicar Plan de Dieta" - Post-MVP).
 5.  **Manejo de Estados (Carga, Error, Vacío):**
     *   Indicador de carga, manejo de errores (404 Plan no encontrado, 403 No autorizado, etc.).
 6.  **Pruebas (Frontend):**
@@ -1043,8 +1031,8 @@ Como profesional, quiero poder crear un nuevo plan de entrenamiento personalizad
     *   Acceder a la edición desde la vista de detalles del plan (HU-016) (e.g., `/patients/{patientId}/workout-plans/{workoutPlanId}/edit`).
     *   El formulario debe ser similar al de creación (TF-015), precargado con los datos del plan existente.
     *   Permitir edición de información general del plan (título, descripción, fechas, objetivos, estado, notas).
-    *   Permitir editar, eliminar y añadir nuevos días de entrenamiento. Opcional: reordenar días.
-    *   Permitir editar, eliminar y añadir nuevos ejercicios dentro de un día. Opcional: reordenar ejercicios.
+    *   Permitir editar, eliminar y añadir nuevos días de entrenamiento. (Reordenar días se pospone para Post-MVP).
+    *   Permitir editar, eliminar y añadir nuevos ejercicios dentro de un día. (Reordenar ejercicios se pospone para Post-MVP).
     *   Validaciones en cliente (similares a TF-015).
     *   Botones "Guardar Cambios" y "Cancelar".
     *   Al guardar, redirigir a la vista de detalles del plan actualizado (HU-016).

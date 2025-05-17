@@ -108,6 +108,7 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 ### 4. Especificación de la API
 
 **Prompt 1:**
+Ya hemos cubierto las funcionalidades principales del MVP. Ahora necesito cubrir las especificaciones de la API en formato OpenApi que derivan de todas las historias que acabamos de elaborar. El resultado debe ser completar el punto ## 4. Especificación de la API del archivo @readme.md 
 
 **Prompt 2:**
 
@@ -118,8 +119,10 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 ### 5. Historias de Usuario
 
 **Prompt 1:**
+Actua como un project manager experto. Estoy contruyendo una aplicación mvp para trackear el progreso deportivo y nutricional de pacientes como nutricionista o como entrenador. Escanea el proyecto partiendo del @readme.md para obtener contexto y stack tecnologico.
 
 **Prompt 2:**
+Necesito crear un archivo markdown en la seccion docs con todas las historias de usuario que se han definido en el documento @prd.md.  En  estas historias de usuario el objetivo es ser lo mas especifico posible para que un desarrollador backend, frontend y qa no tenga problemas para realizar su trabajo. Vamos a ir una por una y paso a paso.
 
 **Prompt 3:**
 
@@ -128,8 +131,10 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 ### 6. Tickets de Trabajo
 
 **Prompt 1:**
+Vamos a crear los tickets de trabajo del proyecto dentro de la carpeta docs en formato markdown. Partiendo de las historias de usuario @user_stories.md , quiero crear tickets para la parte frontend del proyecto y otros para la parte backend. Pregunta cualquier cosa que necesites.
 
 **Prompt 2:**
+Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo funcional en unas 30 horas. Ten en cuenta que voy a usar un editor de codigo con IA como Cursor para acelerar el desarrollo. Sugiereme que funcionalidades podemos simplificar. Ten en cuenta las historias de usuario y los tickets.
 
 **Prompt 3:**
 

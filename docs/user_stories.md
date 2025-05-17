@@ -265,28 +265,27 @@
         3.  **Estado Post-Cierre de Sesión:** Después de cerrar sesión, el usuario no debe poder acceder a las secciones protegidas de la aplicación sin volver a iniciar sesión. Cualquier intento de acceso a rutas protegidas debe redirigir a la página de inicio de sesión.
 
     *   **Lógica de Negocio (Backend):**
-        1.  **Invalidación de Token (Opcional pero Recomendado):**
-            *   Aunque la invalidación principal del JWT ocurre en el cliente al eliminarlo, para mayor seguridad (especialmente si los tokens tienen una vida útil larga o para prevenir el uso de tokens robados antes de su expiración), se puede implementar una lógica de "lista negra" de tokens en el backend.
-            *   **Endpoint de Logout (Opcional):** `POST /api/auth/logout`. Al llamarlo con el token actual, este token se añade a una lista negra (ej. en Redis o una tabla de base de datos) hasta que expire naturalmente.
-            *   El middleware de autenticación (que verifica los tokens en cada solicitud a rutas protegidas) deberá consultar esta lista negra.
-        2.  **Si no se implementa lista negra en backend:** El cierre de sesión es principalmente una operación del lado del cliente. El backend no necesita hacer nada específico si los JWT son autocontenidos y su validación se basa solo en la firma y la fecha de expiración.
+        1.  **Invalidación de Token en Cliente (Principal):**
+            *   El cierre de sesión es principalmente una operación del lado del cliente al eliminar el token JWT almacenado.
+        2.  **Invalidación de Token en Backend (Opcional - No para MVP inicial):**
+            *   Para mayor seguridad futura (especialmente si los tokens tienen una vida útil larga o para prevenir el uso de tokens robados antes de su expiración), se podría implementar una lógica de "lista negra" de tokens en el backend.
+            *   Esto implicaría un endpoint de Logout (ej. `POST /api/auth/logout`) que añada el token a una lista negra hasta que expire naturalmente.
+            *   El middleware de autenticación debería consultar esta lista negra.
+            *   **Para el MVP actual, esta funcionalidad de backend no se implementará.**
 
     *   **Pruebas (QA):**
         1.  **Cierre de Sesión Exitoso:**
             *   Iniciar sesión como profesional.
             *   Hacer clic en el botón/enlace "Cerrar Sesión".
             *   Verificar que el usuario es redirigido a la página de inicio de sesión.
+            *   Verificar (usando herramientas de desarrollador del navegador) que el token JWT ha sido eliminado del almacenamiento del cliente (localStorage, sessionStorage, o que la cookie de sesión ha sido eliminada/invalidada).
         2.  **Acceso Post-Cierre de Sesión:**
             *   Después de cerrar sesión, intentar acceder a una URL protegida (ej. `/dashboard`) directamente.
             *   Verificar que se redirige al usuario a la página de inicio de sesión y no se muestra el contenido protegido.
         3.  **Invalidación del Token en Cliente:**
             *   Verificar (usando herramientas de desarrollador del navegador) que el token JWT ha sido eliminado del almacenamiento del cliente (localStorage, sessionStorage, o que la cookie de sesión ha sido eliminada/invalidada).
         4.  **Prueba con Múltiples Sesiones (si aplica y se gestiona en backend):** Si un usuario puede tener múltiples sesiones activas, verificar cómo afecta el cierre de sesión de una de ellas a las otras. (Para MVP, usualmente una sesión por token es suficiente).
-        5.  **(Si se implementa lista negra en backend) Prueba de Token en Lista Negra:**
-            *   Cerrar sesión.
-            *   Intentar reutilizar el mismo token (obtenido antes del logout) para acceder a un endpoint protegido (usando herramientas como Postman).
-            *   Verificar que el acceso es denegado (ej. error 401).
-        6.  **Usabilidad:** Asegurar que la opción de cerrar sesión es fácil de encontrar.
+        5.  **Usabilidad:** Asegurar que la opción de cerrar sesión es fácil de encontrar.
 
 ---
 
@@ -531,8 +530,8 @@
                 *   Quizás una foto de perfil placeholder o iniciales si no hay foto.
                 *   Un botón/enlace para "Ver Detalles" o "Abrir Perfil" que navegue a la vista detallada del paciente (HU-009).
                 *   Opcional (MVP): Acciones rápidas como "Editar" (HU-006) o "Crear Plan".
-            *   **Paginación:** Si se espera un gran número de pacientes, implementar paginación para la lista.
-            *   **Ordenación:** Permitir ordenar la lista de pacientes por defecto por fecha de creación (más recientes primero) o alfabéticamente por nombre. Opcional para MVP, pero útil.
+            *   **Visualización de la Lista:** Se cargarán todos los pacientes del profesional. Si la lista excede un número determinado (ej. 20 pacientes), se habilitará el scroll vertical para navegar por ella. No se implementará paginación para el MVP.
+            *   **Ordenación:** La lista de pacientes se presentará con un orden por defecto (ej. alfabéticamente por nombre o por fecha de creación más reciente). No se implementará funcionalidad de ordenación interactiva para el MVP.
         4.  **Estado Vacío / Sin Pacientes:**
             *   Si el profesional aún no ha registrado ningún paciente, mostrar un mensaje amigable y una llamada a la acción clara para "Añadir Nuevo Paciente" (que lleve a HU-005).
         5.  **Botón "Añadir Paciente":**
@@ -546,12 +545,11 @@
                 *   Requiere autenticación del profesional.
                 *   Filtra pacientes por el `professional_id` del usuario autenticado.
                 *   Acepta el parámetro `search` para la búsqueda.
-                *   Debe soportar paginación (ej. `?page=1&limit=10`).
-                *   Debe soportar ordenación (ej. `?sortBy=name&order=asc`).
+                *   Devolverá la lista completa de pacientes del profesional que coincidan con los criterios, ordenada por defecto (ej. por nombre o fecha de creación). No soportará parámetros de paginación ni ordenación avanzada para el MVP.
         2.  **Datos Devueltos por Paciente:**
             *   Para cada paciente, devolver los campos necesarios para mostrar en la lista (ID, nombre, apellidos, email, teléfono, etc.).
         3.  **Respuesta del API:**
-            *   **Éxito (200 OK):** Devolver la lista de pacientes (posiblemente paginada), junto con metadatos de paginación (total de pacientes, total de páginas, página actual).
+            *   **Éxito (200 OK):** Devolver la lista de pacientes.
             *   **No Autorizado (401 Unauthorized).**
             *   **Error del Servidor (500 Internal Server Error).**
 
@@ -565,10 +563,9 @@
         4.  **Navegación:**
             *   Verificar que el botón/enlace "Ver Detalles" para cada paciente lleva al perfil correcto.
             *   Verificar que el botón "Añadir Paciente" lleva al formulario correcto.
-        5.  **Paginación (si implementada):**
-            *   Probar la navegación entre páginas.
-            *   Verificar que la paginación funciona con y sin términos de búsqueda.
-        6.  **Ordenación (si implementada):** Probar las diferentes opciones de ordenación.
+        5.  **Visualización con Muchos Pacientes:**
+            *   Probar con una cantidad de pacientes que exceda el umbral (ej. 25 pacientes) y verificar que el scroll vertical funciona correctamente.
+        6.  **Ordenación por Defecto:** Verificar que la lista se muestra en el orden por defecto esperado.
         7.  **Seguridad:** Asegurar que un profesional solo ve y puede interactuar con sus propios pacientes.
         8.  **Diseño Responsivo:** Probar en diferentes dispositivos y resoluciones de pantalla.
 
