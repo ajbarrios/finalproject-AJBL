@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "dist/app.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "nodemon src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.18",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.8.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.8.2",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "pg": "^8.16.0"
+  }
+}
