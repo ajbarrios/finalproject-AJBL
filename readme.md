@@ -30,7 +30,6 @@ NutriTrack Pro es una aplicación web para profesionales de la nutrición y entr
 
 > Puedes tenerlo alojado en público o en privado, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/). También puedes compartir por correo un archivo zip con el contenido
 
-
 ---
 
 ## 1. Descripción general del producto
@@ -705,7 +704,9 @@ Representa un ejercicio específico dentro de un día de entrenamiento.
 
 ## 4. Especificación de la API
 
-> Si tu backend se comunica a través de API, describe los endpoints principales (máximo 3) en formato OpenAPI. Opcionalmente puedes añadir un ejemplo de petición y de respuesta para mayor claridad
+La especificación completa de la API en formato OpenAPI 3.0 se encuentra en el siguiente archivo:
+
+[Ver Especificación OpenAPI](./docs/openapi_spec.yaml)
 
 ---
 
@@ -713,27 +714,128 @@ Representa un ejercicio específico dentro de un día de entrenamiento.
 
 > Documenta 3 de las historias de usuario principales utilizadas durante el desarrollo, teniendo en cuenta las buenas prácticas de producto al respecto.
 
-**Historia de Usuario 1**
+**Historia de Usuario 1: HU-001 Registro de Nuevo Profesional**
 
-**Historia de Usuario 2**
+*   **ID:** HU-001
+*   **Título:** Registro de Nuevo Profesional
+*   **Como un:** Profesional (nutricionista/entrenador) que aún no tiene cuenta
+*   **Quiero:** Poder registrarme en la aplicación proporcionando mi nombre completo, email, una contraseña segura y mi tipo de profesión (nutricionista o entrenador)
+*   **Para que:** Pueda crear mi perfil, acceder a las funcionalidades del sistema y comenzar a gestionar mis pacientes y sus planes nutricionales o de entrenamiento.
+*   **Criterios de Aceptación Clave (Resumen):**
+    *   El sistema permite registrarse con nombre, email, contraseña y profesión.
+    *   Validaciones de campos en frontend y backend (email único, formato de contraseña).
+    *   Contraseña almacenada de forma segura (hasheada).
+    *   Feedback claro al usuario sobre éxito o errores (ej. email duplicado).
+    *   Redirección a login o dashboard tras registro exitoso.
+    *   *Para una descripción detallada de todos los criterios, ver HU-001 en `docs/user_stories.md`.*
 
-**Historia de Usuario 3**
+**Historia de Usuario 2: HU-005 Registro de Nuevo Paciente**
+
+*   **ID:** HU-005
+*   **Título:** Registro de Nuevo Paciente
+*   **Como un:** Profesional que ha iniciado sesión
+*   **Quiero:** Poder registrar un nuevo paciente en el sistema proporcionando su información personal básica (nombre, apellidos, email, teléfono, fecha de nacimiento, género), datos biométricos iniciales (altura, peso, etc.), notas médicas relevantes, restricciones alimentarias y sus objetivos.
+*   **Para que:** Pueda tener un perfil completo del paciente y comenzar a crear planes de dieta y entrenamiento personalizados y hacer seguimiento de su progreso.
+*   **Criterios de Aceptación Clave (Resumen):**
+    *   El profesional autenticado puede acceder a un formulario para registrar un nuevo paciente.
+    *   El formulario incluye campos para información personal, biométrica inicial, notas y objetivos.
+    *   Validaciones en frontend y backend.
+    *   El paciente creado se asocia automáticamente al profesional que lo registra.
+    *   Si se proporcionan datos biométricos iniciales, se crea un primer registro biométrico.
+    *   Feedback claro al usuario y redirección tras el registro exitoso.
+    *   *Para una descripción detallada de todos los criterios, ver HU-005 en `docs/user_stories.md`.*
+
+**Historia de Usuario 3: HU-012 Creación Básica de Plan de Dieta**
+
+*   **ID:** HU-012
+*   **Título:** Creación Básica de Plan de Dieta
+*   **Como un:** Profesional (especialmente nutricionista, pero también entrenador si aplica) que ha iniciado sesión
+*   **Quiero:** Poder crear un nuevo plan de dieta personalizado para un paciente específico, definiendo un título, descripción, fechas de vigencia, objetivos y las comidas para diferentes momentos del día.
+*   **Para que:** Pueda proporcionar al paciente una guía nutricional estructurada y adaptada a sus necesidades.
+*   **Criterios de Aceptación Clave (Resumen):**
+    *   El profesional autenticado puede acceder a un formulario para crear un plan de dieta para un paciente.
+    *   El formulario permite definir información general del plan (título, fechas, objetivos) y añadir múltiples comidas (tipo, contenido).
+    *   Validaciones en frontend y backend para los datos del plan y de cada comida.
+    *   El plan creado se asocia al paciente y al profesional. Las comidas se asocian al plan.
+    *   Operación de guardado transaccional.
+    *   Feedback claro y redirección tras creación exitosa.
+    *   *Para una descripción detallada de todos los criterios, ver HU-012 en `docs/user_stories.md`.*
 
 ---
 
 ## 6. Tickets de Trabajo
 
-> Documenta 3 de los tickets de trabajo principales del desarrollo, uno de backend, uno de frontend, y uno de bases de datos. Da todo el detalle requerido para desarrollar la tarea de inicio a fin teniendo en cuenta las buenas prácticas al respecto. 
+A continuación, se detallan algunos tickets de trabajo representativos del proyecto, ofreciendo una visión de las tareas específicas de frontend, backend y base de datos.
 
-**Ticket 1**
+### Ticket Frontend Ejemplo: TF-008
 
-**Ticket 2**
+**ID:** TF-008
+**Tipo:** Frontend
+**Historia de Usuario Relacionada:** HU-008 - Registro de Nuevo Paciente
+**Título:** Desarrollar Interfaz de Usuario para Registro de Nuevos Pacientes
 
-**Ticket 3**
+**Descripción:**
+Crear el formulario y la lógica de interfaz de usuario necesaria para que un nutricionista pueda registrar un nuevo paciente en el sistema. Esto incluye campos para información personal (nombre, contacto, fecha de nacimiento), historial médico básico y objetivos.
 
----
+**Criterios de Aceptación:**
+1.  El formulario de registro es accesible desde el dashboard del nutricionista.
+2.  El formulario incluye campos para: Nombre completo, Correo electrónico, Teléfono, Fecha de Nacimiento, Género, Dirección, Notas de historial médico relevante, Objetivos del paciente.
+3.  Validación de campos en el lado del cliente (e.g., formato de email, campos obligatorios).
+4.  Al enviar el formulario, se realiza una petición al endpoint backend correspondiente.
+5.  Se muestra feedback al usuario sobre el resultado del registro (éxito o error).
+6.  La interfaz es responsiva y se visualiza correctamente en diferentes tamaños de pantalla.
 
-## 7. Pull Requests
+**Estimación de Esfuerzo:** 3 puntos
+**Prioridad:** Alta
+**Asignado a:** Frontend Team
+**Estado:** Pendiente
+
+### Ticket Backend Ejemplo: TB-005
+
+**ID:** TB-005
+**Tipo:** Backend
+**Historia de Usuario Relacionada:** HU-005 - Asignación de Plan de Dieta a Paciente
+**Título:** Desarrollar Endpoint para Asignar un Plan de Dieta Existente a un Paciente
+
+**Descripción:**
+Crear la lógica de backend y el endpoint API necesarios para permitir a un nutricionista asignar un plan de dieta previamente creado a un paciente específico.
+
+**Criterios de Aceptación:**
+1.  Se define un endpoint PUT o POST (e.g., `/api/v1/pacientes/{pacienteId}/planes-dieta/{planId}`).
+2.  El endpoint requiere autenticación y autorización del nutricionista.
+3.  Se valida que tanto el paciente como el plan de dieta existan en la base de datos.
+4.  Se crea o actualiza la relación entre el paciente y el plan de dieta en la base de datos.
+5.  El endpoint devuelve una respuesta adecuada (e.g., 200 OK con la relación actualizada o 201 Created).
+6.  Se manejan errores comunes (e.g., paciente no encontrado, plan no encontrado).
+
+**Estimación de Esfuerzo:** 2 puntos
+**Prioridad:** Alta
+**Asignado a:** Backend Team
+**Estado:** Pendiente
+
+### Ticket Base de Datos Ejemplo: TB-DB01
+
+**ID:** TB-DB01
+**Tipo:** Backend - Base de Datos
+**Historia de Usuario Relacionada:** N/A (Configuración Inicial)
+**Título:** Definición del Esquema de la Base de Datos, Creación de Migraciones Iniciales y Datos de Semilla
+
+**Descripción:**
+Este ticket aborda la configuración fundamental de la base de datos para NutriTrack Pro. Implica definir el esquema de la base de datos basado en el Diagrama de Entidad-Relación (ERD) simplificado, generar las migraciones iniciales necesarias para crear las tablas y relaciones, y poblar la base de datos con datos de semilla esenciales para el desarrollo y las pruebas.
+
+**Criterios de Aceptación:**
+1.  El esquema de la base de datos (utilizando Prisma Schema o similar) está definido y refleja el ERD (Pacientes, Usuarios, Planes de Dieta, Planes de Entrenamiento, Comidas, Ejercicios).
+2.  Se generan y aplican con éxito las migraciones iniciales de la base de datos.
+3.  Se crean scripts de semillas para poblar las tablas con datos de muestra (e.g., tipos de comida, categorías de ejercicio, un usuario de prueba).
+4.  La base de datos es accesible y puede ser consultada por la aplicación backend.
+5.  La configuración de la conexión a la base de datos está externalizada y gestionada de forma segura (e.g., mediante variables de entorno).
+
+**Estimación de Esfuerzo:** 3 puntos
+**Prioridad:** Muy Alta
+**Asignado a:** Backend Team
+**Estado:** Pendiente
+
+## 7. Pull requests
 
 > Documenta 3 de las Pull Requests realizadas durante la ejecución del proyecto
 
