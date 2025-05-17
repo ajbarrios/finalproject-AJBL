@@ -57,6 +57,69 @@ NutriTrack Pro cuenta con un diseño minimalista, fresco y moderno, que se adapt
 ### **1.4. Instrucciones de instalación:**
 > Documenta de manera precisa las instrucciones para instalar y poner en marcha el proyecto en local (librerías, backend, frontend, servidor, base de datos, migraciones y semillas de datos, etc.)
 
+(Aquí irían las instrucciones generales si las tienes)
+
+#### **Backend (Node.js/Express con Prisma y PostgreSQL)**
+
+1.  **Navega al directorio `backend`:**
+    ```bash
+    cd backend
+    ```
+
+2.  **Configura las variables de entorno:**
+    Crea un archivo `.env` en el directorio `backend` (copiando `backend/.env.example` si existiera) y configura las siguientes variables, especialmente `DATABASE_URL` para apuntar a tu instancia de PostgreSQL:
+    ```env
+    # backend/.env
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
+    PORT=3001 # O el puerto que prefieras para la API
+    # Otras variables de entorno necesarias...
+    ```
+    Asegúrate de que los detalles de `DATABASE_URL` coincidan con la configuración de tu base de datos (local o Dockerizada).
+
+3.  **Instala las dependencias:**
+    ```bash
+    npm install
+    ```
+
+4.  **Base de Datos (PostgreSQL con Docker Compose - Opcional pero recomendado para desarrollo):**
+    Si aún no tienes una instancia de PostgreSQL, puedes usar el `docker-compose.yml` proporcionado en la raíz del proyecto para levantar una.
+    *   Asegúrate de tener Docker y Docker Compose instalados.
+    *   Crea un archivo `.env` en la **raíz del proyecto** (junto a `docker-compose.yml`) con las credenciales para la base de datos que usará Docker Compose:
+        ```env
+        # Raíz del proyecto .env (para Docker Compose)
+        POSTGRES_USER=nutritrackuser
+        POSTGRES_PASSWORD=tu_contraseña_segura
+        POSTGRES_DB=nutritrack_pro_db
+        DB_PORT=5432 # Puerto local para la base de datos
+        ```
+    *   Desde la **raíz del proyecto**, levanta el servicio de base de datos:
+        ```bash
+        docker-compose up -d db
+        ```
+
+5.  **Migraciones de la Base de Datos (Prisma):**
+    Una vez que tu base de datos esté accesible y `DATABASE_URL` esté configurada en `backend/.env`, aplica las migraciones para crear el esquema:
+    ```bash
+    npm run db:migrate 
+    # O directamente: npx prisma migrate dev
+    ```
+    Esto creará las tablas en tu base de datos según el `schema.prisma`.
+
+6.  **Datos de Semilla (Prisma - Opcional):**
+    Para poblar la base de datos con datos iniciales de prueba, puedes ejecutar el script de semillas:
+    ```bash
+    npm run db:seed
+    # O directamente: npx prisma db seed
+    ```
+
+7.  **Inicia el servidor de desarrollo del backend:**
+    ```bash
+    npm run dev
+    ```
+    El servidor debería iniciarse (por defecto en `http://localhost:3000` si usaste ese puerto).
+
+(Aquí irían las instrucciones para el Frontend)
+
 ---
 
 ## 2. Arquitectura del Sistema
