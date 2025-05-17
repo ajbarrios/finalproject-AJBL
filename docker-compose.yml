@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13 # La versión 13 es mencionada en tu readme.md, puedes cambiarla si prefieres una más reciente.
+    container_name: nutritrack_pro_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${DB_PORT:-5432}:5432" # Expone el puerto 5432 por defecto, o el que definas en DB_PORT en .env
+    volumes:
+      - nutritrack_pro_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nutritrack_pro_postgres_data: # Define el volumen para la persistencia de datos 

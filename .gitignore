@@ -1,0 +1,80 @@
+# Archivos de entorno - ¡IMPORTANTE! Asegúrate de que .env NO esté en el repositorio si contiene secretos.
+# Si tienes un .env.example o .env.template, podrías querer excluir .env pero incluir el ejemplo.
+.env
+# .env*.local
+# .env.development.local
+# .env.test.local
+# .env.production.local
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Directorios de dependencias (generalmente manejados por los .gitignore de frontend/backend)
+# node_modules/
+
+# Salida de compilación/distribución (generalmente manejada por los .gitignore de frontend/backend)
+# dist/
+# build/
+
+# Archivos de editor
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de caché de herramientas
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# Archivos de Docker (si no quieres versionar ciertos archivos de Docker localmente)
+# docker-compose.override.yml
+
+# Archivos de Test Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Archivos de dependencias de Python (si por alguna razón se usan en la raíz)
+# __pycache__/
+# *.pyc
+# *.pyo
+# .Python
+# env/
+# venv/
+# ENV/
+# VENV/
+# .venv/
+
+# Archivos de compilación de Java/Kotlin/Scala (si se usan)
+# *.class
+# *.jar
+# *.war
+# target/
+# build/
+
+# Archivos generados por IDEs de JetBrains
+# *.iml
+# .idea/workspace.xml
+# .idea/shelf/
+
+# Archivos de caché de Parcel
+# .cache/
+# .parcel-cache/
+
+# Otros
+.history 
