@@ -769,7 +769,7 @@ Representa un ejercicio específico dentro de un día de entrenamiento.
 
 La especificación completa de la API en formato OpenAPI 3.0 se encuentra en el siguiente archivo:
 
-[Ver Especificación OpenAPI](./docs/openapi_spec.yaml)
+[Ver Especificación OpenAPI](./docs/api/openapi_spec.yaml)
 
 ---
 
@@ -903,6 +903,8 @@ Este ticket aborda la configuración fundamental de la base de datos para NutriT
 > Documenta 3 de las Pull Requests realizadas durante la ejecución del proyecto
 
 **Pull Request 1**
+
+[Pull request documentación técnica](https://github.com/ajbarrios/finalproject-AJBL/pull/1)
 
 **Pull Request 2**
 
