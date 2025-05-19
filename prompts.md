@@ -137,6 +137,13 @@ Vamos a crear los tickets de trabajo del proyecto dentro de la carpeta docs en f
 Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo funcional en unas 30 horas. Ten en cuenta que voy a usar un editor de codigo con IA como Cursor para acelerar el desarrollo. Sugiereme que funcionalidades podemos simplificar. Ten en cuenta las historias de usuario y los tickets.
 
 **Prompt 3:**
+"Dado el ticket TB-001 (Configuración Inicial y Scaffolding del Proyecto Backend), y específicamente la Historia de Usuario HU-001 (Registro de Nuevo Profesional), ¿puedes proponerme un plan de acción detallado para implementar el backend de esta HU, incluyendo la instalación de dependencias, definición de rutas, controladores, validación, lógica de negocio con Prisma, y estructura de código?"
+
+**Prompt 4:**
+"Tengo el siguiente error al ejecutar los tests de Vitest: 'ReferenceError: Cannot access 'mockPrismaSingleton' before initialization'. El error apunta a la forma en que se está mockeando PrismaClient. ¿Puedes ayudarme a corregir la configuración del mock en `backend/tests/unit/api/controllers/auth.controller.test.ts` para resolver este problema de hoisting con `vi.mock`?"
+
+**Prompt 5:**
+"Los tests de `auth.controller.test.ts` están fallando. El error es `TypeError: Invalid enum value: __esModule` al intentar mockear Prisma. Sigue la guía oficial de Prisma para mockear PrismaClient usando el patrón Singleton ([Unit testing | Prisma Docs](https://www.prisma.io/docs/orm/prisma-client/testing/unit-testing)) y reestructura los tests y la configuración necesaria (creación de `prisma.client.ts`, `prisma.mock.ts`, actualización de `vitest.config.ts` y el controlador/tests) para solucionar este problema."
 
 ---
 

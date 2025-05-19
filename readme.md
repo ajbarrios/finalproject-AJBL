@@ -71,7 +71,7 @@ NutriTrack Pro cuenta con un diseño minimalista, fresco y moderno, que se adapt
     ```env
     # backend/.env
     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
-    PORT=3001 # O el puerto que prefieras para la API
+    PORT=3000 # O el puerto que prefieras para la API
     # Otras variables de entorno necesarias...
     ```
     Asegúrate de que los detalles de `DATABASE_URL` coincidan con la configuración de tu base de datos (local o Dockerizada).
