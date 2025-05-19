@@ -1,6 +1,9 @@
 import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
 
+// Importar rutas de autenticación
+import authRoutes from './api/routes/auth.routes';
+
 // Cargar variables de entorno desde .env
 dotenv.config();
 
@@ -18,6 +21,9 @@ app.get('/', (req: Request, res: Response) => {
     status: 'running'
   });
 });
+
+// Configurar rutas de la API
+app.use('/api/auth', authRoutes); // Montar rutas de autenticación bajo /api/auth
 
 // Iniciar el servidor
 app.listen(PORT, () => {
