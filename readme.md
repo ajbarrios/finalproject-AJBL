@@ -103,7 +103,7 @@ NutriTrack Pro cuenta con un diseño minimalista, fresco y moderno, que se adapt
     npm run db:migrate 
     # O directamente: npx prisma migrate dev
     ```
-    Esto creará las tablas en tu base de datos según el `schema.prisma`.
+    Esto aplicará las migraciones existentes (definidas en `backend/prisma/migrations/`) y creará las tablas y columnas en tu base de datos según lo definido en `backend/prisma/schema.prisma`. Como resultado de la configuración actual, los nombres de las tablas, columnas y los valores de los enums en la base de datos estarán en inglés.
 
 6.  **Datos de Semilla (Prisma - Opcional):**
     Para poblar la base de datos con datos iniciales de prueba, puedes ejecutar el script de semillas:
@@ -769,7 +769,7 @@ Representa un ejercicio específico dentro de un día de entrenamiento.
 
 La especificación completa de la API en formato OpenAPI 3.0 se encuentra en el siguiente archivo:
 
-[Ver Especificación OpenAPI](./docs/openapi_spec.yaml)
+[Ver Especificación OpenAPI](./docs/api/openapi_spec.yaml)
 
 ---
 
@@ -903,6 +903,8 @@ Este ticket aborda la configuración fundamental de la base de datos para NutriT
 > Documenta 3 de las Pull Requests realizadas durante la ejecución del proyecto
 
 **Pull Request 1**
+
+[Pull request documentación técnica](https://github.com/ajbarrios/finalproject-AJBL/pull/1)
 
 **Pull Request 2**
 
