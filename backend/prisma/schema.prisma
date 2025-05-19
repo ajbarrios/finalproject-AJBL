@@ -1,9 +1,204 @@
-// Define tu esquema de base de datos para Prisma aquí
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+enum ProfessionType {
+  NUTRITIONIST
+  TRAINER
+}
+
+enum MealType {
+  BREAKFAST
+  MID_MORNING_SNACK
+  LUNCH
+  AFTERNOON_SNACK
+  DINNER
+  LATE_NIGHT_SNACK
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model Professional {
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?
+  profession   ProfessionType
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  patients     Patient[]
+  dietPlans    DietPlan[]
+  workoutPlans WorkoutPlan[]
+
+  @@index([createdAt])
+}
+
+model Patient {
+  id               Int       @id @default(autoincrement())
+  professionalId   Int
+  email            String?
+  firstName        String
+  lastName         String
+  phone            String?
+  birthDate        DateTime? @db.Date
+  gender           String?
+  height           Float? // Height in cm
+  medicalNotes     String?   @db.Text
+  dietRestrictions String?   @db.Text
+  objectives       String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  professional     Professional      @relation(fields: [professionalId], references: [id])
+  biometricRecords BiometricRecord[]
+  dietPlans        DietPlan[]
+  workoutPlans     WorkoutPlan[]
+
+  @@index([professionalId])
+  @@index([email])
+  @@index([firstName, lastName])
+  @@index([createdAt])
+}
+
+model BiometricRecord {
+  id                Int      @id @default(autoincrement())
+  patientId         Int
+  recordDate        DateTime @db.Date
+  weight            Float? // Weight in kg
+  bodyFatPercentage Float?
+  musclePercentage  Float?
+  waterPercentage   Float?
+  backChestDiameter Float? // Back/chest diameter in cm
+  waistDiameter     Float? // Waist diameter in cm
+  armsDiameter      Float? // Arms diameter in cm
+  legsDiameter      Float? // Legs diameter in cm
+  calvesDiameter    Float? // Calves diameter in cm
+  notes             String?  @db.Text
+  createdAt         DateTime @default(now())
+  // No updatedAt as per ERD
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@index([recordDate])
+  @@index([patientId, recordDate])
+}
+
+model DietPlan {
+  id             Int       @id @default(autoincrement())
+  professionalId Int
+  patientId      Int
+  title          String
+  description    String?   @db.Text
+  startDate      DateTime? @db.Date
+  endDate        DateTime? @db.Date
+  objectives     String?   @db.Text
+  isActive       Boolean   @default(true)
+  notes          String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  professional Professional @relation(fields: [professionalId], references: [id])
+  patient      Patient      @relation(fields: [patientId], references: [id])
+  meals        DietMeal[]   @relation("DietPlanMeals")
+
+  @@index([professionalId])
+  @@index([patientId])
+  @@index([isActive])
+  @@index([startDate, endDate])
+  @@index([patientId, isActive])
+}
+
+model DietMeal {
+  id         Int      @id @default(autoincrement())
+  dietPlanId Int
+  mealType   MealType
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  dietPlan DietPlan @relation("DietPlanMeals", fields: [dietPlanId], references: [id])
+
+  @@index([dietPlanId])
+  @@index([mealType])
+}
+
+model WorkoutPlan {
+  id             Int       @id @default(autoincrement())
+  professionalId Int
+  patientId      Int
+  title          String
+  description    String?   @db.Text
+  startDate      DateTime? @db.Date
+  endDate        DateTime? @db.Date
+  objectives     String?   @db.Text
+  isActive       Boolean   @default(true)
+  notes          String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  professional Professional @relation(fields: [professionalId], references: [id])
+  patient      Patient      @relation(fields: [patientId], references: [id])
+  days         WorkoutDay[] @relation("WorkoutPlanDays")
+
+  @@index([professionalId])
+  @@index([patientId])
+  @@index([isActive])
+  @@index([startDate, endDate])
+  @@index([patientId, isActive])
+}
+
+model WorkoutDay {
+  id            Int       @id @default(autoincrement())
+  workoutPlanId Int
+  dayOfWeek     DayOfWeek
+  description   String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  workoutPlan WorkoutPlan @relation("WorkoutPlanDays", fields: [workoutPlanId], references: [id])
+  exercises   Exercise[]  @relation("WorkoutDayExercises")
+
+  @@index([workoutPlanId])
+  @@index([dayOfWeek])
+}
+
+model Exercise {
+  id           Int      @id @default(autoincrement())
+  workoutDayId Int
+  name         String
+  setsReps     String // e.g., "4x12"
+  observations String?  @db.Text
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  workoutDay WorkoutDay @relation("WorkoutDayExercises", fields: [workoutDayId], references: [id])
+
+  @@index([workoutDayId])
+  @@index([name])
+  @@index([displayOrder])
 }
