@@ -141,106 +141,43 @@
         7.  **Respuesta del API:** Verificar las respuestas del API para cada escenario (éxito, error de validación, credenciales inválidas, error de servidor).
 ---
 
-### HU-003: Recuperación de Contraseña del Profesional
+### HU-003: Recuperación de Contraseña del Profesional (Simplificado para MVP)
 
 *   **ID:** HU-003
-*   **Título:** Recuperación de Contraseña del Profesional
+*   **Título:** Recuperación de Contraseña del Profesional (Simplificado para MVP)
 *   **Como un:** Profesional registrado que ha olvidado su contraseña
-*   **Quiero:** Poder solicitar un enlace de recuperación de contraseña a mi email registrado
-*   **Para que:** Pueda restablecer mi contraseña y volver a acceder a mi cuenta.
+*   **Quiero:** Encontrar información sobre cómo proceder para recuperar mi contraseña
+*   **Para que:** Pueda eventualmente volver a acceder a mi cuenta.
 
 *   **Requisitos Funcionales Asociados (PRD):**
-    *   RF1.4: El sistema permitirá a los profesionales recuperar su contraseña mediante email.
+    *   RF1.4: El sistema permitirá a los profesionales recuperar su contraseña mediante email. (Revisado para MVP: Proceso manual vía soporte).
 
-*   **Criterios de Aceptación:**
+*   **Criterios de Aceptación (Simplificado para MVP):**
 
-    *   **Interfaz de Usuario (Frontend) - Fase 1: Solicitud de Recuperación:**
-        1.  **Página/Formulario de Solicitud:** Debe existir una página/sección accesible (ej. `/recuperar-password` o un enlace "Olvidé mi contraseña" en la página de login). Se utilizará `React Hook Form` para la gestión del estado del formulario y las validaciones.
-        2.  **Campo Requerido:** El formulario debe incluir un campo para "Email" (email, obligatorio, formato válido).
-        3.  **Validaciones en Cliente:**
-            *   El campo email debe ser validado como obligatorio y de formato correcto.
-            *   Mostrar mensaje de error claro si no se cumple.
-        4.  **Envío del Formulario:**
-            *   Al hacer clic en "Enviar enlace de recuperación", si la validación es correcta, el email se envía al backend.
-            *   Mostrar indicador de carga.
-        5.  **Respuesta del Sistema:**
-            *   **Éxito (Incluso si el email no existe):** Mostrar un mensaje genérico indicando que si el email está registrado, se enviará un enlace de recuperación (ej. "Si tu email está registrado con nosotros, recibirás un correo con instrucciones para restablecer tu contraseña en breve."). Esto es para evitar la enumeración de usuarios.
-            *   **Error Genérico:** Si ocurre un error de envío, mostrar un mensaje (ej. "No se pudo procesar tu solicitud. Por favor, inténtalo de nuevo más tarde.").
+    *   **Interfaz de Usuario (Frontend):**
+        1.  **Enlace/Página de "Olvidé mi contraseña":**
+            *   Debe existir un enlace "Olvidé mi contraseña" en la página de inicio de sesión (o una página `/recuperar-password` accesible).
+        2.  **Información de Contacto para Soporte:**
+            *   Al acceder a la opción de recuperación, se debe mostrar un mensaje claro al usuario (ej. "Para recuperar tu contraseña, por favor contacta a soporte en soporte@nutritrack.pro.").
+            *   Alternativamente, puede ser una página estática con esta información.
+        3.  **Navegación:** El usuario debe poder volver fácilmente a la página de inicio de sesión.
 
-    *   **Lógica de Negocio (Backend) - Fase 1: Solicitud de Recuperación:**
-        1.  **Endpoint de Solicitud:** Debe existir un endpoint API (ej. `POST /api/auth/forgot-password`) que acepte `email`.
-        2.  **Validación de Datos del Servidor:** Validar que el email está presente y tiene formato correcto.
-            *   Buscar al profesional en la tabla `PROFESSIONAL` por el email proporcionado.
-            *   **Importante:** Si el email no existe, el sistema debe comportarse externamente de la misma manera que si existiera (para no revelar si un email está registrado o no). No devolver un error inmediato al frontend que indique "email no encontrado".
-        4.  **Generación de Token de Reseteo:**
-            *   Si el profesional existe (o incluso si no, para mantener el tiempo de respuesta similar, aunque no se envíe email):
-                *   Generar un token único y seguro para el reseteo de contraseña (ej. un UUID o un token criptográficamente seguro).
-                *   Este token debe tener una vida útil corta (ej. 1 hora).
-                *   Almacenar el token hasheado junto con el `professional_id` y su fecha de expiración en una tabla dedicada (ej. `PASSWORD_RESET_TOKENS`) o en la tabla `PROFESSIONAL` (ej. `reset_token`, `reset_token_expires_at`).
-        5.  **Envío de Email:**
-            *   Si el profesional existe, enviar un email a la dirección proporcionada.
-            *   El email debe contener un enlace único que incluya el token de reseteo (ej. `https://tusitio.com/resetear-password?token=TOKEN_GENERADO`).
-            *   El contenido del email debe ser claro, indicando que se ha solicitado un reseteo de contraseña y el tiempo de validez del enlace.
-        6.  **Respuesta del API:**
-            *   **Éxito (200 OK):** Devolver siempre un mensaje genérico de éxito (ej. "Solicitud procesada."), independientemente de si el email existía o no.
+    *   **Lógica de Negocio (Backend):**
+        1.  **Sin Implementación de Lógica de Recuperación Automatizada:**
+            *   No se desarrollará un endpoint para solicitar tokens de reseteo.
+            *   No se implementará la generación ni el envío de emails de recuperación.
+            *   No se desarrollará un endpoint para restablecer la contraseña con un token.
+        2.  **Proceso Manual:**
+            *   La recuperación de contraseña será un proceso manual. El administrador del sistema (inicialmente, el equipo de desarrollo) deberá cambiar la contraseña directamente en la base de datos a petición del usuario.
+            *   Se debe documentar internamente el procedimiento para este cambio manual.
 
-    *   **Interfaz de Usuario (Frontend) - Fase 2: Restablecimiento de Contraseña:**
-        1.  **Página/Formulario de Restablecimiento:** Debe existir una página accesible a través del enlace del email (ej. `/resetear-password?token=TOKEN_RECIBIDO`). Se utilizará `React Hook Form` para la gestión del estado del formulario y las validaciones.
-        2.  **Campos Requeridos:**
-            *   Nueva Contraseña (password, obligatorio).
-            *   Confirmar Nueva Contraseña (password, obligatorio, debe coincidir).
-            *   El token se obtendrá del parámetro URL.
-        3.  **Validaciones en Cliente:**
-            *   Validar que la nueva contraseña y su confirmación cumplen los criterios de seguridad y coinciden.
-            *   Mostrar mensajes de error claros.
-        4.  **Envío del Formulario:**
-            *   Al hacer clic en "Restablecer Contraseña", los datos (nueva contraseña y token) se envían al backend.
-            *   Mostrar indicador de carga.
-        5.  **Respuesta del Sistema:**
-            *   **Éxito:** Mostrar un mensaje de éxito (ej. "Tu contraseña ha sido restablecida correctamente. Ahora puedes <a href='/login'>iniciar sesión</a>.") y redirigir a la página de login.
-            *   **Error (Token Inválido/Expirado):** Mostrar un mensaje claro (ej. "El enlace de recuperación es inválido o ha expirado. Por favor, <a href='/recuperar-password'>solicita uno nuevo</a>.").
-            *   **Error Genérico:** Mostrar un mensaje genérico.
-
-    *   **Lógica de Negocio (Backend) - Fase 2: Restablecimiento de Contraseña:**
-        1.  **Endpoint de Restablecimiento:** Debe existir un endpoint API (ej. `POST /api/auth/reset-password`) que acepte `token`, `newPassword`.
-        2.  **Validación de Datos del Servidor:**
-            *   Validar que `token` y `newPassword` están presentes.
-            *   Validar que `newPassword` cumple los criterios de seguridad.
-        3.  **Verificación del Token:**
-            *   Buscar el token (hasheado, si se almacenó así) en la tabla `PASSWORD_RESET_TOKENS` o `PROFESSIONAL`.
-            *   Verificar que el token existe, no ha sido utilizado previamente y no ha expirado.
-            *   Si el token es inválido o ha expirado, devolver un error.
-        4.  **Actualización de Contraseña:**
-            *   Si el token es válido, hashear la `newPassword`.
-            *   Actualizar la contraseña del profesional asociado al token en la tabla `PROFESSIONAL`.
-            *   Invalidar el token de reseteo (ej. marcándolo como usado o eliminándolo) para que no pueda ser reutilizado.
-        5.  **Respuesta del API:**
-            *   **Éxito (200 OK):** Devolver un mensaje de éxito.
-            *   **Error de Validación (400 Bad Request):** Si los datos de entrada son inválidos (ej. contraseña no cumple criterios).
-            *   **Token Inválido/Expirado (400 Bad Request o 401 Unauthorized):** Si el token no es válido.
-            *   **Error del Servidor (500 Internal Server Error):** Si ocurre un error inesperado.
-
-    *   **Pruebas (QA):**
-        1.  **Solicitud de Recuperación Exitosa:**
-            *   Verificar que se puede solicitar un reseteo para un email registrado.
-            *   Confirmar la recepción del email con el enlace de recuperación.
-            *   Verificar que el enlace contiene un token.
-        2.  **Solicitud con Email No Registrado:** Verificar que el sistema muestra el mismo mensaje de "instrucciones enviadas" para no revelar la existencia del email. Confirmar que NO se envía ningún email.
-        3.  **Restablecimiento Exitoso:**
-            *   Usar el enlace del email para acceder al formulario de restablecimiento.
-            *   Ingresar una nueva contraseña válida y confirmarla.
-            *   Verificar que la contraseña se actualiza y se puede iniciar sesión con la nueva contraseña.
-            *   Verificar que el enlace de reseteo ya no es válido después de usarse.
-        4.  **Token Inválido/Expirado:**
-            *   Intentar restablecer la contraseña con un token incorrecto o manipulado.
-            *   Intentar restablecer la contraseña después de que el token haya expirado (requiere poder configurar tiempos de expiración cortos para prueba).
-            *   Verificar los mensajes de error apropiados.
-        5.  **Validaciones de Nueva Contraseña:** Probar que la nueva contraseña cumpla los criterios de seguridad en el formulario de restablecimiento.
-        6.  **Seguridad:**
-            *   Asegurar que los tokens de reseteo son únicos, seguros y de corta duración.
-            *   Asegurar que se invalidan después de su uso.
-        7.  **Flujo Completo:** Probar todo el proceso en diferentes navegadores/dispositivos.
-        8.  **Respuestas del API:** Verificar las respuestas de los dos endpoints para todos los escenarios.
+    *   **Pruebas (QA) (Simplificado para MVP):**
+        1.  **Verificación del Enlace/Página:**
+            *   Comprobar que el enlace "Olvidé mi contraseña" es visible en la página de login y dirige a la información correcta.
+        2.  **Verificación del Mensaje de Soporte:**
+            *   Asegurar que el mensaje con la dirección de email de soporte se muestra claramente.
+        3.  **Documentación del Proceso Manual:**
+            *   Confirmar que el procedimiento para que el administrador cambie una contraseña manualmente está documentado.
 ---
 
 ### HU-004: Cerrar Sesión del Profesional

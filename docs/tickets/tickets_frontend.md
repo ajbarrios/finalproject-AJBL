@@ -164,74 +164,40 @@ Como un profesional registrado, quiero poder iniciar sesión en la aplicación u
 ---
 
 **ID del Ticket:** TF-003
-**Historia de Usuario Relacionada:** HU-003 - Recuperación de Contraseña del Profesional
+**Historia de Usuario Relacionada:** HU-003 - Recuperación de Contraseña del Profesional (Simplificado para MVP)
 **Tipo:** Feature
-**Prioridad:** Media
+**Prioridad:** Baja (Simplificado para MVP)
 
-**Descripción:**
-Como un profesional registrado que ha olvidado su contraseña, quiero poder solicitar un enlace de recuperación a mi email y luego usar ese enlace para restablecer mi contraseña, para poder volver a acceder a mi cuenta.
+**Descripción (Simplificado para MVP):**
+Como un profesional registrado que ha olvidado su contraseña, quiero encontrar información de contacto para solicitar ayuda y recuperar el acceso a mi cuenta.
 
-**Tareas Específicas (Frontend):**
+**Tareas Específicas (Frontend - Simplificado para MVP):**
+1.  **Crear o Modificar Página/Sección de "Olvidé mi contraseña":**
+    *   Asegurar que haya un enlace "Olvidé mi contraseña" en la página de inicio de sesión (`/login`).
+    *   Este enlace debe dirigir a una página estática (ej. `/recuperar-password-info`) o mostrar un mensaje/modal directamente en la página de login.
+2.  **Mostrar Información de Contacto para Soporte:**
+    *   La página/sección/modal debe mostrar un mensaje claro al usuario, por ejemplo: "Para recuperar tu contraseña, por favor contacta a soporte en soporte@nutritrack.pro."
+    *   El diseño debe ser simple, claro y responsivo.
+3.  **Asegurar Navegación:**
+    *   El usuario debe poder volver fácilmente a la página de inicio de sesión desde esta información.
+4.  **Pruebas (Frontend):**
+    *   Verificar que el enlace "Olvidé mi contraseña" existe y funciona.
+    *   Verificar que el mensaje de contacto de soporte se muestra correctamente y es visible.
+    *   Probar la navegación de vuelta a la página de login.
 
-**Fase 1: Solicitud de Recuperación**
-1.  **Crear Página/Componente de Solicitud de Recuperación:**
-    *   Diseñar y desarrollar la página (`/recuperar-password` o similar), accesible desde la página de login.
-    *   Asegurar responsividad.
-2.  **Desarrollar Formulario de Solicitud:**
-    *   Implementar campo para "Email".
-3.  **Implementar Validaciones en Cliente (Email):**
-    *   Validar que el email es obligatorio y tiene formato válido.
-    *   Mostrar mensaje de error claro.
-4.  **Manejar Envío del Formulario de Solicitud:**
-    *   Al enviar, realizar petición `POST` al endpoint `/api/auth/forgot-password` con el email.
-    *   Mostrar indicador de carga.
-5.  **Gestionar Respuestas del Backend (Solicitud):**
-    *   **Éxito (Backend siempre responde 200 OK para no enumerar usuarios):**
-        *   Mostrar mensaje genérico (ej. "Si tu email está registrado, recibirás un correo con instrucciones.").
-    *   **Error Genérico (ej. fallo de red):**
-        *   Mostrar mensaje (ej. "No se pudo procesar tu solicitud. Inténtalo más tarde.").
-
-**Fase 2: Restablecimiento de Contraseña**
-6.  **Crear Página/Componente de Restablecimiento:**
-    *   Diseñar y desarrollar la página (`/resetear-password` o similar) que acepte un token como parámetro URL (ej. `/resetear-password?token=TOKEN_VALOR`).
-    *   Asegurar responsividad.
-7.  **Extraer Token de la URL:**
-    *   Al cargar la página, obtener el valor del token del parámetro de la URL.
-8.  **Desarrollar Formulario de Restablecimiento:**
-    *   Implementar campos para "Nueva Contraseña" y "Confirmar Nueva Contraseña".
-9.  **Implementar Validaciones en Cliente (Nueva Contraseña):**
-    *   Validar criterios de seguridad para la nueva contraseña.
-    *   Validar que ambas contraseñas coincidan.
-    *   Mostrar mensajes de error claros.
-10. **Manejar Envío del Formulario de Restablecimiento:**
-    *   Al enviar, realizar petición `POST` al endpoint `/api/auth/reset-password` con el `token` y `newPassword`.
-    *   Mostrar indicador de carga.
-11. **Gestionar Respuestas del Backend (Restablecimiento):**
-    *   **Éxito (200 OK):**
-        *   Mostrar mensaje de éxito (ej. "Tu contraseña ha sido restablecida. Ahora puedes <a href='/login'>iniciar sesión</a>.").
-        *   Redirigir a la página de login.
-    *   **Error (Token Inválido/Expirado - 400 Bad Request):**
-        *   Mostrar mensaje claro (ej. "El enlace de recuperación es inválido o ha expirado. Por favor, <a href='/recuperar-password'>solicita uno nuevo</a>.").
-    *   **Error de Validación (Contraseña no cumple criterios - 400 Bad Request):**
-        *   Mostrar mensajes de error devueltos por el backend.
-    *   **Error Genérico del Servidor (500 Internal Server Error):**
-        *   Mostrar mensaje genérico.
-12. **Pruebas Unitarias y de Integración (Frontend):**
-    *   Probar ambos formularios, validaciones, manejo de token y respuestas del backend para ambas fases.
-
-**Criterios de Aceptación (Frontend):**
-*   Ambos formularios (solicitud y restablecimiento) son funcionales.
-*   Las validaciones en cliente para email y nueva contraseña funcionan.
-*   Se extrae y envía correctamente el token de la URL.
-*   La comunicación con los endpoints del backend (`/forgot-password`, `/reset-password`) es correcta.
-*   Se manejan adecuadamente todas las respuestas del backend (éxito y errores) para ambas fases.
-*   La redirección tras el restablecimiento exitoso funciona.
+**Criterios de Aceptación (Frontend - Simplificado para MVP):**
+*   Existe un enlace "Olvidé mi contraseña" en la página de login.
+*   Al hacer clic en el enlace, se muestra un mensaje claro con la dirección de email de soporte para la recuperación manual de contraseña.
+*   La interfaz es responsiva.
+*   El usuario puede navegar de vuelta a la página de login.
+*   No se implementa ningún formulario para introducir email ni para restablecer contraseña con token.
+*   No se realizan llamadas a API del backend para la recuperación de contraseña.
 
 **Consideraciones Técnicas (Frontend):**
-*   Manejo de parámetros URL para el token.
-*   Comunicación clara de los criterios de seguridad de la contraseña.
+*   Simplicidad. Puede ser una página estática o un componente modal simple.
+*   Asegurar que el texto de contacto de soporte sea fácilmente actualizable si es necesario.
 
-**Etiquetas:** `frontend`, `autenticación`, `recuperación de contraseña`, `HU-003`
+**Etiquetas:** `frontend`, `autenticación`, `recuperación de contraseña`, `HU-003`, `mvp-simplificado`
 
 ---
 

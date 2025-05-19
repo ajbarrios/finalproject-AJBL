@@ -145,69 +145,31 @@ Permitir que un profesional registrado inicie sesión validando sus credenciales
 ---
 
 **ID del Ticket:** TB-003
-**Historia de Usuario Relacionada:** HU-003 - Recuperación de Contraseña del Profesional
-**Tipo:** Feature
-**Prioridad:** Media
+**Historia de Usuario Relacionada:** HU-003 - Recuperación de Contraseña del Profesional (Simplificado para MVP)
+**Tipo:** Task (Documentación/Proceso)
+**Prioridad:** Baja (Simplificado para MVP)
 
-**Descripción:**
-Implementar el flujo de recuperación de contraseña. Fase 1: generar y enviar un token de reseteo por email. Fase 2: validar el token y actualizar la contraseña del profesional.
+**Descripción (Simplificado para MVP):**
+No se implementará lógica de backend automatizada para la recuperación de contraseña. El proceso será manual, realizado por un administrador directamente en la base de datos a solicitud del usuario. Esta tarea consiste en documentar dicho proceso manual.
 
-**Tareas Específicas (Backend):**
+**Tareas Específicas (Backend - Simplificado para MVP):**
+1.  **No Implementar Endpoints de Recuperación:**
+    *   No se creará el endpoint `POST /api/auth/forgot-password`.
+    *   No se creará el endpoint `POST /api/auth/reset-password`.
+2.  **No Implementar Lógica de Tokens ni Emails:**
+    *   No se generarán, almacenarán ni validarán tokens de reseteo.
+    *   No se configurará ni se utilizará un servicio de envío de emails para este propósito.
+3.  **Documentar el Proceso Manual de Recuperación de Contraseña:**
+    *   Crear un documento interno (ej. en la wiki del proyecto o un archivo Markdown en `/docs/internal`) que describa los pasos que un administrador debe seguir para cambiar la contraseña de un profesional directamente en la base de datos (PostgreSQL).
+    *   Incluir consideraciones de seguridad, como la necesidad de verificar la identidad del solicitante y cómo generar un hash seguro para la nueva contraseña si se proporciona en texto plano (o cómo guiar al usuario para que la cambie después del primer login con una temporal).
+    *   Especificar las consultas SQL o comandos de Prisma necesarios para actualizar la contraseña hasheada del profesional.
 
-**Fase 1: Solicitud de Recuperación (`POST /api/auth/forgot-password`)**
-1.  **Validar Entrada:**
-    *   Aceptar `email` en el cuerpo de la solicitud.
-    *   Validar que el `email` esté presente y tenga formato correcto.
-2.  **Buscar Profesional y Generar Token:**
-    *   Buscar al profesional por `email`. Si no existe, no se debe revelar esta información directamente en la respuesta para evitar enumeración de usuarios.
-    *   Si el profesional existe (o incluso si no, para mantener tiempos de respuesta similares y ofuscar): Generar un token de reseteo único y seguro (ej. UUID, token criptográfico).
-    *   Almacenar el token (preferiblemente hasheado) asociado al `professional_id` (si existe) y con una marca de tiempo de expiración corta (ej. 1 hora). Esto puede ser en una nueva tabla `PASSWORD_RESET_TOKENS` o en la tabla `PROFESSIONAL`.
-3.  **Enviar Email de Recuperación:**
-    *   Si el profesional existe: Enviar un email a la dirección proporcionada.
-    *   El email debe contener un enlace único a la página de restablecimiento del frontend, incluyendo el token (ej. `https://frontend.app/resetear-password?token=VALOR_TOKEN`).
-    *   El email debe ser claro sobre el propósito y la validez del enlace.
-4.  **Respuesta del API (Solicitud):**
-    *   **Siempre devolver 200 OK** con un mensaje genérico (ej. "Solicitud procesada. Si el email está registrado, se enviará un enlace.") para no confirmar la existencia o no de una cuenta con ese email.
+**Criterios de Aceptación (Backend - Simplificado para MVP):**
+*   No existe ninguna funcionalidad de API desplegada para la recuperación automática de contraseñas.
+*   Existe un documento interno que detalla claramente el procedimiento manual para que un administrador restablezca la contraseña de un profesional.
+*   El procedimiento documentado incluye los comandos o pasos necesarios para interactuar con la base de datos de forma segura.
 
-**Fase 2: Restablecimiento de Contraseña (`POST /api/auth/reset-password`)**
-5.  **Validar Entrada:**
-    *   Aceptar `token` y `newPassword` en el cuerpo de la solicitud.
-    *   Validar que ambos estén presentes.
-    *   Validar que `newPassword` cumpla los criterios de seguridad definidos.
-6.  **Verificar Token:**
-    *   Buscar el `token` (hasheado, si se almacenó así) en la tabla/lugar de almacenamiento.
-    *   Verificar que el token existe, no ha sido utilizado previamente y no ha expirado.
-    *   Si el token es inválido o expirado, devolver un error (400 Bad Request).
-7.  **Actualizar Contraseña:**
-    *   Si el token es válido: Hashear la `newPassword` (usando bcrypt).
-    *   Actualizar la contraseña del profesional asociado al token en la tabla `PROFESSIONAL`.
-    *   Invalidar el token de reseteo (marcarlo como usado o eliminarlo) para prevenir su reutilización.
-8.  **Respuesta del API (Restablecimiento):**
-    *   **Éxito (200 OK):** Devolver un mensaje de éxito.
-    *   **Error de Validación (400 Bad Request):** Si el token es inválido/expirado, o si `newPassword` no cumple los criterios.
-    *   **Error Interno del Servidor (500 Internal Server Error):** Para errores inesperados.
-
-**Pruebas Unitarias y de Integración (Backend):**
-*   Probar la generación y almacenamiento de tokens de reseteo.
-*   Probar el envío de email (usando un servicio mockeado en pruebas unitarias).
-*   Probar la validación de tokens (existente, no existente, expirado, usado).
-*   Probar la actualización de contraseña y la invalidación del token.
-*   Verificar todas las respuestas del API para ambas fases.
-
-**Criterios de Aceptación (Backend):**
-*   Los endpoints `/api/auth/forgot-password` y `/api/auth/reset-password` son funcionales y seguros.
-*   Los tokens de reseteo se generan, almacenan y validan correctamente (incluyendo expiración).
-*   El envío de email (si el usuario existe) funciona.
-*   La contraseña se actualiza de forma segura y el token se invalida tras el uso.
-*   Las respuestas del API son correctas y no revelan información sensible (ej. existencia de emails).
-
-**Consideraciones Técnicas (Backend):**
-*   Servicio de envío de emails (ej. SendGrid, Nodemailer con SMTP).
-*   Mecanismo de almacenamiento para tokens de reseteo (tabla dedicada es recomendada).
-*   Seguridad en la generación y manejo de tokens.
-*   Configuración de la plantilla de email.
-
-**Etiquetas:** `backend`, `autenticación`, `recuperación de contraseña`, `seguridad`, `jwt`, `HU-003`
+**Etiquetas:** `backend`, `autenticación`, `recuperación de contraseña`, `proceso manual`, `documentación`, `HU-003`, `mvp-simplificado`
 
 ---
 
