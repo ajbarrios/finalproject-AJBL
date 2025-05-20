@@ -1,0 +1,11 @@
+{
+  "name": "nutritrack-pro",
+  "version": "1.0.0",
+  "description": "NutriTrack Pro es una aplicación web para profesionales de la nutrición y entrenadores deportivos",
+  "directories": {
+    "doc": "docs"
+  },
+  "keywords": [],
+  "author": "Antonio José Barrios León",
+  "license": "ISC"
+}
