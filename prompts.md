@@ -136,29 +136,38 @@ Vamos a crear los tickets de trabajo del proyecto dentro de la carpeta docs en f
 **Prompt 2:**
 Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo funcional en unas 30 horas. Ten en cuenta que voy a usar un editor de codigo con IA como Cursor para acelerar el desarrollo. Sugiereme que funcionalidades podemos simplificar. Ten en cuenta las historias de usuario y los tickets.
 
-**Prompt 3 (Relacionado con TB-001):**
+**Prompt 3 (Relacionado con TB-001 - Backend - Plan de Acción Inicial):**
 "Dado el ticket TB-001 (Configuración Inicial y Scaffolding del Proyecto Backend), y específicamente la Historia de Usuario HU-001 (Registro de Nuevo Profesional), ¿puedes proponerme un plan de acción detallado para implementar el backend de esta HU, incluyendo la instalación de dependencias, definición de rutas, controladores, validación, lógica de negocio con Prisma, y estructura de código?"
 
-**Prompt 4 (Relacionado con TB-001 y tests de registro):**
+**Prompt 4 (Relacionado con TB-001 - Backend - Tests de registro - Hoisting Prisma Mock):**
 "Tengo el siguiente error al ejecutar los tests de Vitest: 'ReferenceError: Cannot access 'mockPrismaSingleton' before initialization'. El error apunta a la forma en que se está mockeando PrismaClient. ¿Puedes ayudarme a corregir la configuración del mock en `backend/tests/unit/api/controllers/auth.controller.test.ts` para resolver este problema de hoisting con `vi.mock`?"
 
-**Prompt 5 (Relacionado con TB-001 y tests de registro):**
+**Prompt 5 (Relacionado con TB-001 - Backend - Tests de registro - Error Enum Prisma Mock):**
 "Los tests de `auth.controller.test.ts` están fallando. El error es `TypeError: Invalid enum value: __esModule` al intentar mockear Prisma. Sigue la guía oficial de Prisma para mockear PrismaClient usando el patrón Singleton ([Unit testing | Prisma Docs](https://www.prisma.io/docs/orm/prisma-client/testing/unit-testing)) y reestructura los tests y la configuración necesaria (creación de `prisma.client.ts`, `prisma.mock.ts`, actualización de `vitest.config.ts` y el controlador/tests) para solucionar este problema."
 
-**Prompt 6 (Relacionado con TB-002 - Plan de Acción):**
+**Prompt 6 (Relacionado con TB-002 - Backend - Login - Plan de Acción):**
 "Siguiendo con el Ticket TB-002 (Login de Profesional), y la HU-002 (Inicio de Sesión del Profesional), ¿puedes detallarme un plan de acción para implementar el backend de esta funcionalidad? Esto incluiría la instalación de dependencias necesarias (como jsonwebtoken), la definición del esquema de validación con Zod, la lógica del controlador para el login (buscando al profesional, comparando contraseñas, generando el JWT), el manejo de variables de entorno para el JWT, la creación de la ruta y los tests unitarios correspondientes."
 
-**Prompt 7 (Relacionado con TB-002 - Corrección de errores TypeScript en `login`):**
+**Prompt 7 (Relacionado con TB-002 - Backend - Login - Corrección TypeScript):**
 "Arregla los errores de typescript por favor. No uses any ni forzado de casting. (Contexto: errores en `auth.controller.ts` relacionados con `prisma.professional` y la firma de `jwt.sign`)"
 
-**Prompt 8 (Relacionado con TB-002 - Creación de Tests Unitarios para `login`):**
+**Prompt 8 (Relacionado con TB-002 - Backend - Login - Creación Tests Unitarios):**
 "Continua. (Contexto: después de implementar la función `login`, el siguiente paso era crear los tests unitarios)"
 
-**Prompt 9 (Relacionado con TB-002 - Corrección de Tests Unitarios para `login` - Mock JWT):**
+**Prompt 9 (Relacionado con TB-002 - Backend - Login - Corrección Tests Unitarios - Mock JWT):**
 "@test Arregla los test unitarios que fallan (Contexto: error `No "default" export is defined on the "jsonwebtoken" mock`)"
 
-**Prompt 10 (Relacionado con TB-002 - Corrección de Tests Unitarios para `login` - Aserciones):**
+**Prompt 10 (Relacionado con TB-002 - Backend - Login - Corrección Tests Unitarios - Aserciones):**
 "@test Arregla los test unitarios que estan fallando (Contexto: errores en las aserciones de `expiresIn` y mensajes de error de Zod para la función `login`)"
+
+**Prompt 11 (Relacionado con TF-001 - Frontend - Tests Registro - Error Linter Tipos Axios):**
+"Tengo errores de TypeScript en `RegisterForm.test.tsx` al mockear `AxiosError`. Específicamente: `"AxiosRequestConfig" es un tipo y debe importarse mediante una importación de solo tipo...` y `El tipo 'AxiosRequestConfig<any>' no se puede asignar al tipo 'InternalAxiosRequestConfig<any>'...` relacionado con `headers`. ¿Cómo puedo resolver estos errores de tipado de forma concisa?"
+
+**Prompt 12 (Relacionado con TF-001 - Frontend - Tests Registro - Mock `isAxiosError` y Hoisting):**
+"Los tests para `RegisterForm.tsx` fallan en el caso de error 409 (email duplicado). `toast.error` recibe un mensaje genérico en lugar del específico. Parece que `axios.isAxiosError()` no funciona como se espera. Además, al intentar usar `await vi.importActual('axios')` para obtener la implementación real de `isAxiosError`, obtengo `ReferenceError: Cannot access 'actualAxios' before initialization`. ¿Cómo estructuro el mock de `axios` con `vi.mock` y `vi.importActual` para que `isAxiosError` funcione y evite el problema de hoisting?"
+
+**Prompt 13 (Relacionado con TF-001 - Frontend - Tests Registro - Implementación Casos de Error Adicionales):**
+"Para `RegisterForm.test.tsx`, ya tengo tests para el caso de éxito y el error 409. Necesito implementar los tests para los siguientes escenarios de error: error 400 (validación del backend con mensajes de campo), error genérico del servidor (ej. 500), y error de red (sin `error.response`). ¿Puedes proporcionarme el código para estos tests?"
 
 ---
 
