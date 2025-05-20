@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 // Importar rutas de autenticación
 import authRoutes from './api/routes/auth.routes';
@@ -9,6 +10,12 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000; // Usar puerto de .env o 3000 por defecto
+
+// Configurar CORS
+// Esto permitirá todas las solicitudes de origen cruzado. 
+// Para producción, deberías configurarlo de forma más restrictiva, ej:
+// app.use(cors({ origin: 'http://tu-dominio-frontend.com' }));
+app.use(cors());
 
 // Middleware para parsear JSON (opcional por ahora, pero útil para APIs)
 app.use(express.json());
