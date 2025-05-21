@@ -1,7 +1,14 @@
 // import './App.css'; // Eliminada esta importación ya que App.css no existe en src/
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import RegisterPage from './pages/RegisterPage.tsx'
 import { Toaster } from 'react-hot-toast'
+
+// Importaciones de la autenticación y páginas nuevas
+import { AuthProvider } from './contexts/AuthContext'
+import LoginPage from './pages/auth/LoginPage'
+
+// Páginas existentes/placeholders
+import RegisterPage from './pages/auth/RegisterPage.tsx'
+// import HomePage from './pages/HomePage' // Si tienes una HomePage diferente, ajústalo
 
 // Componente para la página de inicio temporal
 const HomePage = () => (
@@ -13,17 +20,21 @@ const HomePage = () => (
       <p className="text-lg text-gray-700 mb-8">
         Tu asistente profesional para la nutrición y el entrenamiento.
       </p>
-      <Link to="/register" className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">
+      <Link to="/login" className="mr-2 px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-300">
+        Ir a Login
+      </Link>
+      <Link to="/register" className="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-300">
         Ir a Registro de Profesional
       </Link>
     </div>
   </div>
 )
 
-// Componente temporal para la página de Login (solo para que el enlace funcione)
-const LoginPagePlaceholder = () => (
+// Placeholder para Dashboard (hasta que se implemente)
+const DashboardPagePlaceholder = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-    <h1 className="text-3xl font-bold">Página de Login (Pronto)</h1>
+    <h1 className="text-3xl font-bold">Dashboard (Pronto)</h1>
+    {/* Aquí podrías añadir un botón de Logout usando useAuth().logout si está protegido */}
     <Link to="/" className="mt-4 text-indigo-600 hover:text-indigo-800">Volver al Inicio</Link>
   </div>
 )
@@ -31,13 +42,23 @@ const LoginPagePlaceholder = () => (
 function App() {
   return (
     <Router>
-      <Toaster position="top-center" reverseOrder={false} />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPagePlaceholder />} /> {/* Ruta placeholder para login */}
-        {/* Aquí se añadirán más rutas */}
-      </Routes>
+      <AuthProvider>
+        <Toaster position="top-center" reverseOrder={false} />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          
+          {/* Ruta de Dashboard (eventualmente protegida) */}
+          <Route path="/dashboard" element={<DashboardPagePlaceholder />} />
+          
+          {/* Podrías añadir una ruta para /recuperar-password si la creas */}
+          {/* <Route path="/recuperar-password" element={<ForgotPasswordPage />} /> */}
+
+          {/* Considera una ruta NotFoundPage para cualquier ruta no coincidente */}
+          {/* <Route path="*" element={<NotFoundPage />} /> */}
+        </Routes>
+      </AuthProvider>
     </Router>
   )
 }
