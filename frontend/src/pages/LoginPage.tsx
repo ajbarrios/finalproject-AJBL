@@ -1,6 +1,6 @@
 import React, { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth'; // Actualiza la ruta para importar desde el nuevo hook
+import { useAuth } from '../hooks/useAuth'; // Actualiza la ruta para importar desde el nuevo hook
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');

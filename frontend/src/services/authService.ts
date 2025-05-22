@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosHeaders } from 'axios';
 
 // Define el tipo para las credenciales de login
 interface LoginCredentials {
@@ -52,7 +52,11 @@ export const loginUser = async (credentials: LoginCredentials): Promise<AuthApiR
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    // Asegurarse de que config.headers existe
+    if (!config.headers) {
+      config.headers = new AxiosHeaders();
+    }
+    config.headers.set('Authorization', `Bearer ${token}`);
   }
   return config;
 }, (error) => {

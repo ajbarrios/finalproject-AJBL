@@ -6,8 +6,8 @@ import { useAuth } from './hooks/useAuth'
 
 // Importaciones de la autenticación y páginas nuevas
 import { AuthProvider } from './contexts/AuthContext'
-import LoginPage from './pages/auth/LoginPage'
-import RegisterPage from './pages/auth/RegisterPage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 
 // Componentes de Ruta
 interface RouteProps {
@@ -26,7 +26,8 @@ const GuestRoute: React.FC<RouteProps> = ({ children }) => {
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
-import Navbar from './components/layout/Navbar';
+import Navbar from './components/common/Navbar';
+import PatientDashboardPage from './pages/PatientDashboardPage';
 
 // Componente para la página de inicio temporal (si no hay otra)
 const HomePage = () => (
@@ -35,18 +36,6 @@ const HomePage = () => (
     <p className="mb-6">Gestiona tus pacientes y sus planes de forma eficiente.</p>
   </div>
 );
-
-// Placeholder simple para el Dashboard
-const DashboardPagePlaceholder = () => {
-  const { user } = useAuth();
-  return (
-    <div className="container mx-auto mt-10 p-4">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      {user && <p className="mt-2">Hola, {user.fullName}!</p>}
-      <p className="mt-4">Aquí verás el resumen de tu actividad.</p>
-    </div>
-  );
-};
 
 function App() {
   const auth = useAuth(); // Para la redirección principal
@@ -72,7 +61,7 @@ function App() {
             {/* <Route path="/recuperar-password" element={<GuestRoute><ForgotPasswordInfoPage /></GuestRoute>} /> */}
 
             {/* Rutas protegidas */}
-            <Route path="/dashboard" element={<ProtectedRoute><DashboardPagePlaceholder /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><PatientDashboardPage /></ProtectedRoute>} />
 
             {/* Ruta principal: redirige a dashboard si está autenticado, sino a login */}
             <Route 

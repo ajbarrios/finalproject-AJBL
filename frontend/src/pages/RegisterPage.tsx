@@ -1,5 +1,5 @@
 import React from 'react';
-import RegisterForm from '../../components/auth/RegisterForm.tsx';
+import RegisterForm from '../components/auth/RegisterForm';
 import { Link } from 'react-router-dom';
 
 const RegisterPage: React.FC = () => {
