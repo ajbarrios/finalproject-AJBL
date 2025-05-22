@@ -1,63 +1,90 @@
 // import './App.css'; // Eliminada esta importación ya que App.css no existe en src/
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import React, { type JSX } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useAuth } from './hooks/useAuth'
 
 // Importaciones de la autenticación y páginas nuevas
 import { AuthProvider } from './contexts/AuthContext'
 import LoginPage from './pages/auth/LoginPage'
+import RegisterPage from './pages/auth/RegisterPage'
 
-// Páginas existentes/placeholders
-import RegisterPage from './pages/auth/RegisterPage.tsx'
-// import HomePage from './pages/HomePage' // Si tienes una HomePage diferente, ajústalo
+// Componentes de Ruta
+interface RouteProps {
+  children: JSX.Element;
+}
 
-// Componente para la página de inicio temporal
+const ProtectedRoute: React.FC<RouteProps> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <div className="text-center mt-20">Cargando autenticación...</div>;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
+const GuestRoute: React.FC<RouteProps> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <div className="text-center mt-20">Cargando autenticación...</div>;
+  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
+};
+
+import Navbar from './components/layout/Navbar';
+
+// Componente para la página de inicio temporal (si no hay otra)
 const HomePage = () => (
-  <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center p-4">
-    <div className="bg-white shadow-xl rounded-lg p-8 md:p-12 text-center">
-      <h1 className="text-4xl md:text-5xl font-bold text-indigo-600 mb-6">
-        ¡Bienvenido a NutriTrack Pro!
-      </h1>
-      <p className="text-lg text-gray-700 mb-8">
-        Tu asistente profesional para la nutrición y el entrenamiento.
-      </p>
-      <Link to="/login" className="mr-2 px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-300">
-        Ir a Login
-      </Link>
-      <Link to="/register" className="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-300">
-        Ir a Registro de Profesional
-      </Link>
-    </div>
+  <div className="container mx-auto mt-10 p-4 text-center">
+    <h1 className="text-3xl font-bold mb-4">Bienvenido a NutriTrack Pro</h1>
+    <p className="mb-6">Gestiona tus pacientes y sus planes de forma eficiente.</p>
   </div>
-)
+);
 
-// Placeholder para Dashboard (hasta que se implemente)
-const DashboardPagePlaceholder = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-    <h1 className="text-3xl font-bold">Dashboard (Pronto)</h1>
-    {/* Aquí podrías añadir un botón de Logout usando useAuth().logout si está protegido */}
-    <Link to="/" className="mt-4 text-indigo-600 hover:text-indigo-800">Volver al Inicio</Link>
-  </div>
-)
+// Placeholder simple para el Dashboard
+const DashboardPagePlaceholder = () => {
+  const { user } = useAuth();
+  return (
+    <div className="container mx-auto mt-10 p-4">
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+      {user && <p className="mt-2">Hola, {user.fullName}!</p>}
+      <p className="mt-4">Aquí verás el resumen de tu actividad.</p>
+    </div>
+  );
+};
 
 function App() {
+  const auth = useAuth(); // Para la redirección principal
+
+  if (auth.isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div>Cargando aplicación...</div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <AuthProvider>
-        <Toaster position="top-center" reverseOrder={false} />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          
-          {/* Ruta de Dashboard (eventualmente protegida) */}
-          <Route path="/dashboard" element={<DashboardPagePlaceholder />} />
-          
-          {/* Podrías añadir una ruta para /recuperar-password si la creas */}
-          {/* <Route path="/recuperar-password" element={<ForgotPasswordPage />} /> */}
+        <Navbar />
+        <main className="container mx-auto p-4 mt-2 min-h-[calc(100vh-80px)]"> {/* Ajustar según altura real de Navbar */}
+          <Toaster position="top-center" reverseOrder={false} />
+          <Routes>
+            {/* Rutas públicas */}
+            <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+            <Route path="/registro" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+            {/* <Route path="/recuperar-password" element={<GuestRoute><ForgotPasswordInfoPage /></GuestRoute>} /> */}
 
-          {/* Considera una ruta NotFoundPage para cualquier ruta no coincidente */}
-          {/* <Route path="*" element={<NotFoundPage />} /> */}
-        </Routes>
+            {/* Rutas protegidas */}
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardPagePlaceholder /></ProtectedRoute>} />
+
+            {/* Ruta principal: redirige a dashboard si está autenticado, sino a login */}
+            <Route 
+              path="/"
+              element={auth.isAuthenticated ? <Navigate to="/dashboard" replace /> : <HomePage />}
+            />
+            
+            {/* Ruta comodín para páginas no encontradas */}
+            <Route path="*" element={<div className="text-center mt-10"><h1 className="text-2xl">404 - Página No Encontrada</h1><Link to="/" className="text-indigo-600 hover:underline">Volver al inicio</Link></div>} />
+          </Routes>
+        </main>
+        <Toaster position="bottom-right" />
       </AuthProvider>
     </Router>
   )
