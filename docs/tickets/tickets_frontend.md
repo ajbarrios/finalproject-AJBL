@@ -438,44 +438,52 @@ Como profesional, quiero poder eliminar el registro de un paciente (soft delete 
 **Prioridad:** Alta
 
 **Descripción:**
-Como profesional, quiero ver un dashboard principal con una lista de mis pacientes, con opción para buscar. Si la lista de pacientes excede un número determinado (ej. 20), se habilitará el scroll vertical. La paginación y ordenación avanzada se posponen para el MVP.
+Como profesional, quiero ver un dashboard principal donde pueda ver una lista de todos mis pacientes al cargar la página, y tener la opción de buscar pacientes por nombre, apellidos o email. El placeholder del campo de búsqueda deberá indicar los campos por los cuales se puede buscar.
 
 **Tareas Específicas (Frontend):**
-1.  **Crear Página de Dashboard de Pacientes:**
-    *   Diseñar y desarrollar la página principal del dashboard (ej. `/dashboard` o `/pacientes`).
-    *   Esta página será la vista principal después del login para muchos profesionales.
-2.  **Implementar Funcionalidad de Listado de Pacientes:**
-    *   Al cargar la página, realizar una petición `GET` al endpoint `/api/patients` para obtener la lista de pacientes del profesional autenticado.
-    *   Mostrar los pacientes en un formato claro (tabla, tarjetas, lista).
-    *   Para cada paciente, mostrar información clave (ej. Nombre completo, Email, Teléfono, ¿última actividad/contacto?, ¿estado?).
-    *   Incluir enlaces/botones para acciones comunes por paciente (ej. Ver Perfil, Editar, Eliminar - si ya implementado).
-    *   Si la lista de pacientes es larga (ej. > 20), asegurar que la lista sea escroleable verticalmente.
-3.  **Implementar Funcionalidad de Búsqueda:**
-    *   Añadir un campo de búsqueda que permita al profesional buscar pacientes por nombre, apellido o email.
-    *   Al ingresar un término de búsqueda, realizar una nueva petición `GET` a `/api/patients` con el parámetro `search`.
-    *   Actualizar la lista de pacientes con los resultados.
+1.  **Crear Página de Dashboard de Pacientes (`PatientDashboardPage.tsx`):**
+    *   Diseñar y desarrollar la página principal del dashboard (ej. `/dashboard/patients`).
+    *   Esta página será la vista principal después del login.
+2.  **Implementar Funcionalidad de Listado Inicial de Pacientes:**
+    *   Al cargar la página, realizar una petición `GET` al endpoint `/api/patients` para obtener la lista de **todos** los pacientes del profesional autenticado.
+    *   Mostrar los pacientes en un formato de **grid de tarjetas (`PatientCard.tsx`)**.
+    *   Para cada paciente, mostrar información clave (ej. Nombre completo, y opcionalmente email).
+    *   Incluir un enlace/botón en cada tarjeta para ver el perfil detallado del paciente.
+    *   Si la lista de pacientes es larga, asegurar que el contenedor sea escroleable verticalmente.
+3.  **Implementar Funcionalidad de Búsqueda (`SearchBar.tsx`):**
+    *   Añadir un campo de búsqueda (`SearchBar.tsx`) con el placeholder: **"Buscar por nombre, apellidos o email..."**.
+    *   Al ingresar un término de búsqueda, realizar una nueva petición `GET` a `/api/patients` con el parámetro `search={searchTerm}` después de un *debounce*.
+    *   Actualizar el grid de tarjetas de pacientes con los resultados.
 4.  **Botón "Añadir Nuevo Paciente":**
-    *   Asegurar que haya un botón prominente para "Añadir Nuevo Paciente" que lleve al formulario de TF-005.
+    *   Asegurar que haya un botón prominente para "Añadir Nuevo Paciente" que lleve al formulario de creación de pacientes (referencia a TF-005).
 5.  **Manejo de Estados (Carga, Error, Vacío):**
     *   Mostrar indicadores de carga mientras se obtienen los datos.
     *   Mostrar un mensaje apropiado si ocurre un error al cargar los pacientes.
-    *   Mostrar un mensaje si el profesional no tiene ningún paciente registrado aún, con una llamada a la acción para añadir uno.
-6.  **Pruebas (Frontend):**
-    *   Probar el listado de pacientes con diferentes cantidades de datos (pocos, ~20, >20 para probar scroll).
-    *   Probar la búsqueda con diferentes términos (coincidencias, no coincidencias).
-    *   Probar los estados de carga, error y vacío.
+    *   Mostrar un mensaje si el profesional no tiene ningún paciente registrado aún (o si la búsqueda no arroja resultados), con una llamada a la acción para añadir uno si la lista general está vacía.
+6.  **Servicio API para Pacientes (`src/services/patientService.ts`):**
+    *   Modificar/crear la función `fetchPatients(searchTerm?: string)`.
+    *   Si `searchTerm` es vacío o no se proporciona, el backend debe devolver todos los pacientes del profesional logueado.
+    *   Si `searchTerm` está presente, el backend buscará por nombre, apellidos y email en los pacientes del profesional logueado.
 
 **Criterios de Aceptación (Frontend):**
-*   El dashboard muestra una lista de los pacientes del profesional.
-*   Si hay muchos pacientes, la lista tiene scroll vertical.
-*   La búsqueda por nombre/email filtra la lista de pacientes.
-*   Se manejan adecuadamente los diferentes estados (carga, error, vacío).
-*   Hay acceso fácil para añadir un nuevo paciente.
+*   Al cargar la página del dashboard, se muestra un grid de tarjetas con **todos** los pacientes del profesional.
+*   La barra de búsqueda tiene el placeholder "Buscar por nombre, apellidos o email...".
+*   La búsqueda por nombre, apellidos o email filtra el grid de tarjetas de pacientes.
+*   La búsqueda utiliza *debouncing*.
+*   Se manejan adecuadamente los diferentes estados (carga, error, lista vacía/búsqueda sin resultados).
+*   Hay un acceso fácil para añadir un nuevo paciente (botón que navega a la ruta/modal de creación).
+*   Si hay muchos pacientes, el grid es escroleable.
+*   Las tarjetas de paciente (`PatientCard.tsx`) muestran información esencial y permiten acceder al perfil detallado del paciente.
 
 **Consideraciones Técnicas (Frontend):**
-*   Gestión del estado de la lista de pacientes, parámetros de búsqueda.
-*   Componentes de tabla/lista reutilizables.
-*   Debouncing para la entrada de búsqueda para no sobrecargar el API.
+*   Framework/Librería: React con TypeScript.
+*   Gestión de estado: Para `patients`, `isLoading`, `error`, `searchTerm` (ej. `useState`, `useReducer`, o gestor de estado global si aplica).
+*   Librería para peticiones HTTP: Axios o Fetch API.
+*   Componentes: `PatientDashboardPage.tsx`, `PatientCard.tsx`, `SearchBar.tsx`.
+*   Estilos: Tailwind CSS para layout responsivo del grid, tarjetas y barra de búsqueda.
+*   Debouncing: Implementar en `SearchBar.tsx` para la función `onSearchChange`.
+*   Routing: React Router Dom para la página `/dashboard/patients` y navegación.
+*   Servicio API: `patientService.ts` con la función `fetchPatients`.
 
 **Etiquetas:** `frontend`, `pacientes`, `dashboard`, `listado`, `búsqueda`, `HU-008`
 
