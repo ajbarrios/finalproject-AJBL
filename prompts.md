@@ -169,6 +169,15 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 13 (Relacionado con TF-001 - Frontend - Tests Registro - Implementación Casos de Error Adicionales):**
 "Para `RegisterForm.test.tsx`, ya tengo tests para el caso de éxito y el error 409. Necesito implementar los tests para los siguientes escenarios de error: error 400 (validación del backend con mensajes de campo), error genérico del servidor (ej. 500), y error de red (sin `error.response`). ¿Puedes proporcionarme el código para estos tests?"
 
+**Prompt 14 (Relacionado con TB-004 - Frontend - Cierre de Sesión - Plan de Acción):**
+"Plantea un plan de accion para resolver el ticket \"TB-004\" de @tickets_backend.md . Solo hay que hacer trabajo en la parte frontal."
+
+**Prompt 15 (Relacionado con TB-004 - Frontend - Cierre de Sesión - Creación Navbar):**
+"Para resolver el ticket, desarrolla un component comun de tipo barra dentro de la carpeta \"components\" donde aparezca un icono de tipo logout al lado del nombre y apellidos del usuario. Al pulsar hará el comportamiento descrito en el ticket \"TB-004\"."
+
+**Prompt 16 (Relacionado con TB-004 - Frontend - Cierre de Sesión - Corrección Estilos/Fondos):**
+"Las paginas de login y registro entre otras, presentar un espacio en blanco que se nota respecto al fondo gris. Puedes eliminarlo y hacer lo mismo para todas?"
+
 ---
 
 ### 7. Pull Requests
