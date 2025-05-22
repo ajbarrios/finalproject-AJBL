@@ -11,7 +11,7 @@ info:
     email: soporte@example.com # Reemplazar con email real si aplica
 
 servers:
-  - url: http://localhost:3010/api # Asumiendo backend en puerto 3010
+  - url: http://localhost:3000/api # Puerto por defecto es 3000
     description: Servidor de desarrollo local
   - url: https://api.nutritrackpro.com/api # URL de producción (ejemplo)
     description: Servidor de producción
