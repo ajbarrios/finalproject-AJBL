@@ -1,14 +1,1 @@
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
-
-body {
-  @apply bg-gray-100 text-gray-900;
-  font-family: 'Inter', sans-serif; /* O la fuente que estés usando */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Puedes añadir aquí estilos para componentes base si es necesario,
-   aunque con Tailwind v4 es más común usar clases de utilidad directamente
-   o definir componentes con @layer components si aún lo necesitas para
-   abstracciones específicas. Para este cambio, lo de arriba es suficiente. */
+@import "tailwindcss";
