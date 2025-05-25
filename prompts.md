@@ -232,6 +232,15 @@ Contexto: Corrección de errores de linter y tipado en `patient.controller.test.
 **Prompt 29 (Relacionado con TB-008 - Backend - Implementación Casos de Prueba Controlador `patient.controller.ts`):**
 "Continua construyendo tests para el controlador por favor"
 
+**Prompt 30 (Relacionado con TB-008 - Backend - Añadir Endpoint GET por ID a Postman):**
+"¿Puedes añadir a la coleccion de postman @NutriTrack Pro.postman_collection los endpoints nuevos que hemos creado en @patient.controller.ts para probarlos a traves de postman?"
+
+**Prompt 31 (Relacionado con TB-008 - Frontend - Actualizar Tests Service para GET por ID):**
+"¿Puedes actualizar los test unitarios de @patientService.test.ts en base a los nuevos cambios de  @patient.service.ts ?"
+
+**Prompt 32 (Relacionado con TB-008 - Frontend - Corrección Linter Tests Service):**
+"Corrige los errores del linter por favor." *(Seguido de iteraciones de corrección automática)*
+
 ---
 
 ### 7. Pull Requests
