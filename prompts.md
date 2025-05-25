@@ -256,6 +256,18 @@ Contexto: Corrección de errores de linter y tipado en `patient.controller.test.
 **Prompt 37 (Relacionado con TF-009 - Creación Tests Unitarios):**
 "Continua con el plan: crea los tests unitarios para `PatientProfilePage.tsx`."
 
+**Prompt 38 (Relacionado con Validación de Formulario y Tests TF-XXX):**
+"Puedes arreglar el test unitario que falla? Te adjunto salida de terminal @node"
+
+**Prompt 39 (Relacionado con Validación de Formulario y Tests TF-XXX):**
+"Editar el fichero @NewPatientPage.tsx para que cuando se pulse en registrar paciente, todos los campos tengan un mensaje de error justo abajo diciendo: \"el campo <nombre_del_campo> es obligatorio\"."
+
+**Prompt 40 (Relacionado con Validación de Formulario y Tests TF-XXX):**
+"Hay un fallo de ortografia, debe de empezar por mayuscula: El campo XXX es obligatorio."
+
+**Prompt 41 (Relacionado con Validación de Formulario y Tests TF-XXX):**
+"Con este campo, actualiza los test unitarios de @NewPatientPage.test.tsx"
+
 ---
 
 ### 7. Pull Requests
