@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import apiClient from './authService'; // Usaremos esto para mockear sus métodos
-import { fetchPatients, fetchPatientById } from '../services/patientService'; // Importar funciones directamente
+import { fetchPatients, fetchPatientById, createPatient } from '../services/patientService'; // Importar funciones directamente
 import type { Patient } from '../types/patient';
+import type { NewPatientData } from '../types/patient'; // Importar tipo para datos de creación
 // Eliminamos AxiosRequestConfig si no se usa, mantenemos InternalAxiosRequestConfig si es la que se usa.
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
@@ -10,6 +11,7 @@ vi.mock('./authService', () => {
   return {
     default: {
       get: vi.fn(),
+      post: vi.fn(),
     },
   };
 });
@@ -194,5 +196,88 @@ describe('patientService - fetchPatientById', () => {
     vi.mocked(apiClient.get as Mock).mockRejectedValue(genericError);
 
     await expect(fetchPatientById(patientId)).rejects.toThrow();
+  });
+});
+
+describe('patientService - createPatient', () => {
+  const mockPatientData: NewPatientData = {
+    firstName: 'Nuevo',
+    lastName: 'Paciente',
+    email: 'nuevo.paciente@example.com',
+    phone: '+34123456789',
+    birthDate: new Date('1990-01-15'),
+    gender: 'Prefiero no especificar',
+    height: 170.5,
+    medicalNotes: 'Historial de alergias leves.',
+    dietRestrictions: 'Ninguna',
+    objectives: 'Mejorar composición corporal',
+    initialBiometrics: {
+      recordDate: new Date('2023-11-20'),
+      weight: 75.2,
+      bodyFatPercentage: 20.1,
+      musclePercentage: 35.5,
+      waterPercentage: 50.3,
+      waistDiameter: 85.0,
+      notes: 'Medición inicial.',
+    },
+  };
+
+  const mockCreatedPatient = {
+    id: 'patient-123', // ID simulado
+    professionalId: 'prof-abc', // ID profesional simulado
+    ...mockPatientData,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  beforeEach(() => {
+    // Resetear el mock de apiClient.post antes de cada prueba
+    (apiClient.post as Mock).mockReset();
+  });
+
+  it('debería llamar a apiClient.post con los datos correctos y devolver el paciente creado', async () => {
+    // Configurar el mock de apiClient.post para resolver con el paciente creado
+    vi.mocked(apiClient.post as Mock).mockResolvedValue({ data: mockCreatedPatient });
+
+    // Llamar a la función del servicio
+    const result = await createPatient(mockPatientData);
+
+    // Aserciones
+    expect(apiClient.post).toHaveBeenCalledOnce();
+    expect(apiClient.post).toHaveBeenCalledWith('/patients', mockPatientData);
+    expect(result).toEqual(mockCreatedPatient);
+  });
+
+  it('debería lanzar un error si la llamada a la API falla (AxiosError)', async () => {
+    const errorMessage = 'Error de creación simulado';
+    // Configurar el mock de apiClient.post para rechazar con un mock de AxiosError
+    const mockAxiosError: AxiosError<{ message?: string }> = {
+      isAxiosError: true,
+      response: {
+        data: { message: errorMessage },
+        status: 400,
+        statusText: 'Bad Request',
+        headers: {},
+        config: {} as InternalAxiosRequestConfig,
+      },
+      name: 'AxiosError',
+      message: 'Request failed with status code 400',
+      config: {} as InternalAxiosRequestConfig,
+      code: 'ERR_BAD_REQUEST',
+      toJSON: () => ({}),
+    };
+    vi.mocked(apiClient.post as Mock).mockRejectedValue(mockAxiosError);
+
+    // Verificar que la función lanza un error
+    await expect(createPatient(mockPatientData)).rejects.toThrow();
+  });
+
+  it('debería lanzar un error genérico si la llamada a la API falla (Error no Axios)', async () => {
+    const genericError = new Error('Error de red genérico');
+    // Configurar el mock de apiClient.post para rechazar con un error genérico
+    vi.mocked(apiClient.post as Mock).mockRejectedValue(genericError);
+
+    // Verificar que la función lanza un error
+    await expect(createPatient(mockPatientData)).rejects.toThrow();
   });
 }); 
