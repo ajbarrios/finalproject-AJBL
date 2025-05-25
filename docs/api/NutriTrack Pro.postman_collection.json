@@ -1,0 +1,210 @@
+{
+	"info": {
+		"_postman_id": "cd5c5993-5abc-48c3-a929-2d19a14482c9",
+		"name": "NutriTrack Pro",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19730999"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login Profesional",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Token is present and set as collection variable\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.collectionVariables.set(\"authToken\", jsonData.token);",
+									"        console.log(\"Auth token set as collection variable.\");",
+									"    } else {",
+									"        console.log(\"Token not found in response.\");",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"tu_email_de_profesional@example.com\",\n  \"password\": \"tu_contraseña_de_profesional\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Autentica a un profesional y guarda el token JWT en la variable de colección `authToken`."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados con la autenticación"
+		},
+		{
+			"name": "Patients",
+			"item": [
+				{
+					"name": "Listar Pacientes (sin búsqueda)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients"
+							]
+						},
+						"description": "Lista todos los pacientes del profesional autenticado. Asegúrate de haber iniciado sesión y que la variable `authToken` esté seteada."
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Pacientes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/patients?search=termino_a_buscar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "termino_a_buscar",
+									"description": "Término para buscar en nombre, apellido o email del paciente."
+								}
+							]
+						},
+						"description": "Lista los pacientes del profesional autenticado que coincidan con el término de búsqueda. Modifica el valor del parámetro `search`."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Paciente por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente a obtener"
+								}
+							]
+						},
+						"description": "Obtiene los detalles de un paciente específico por su ID. Asegúrate de haber iniciado sesión y que la variable `authToken` esté seteada. Modifica el valor del parámetro de ruta `:patientId`."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados con la gestión de pacientes"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "TU_TOKEN_JWT_VALIDO_AQUI_O_DEJAR_VACIO_SI_LOGIN_LO_SETTEA",
+			"type": "string"
+		}
+	]
+}
