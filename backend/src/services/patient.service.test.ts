@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 // Importa el cliente Prisma TAL COMO LO HACE EL SERVICIO. 
 // Vitest debería reemplazar esto con el contenido de __mocks__/prisma.client.ts
 import prismaFromServicePerspective from '../config/db/prisma.client'; 
-import { getPatientsForProfessional } from './patient.service';
+import { getPatientsForProfessional, createPatientForProfessional } from './patient.service';
 import { type Patient } from '../generated/prisma';
 import { type DeepMockProxy } from 'vitest-mock-extended'; // Solo necesitamos el tipo aquí
 import { type PrismaClient } from '../generated/prisma'; // Solo el tipo
@@ -206,4 +206,327 @@ describe('PatientService - getPatientsForProfessional', () => {
       orderBy: { createdAt: 'desc' },
     });
   });
+});
+
+describe('PatientService - createPatientForProfessional', () => {
+  beforeEach(() => {
+    vi.resetAllMocks(); // Resetear todos los mocks antes de cada prueba
+    // Mockear la transacción de Prisma en el beforeEach
+    // Esto asegura que todas las pruebas en este bloque usen el mock de transacción
+    prismaClientMock.$transaction.mockImplementation(async (callback) => {
+        // Ejecutar el callback que contiene las llamadas a create
+        // Pasar una instancia mockeada de prisma al callback
+        return callback(prismaClientMock);
+    });
+  });
+
+  it('debería crear un paciente exitosamente sin datos biométricos iniciales', async () => {
+    const professionalId = 1;
+    const patientData = {
+      firstName: 'Nuevo',
+      lastName: 'Paciente',
+      email: 'nuevo.paciente@example.com',
+    }; // Datos mínimos para crear paciente
+
+    // Configurar el mock de Prisma para la creación del paciente
+    // Asumimos que prisma.patient.create devuelve el objeto del paciente creado con ID
+    const mockCreatedPatient = {
+        id: 201, // Simula un ID generado por la BD
+        professionalId: professionalId,
+        ...patientData,
+        phone: null,
+        birthDate: null,
+        gender: null,
+        height: null,
+        medicalNotes: null,
+        dietRestrictions: null,
+        objectives: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    };
+    prismaClientMock.patient.create.mockResolvedValue(mockCreatedPatient);
+
+    // Ejecutar la función del servicio
+    const result = await createPatientForProfessional(professionalId, patientData);
+
+    // Aserciones
+    expect(result).toEqual(mockCreatedPatient); // Verificar que la función devuelve el paciente creado
+    expect(prismaClientMock.patient.create).toHaveBeenCalledOnce(); // Verificar que se llamó a prisma.patient.create una vez
+    expect(prismaClientMock.patient.create).toHaveBeenCalledWith({
+      data: {
+        ...patientData,
+        professionalId: professionalId,
+      },
+    });
+    // Verificar que NO se llamó a prisma.biometricRecord.create
+    expect(prismaClientMock.biometricRecord.create).not.toHaveBeenCalled();
+  });
+
+  it('debería crear un paciente y un registro biométrico inicial exitosamente', async () => {
+    const professionalId = 1;
+    const patientData = {
+      firstName: 'Paciente Con Bio',
+      lastName: 'Inicial',
+    };
+    const initialBiometrics = {
+      weight: 75.5,
+      recordDate: new Date('2023-11-01'),
+      notes: 'Primera medición',
+    }; // Datos biométricos iniciales
+
+    // Configurar el mock de Prisma para la creación del paciente
+    const mockCreatedPatient = {
+        id: 202,
+        professionalId: professionalId,
+        ...patientData,
+        email: null, phone: null, birthDate: null, gender: null, height: null,
+        medicalNotes: null, dietRestrictions: null, objectives: null,
+        createdAt: new Date(), updatedAt: new Date(),
+    };
+    prismaClientMock.patient.create.mockResolvedValue(mockCreatedPatient);
+
+    // Configurar el mock de Prisma para la creación del registro biométrico
+    const mockCreatedBiometric = {
+        id: 301, // Simula ID generado
+        patientId: mockCreatedPatient.id,
+        ...initialBiometrics,
+        bodyFatPercentage: null, musclePercentage: null, waterPercentage: null,
+        backChestDiameter: null, waistDiameter: null, armsDiameter: null,
+        legsDiameter: null, calvesDiameter: null,
+        createdAt: new Date(),
+    };
+    prismaClientMock.biometricRecord.create.mockResolvedValue(mockCreatedBiometric);
+
+    // Ejecutar la función del servicio
+    const result = await createPatientForProfessional(professionalId, patientData, initialBiometrics);
+
+    // Aserciones
+    expect(result).toEqual(mockCreatedPatient); // Verificar que la función devuelve el paciente creado (el resultado de la transacción)
+    expect(prismaClientMock.$transaction).toHaveBeenCalledOnce(); // Verificar que se llamó a $transaction
+    expect(prismaClientMock.patient.create).toHaveBeenCalledOnce(); // Verificar que se llamó a patient.create dentro de la transacción
+    expect(prismaClientMock.patient.create).toHaveBeenCalledWith({
+      data: {
+        ...patientData,
+        professionalId: professionalId,
+      },
+    });
+    expect(prismaClientMock.biometricRecord.create).toHaveBeenCalledOnce(); // Verificar que se llamó a biometricRecord.create dentro de la transacción
+    expect(prismaClientMock.biometricRecord.create).toHaveBeenCalledWith({
+        data: {
+            // Usamos expect.objectContaining porque la fecha actual podría ser ligeramente diferente si se usa en el servicio
+            // y también para ser flexibles con otros campos que podrían ser null.
+            patientId: mockCreatedPatient.id,
+            recordDate: initialBiometrics.recordDate, // Esperamos la fecha proporcionada en el mock
+            weight: initialBiometrics.weight,
+            notes: initialBiometrics.notes,
+            // Puedes añadir expect.anything() o específicos para otros campos opcionales/null
+            // expect.objectContaining permite verificar un subconjunto de propiedades
+        }
+    });
+  });
+
+   it('debería lanzar un error si falla la creación del paciente en la transacción', async () => {
+       const professionalId = 1;
+       const patientData = {
+         firstName: 'Falla',
+         lastName: 'Creacion',
+       };
+       const initialBiometrics = { weight: 80 };
+       const errorMessage = 'Error de base de datos simulado en transacción'; // Mensaje de error más genérico
+       const mockError = new Error(errorMessage);
+
+       // Configurar el mock de Prisma para que la transacción completa falle/rechace
+       // Esto simula que algo (como patient.create) falló DENTRO de la transacción
+       prismaClientMock.$transaction.mockRejectedValue(mockError);
+
+       // Aserción de que la llamada a la función del servicio lanza el error esperado
+       await expect(createPatientForProfessional(professionalId, patientData, initialBiometrics)).rejects.toThrow(errorMessage);
+
+       // Verificar que se llamó a $transaction
+       expect(prismaClientMock.$transaction).toHaveBeenCalledOnce();
+
+       // No necesitamos verificar llamadas internas como patient.create o biometricRecord.create aquí,
+       // ya que estamos mockeando el fallo de la transacción completa. Esto simplifica la prueba
+       // y la hace menos frágil a la simulación exacta del comportamiento transaccional del mock.
+   });
+
+    // TODO: Añadir más pruebas para validaciones de datos biométricos, etc.
+
+  it('debería crear un paciente exitosamente con todos los campos opcionales y datos biométricos iniciales', async () => {
+    const professionalId = 1;
+    const patientData = {
+      firstName: 'Paciente Completo',
+      lastName: 'Con Todo',
+      email: 'completo@example.com',
+      phone: '111222333',
+      birthDate: new Date('1998-08-20'),
+      gender: 'Otro',
+      height: 185.5,
+      medicalNotes: 'Ninguna conocida, historial familiar de diabetes.',
+      dietRestrictions: 'Vegetariano',
+      objectives: 'Preparación para maratón.',
+    };
+    const initialBiometrics = {
+      recordDate: new Date('2023-11-15'),
+      weight: 78.0,
+      bodyFatPercentage: 18.2,
+      musclePercentage: 42.1,
+      waterPercentage: 55.0,
+      backChestDiameter: 105.0,
+      waistDiameter: 82.0,
+      armsDiameter: 32.5,
+      legsDiameter: 60.0,
+      calvesDiameter: 40.0,
+      notes: 'Muy buena hidratación',
+    }; // Datos biométricos iniciales completos
+
+     // Configurar el mock de Prisma para la creación del paciente
+    const mockCreatedPatient = {
+        id: 203,
+        professionalId: professionalId,
+        ...patientData,
+        createdAt: new Date(), updatedAt: new Date(),
+    };
+    prismaClientMock.patient.create.mockResolvedValue(mockCreatedPatient);
+
+    // Configurar el mock de Prisma para la creación del registro biométrico
+    const mockCreatedBiometric = {
+        id: 302,
+        patientId: mockCreatedPatient.id,
+        ...initialBiometrics,
+        createdAt: new Date(),
+    };
+    prismaClientMock.biometricRecord.create.mockResolvedValue(mockCreatedBiometric);
+
+    // Ejecutar la función del servicio
+    const result = await createPatientForProfessional(professionalId, patientData, initialBiometrics);
+
+    // Aserciones
+    expect(result).toEqual(mockCreatedPatient); // Debería devolver el paciente creado
+    expect(prismaClientMock.$transaction).toHaveBeenCalledOnce();
+    expect(prismaClientMock.patient.create).toHaveBeenCalledOnce();
+    expect(prismaClientMock.patient.create).toHaveBeenCalledWith({
+      data: { ...patientData, professionalId: professionalId },
+    });
+    expect(prismaClientMock.biometricRecord.create).toHaveBeenCalledOnce();
+    expect(prismaClientMock.biometricRecord.create).toHaveBeenCalledWith({
+        data: { patientId: mockCreatedPatient.id, ...initialBiometrics }
+    });
+  });
+
+  it('debería usar la fecha actual para el registro biométrico si recordDate es nulo o inválido', async () => {
+       const professionalId = 1;
+       const patientData = {
+         firstName: 'Paciente Bio Sin Fecha',
+         lastName: 'Testing',
+       };
+       const initialBiometrics = {
+         weight: 65.0,
+         recordDate: null, // Fecha nula
+         notes: 'Medición sin fecha específica',
+       }; // Datos biométricos sin fecha
+
+       // Configurar mocks
+       const mockCreatedPatient = {
+         id: 204,
+         professionalId: professionalId,
+         ...patientData,
+         email: null, phone: null, birthDate: null, gender: null, height: null,
+         medicalNotes: null, dietRestrictions: null, objectives: null,
+         createdAt: new Date(), updatedAt: new Date(),
+       };
+       prismaClientMock.patient.create.mockResolvedValue(mockCreatedPatient);
+
+       // Configurar el mock de Prisma para la creación del registro biométrico con un valor simple
+       const mockCreatedBiometric = { // Mock simple que parece un registro creado
+            id: 303,
+            patientId: mockCreatedPatient.id,
+            recordDate: new Date(), // El servicio debería generar esto
+            weight: initialBiometrics.weight || null,
+            bodyFatPercentage: null, musclePercentage: null, waterPercentage: null,
+            backChestDiameter: null, waistDiameter: null, armsDiameter: null,
+            legsDiameter: null, calvesDiameter: null,
+            notes: initialBiometrics.notes || null,
+            createdAt: new Date(),
+       } as any; // Usar as any para simplificar el tipo de retorno mockeado
+       prismaClientMock.biometricRecord.create.mockResolvedValue(mockCreatedBiometric);
+
+       prismaClientMock.$transaction.mockImplementation(async (callback) => {
+           return callback(prismaClientMock);
+       });
+
+       // Ejecutar la función del servicio
+       const result = await createPatientForProfessional(professionalId, patientData, initialBiometrics);
+
+       // Aserciones
+       expect(result).toEqual(mockCreatedPatient); // Debería devolver el paciente creado
+       expect(prismaClientMock.$transaction).toHaveBeenCalledOnce();
+       expect(prismaClientMock.patient.create).toHaveBeenCalledOnce();
+       expect(prismaClientMock.biometricRecord.create).toHaveBeenCalledOnce();
+
+       // Verificar la llamada a biometricRecord.create, esperando que recordDate sea un objeto Date
+       expect(prismaClientMock.biometricRecord.create).toHaveBeenCalledWith({
+            data: expect.objectContaining({
+                patientId: mockCreatedPatient.id,
+                weight: initialBiometrics.weight,
+                notes: initialBiometrics.notes,
+                recordDate: expect.any(Date), // Esperamos que el servicio haya usado una instancia de Date
+            })
+       });
+   });
+
+   it('debería lanzar un error y revertir si falla la creación del registro biométrico en la transacción', async () => {
+       const professionalId = 1;
+       const patientData = {
+         firstName: 'Falla Bio',
+         lastName: 'Creacion',
+       };
+       const initialBiometrics = { weight: 85 };
+       const errorMessage = 'Error de base de datos al crear registro biométrico';
+
+       // Configurar el mock de Prisma para la creación del paciente (exitosa)
+       const mockCreatedPatient = {
+         id: 205,
+         professionalId: professionalId,
+         ...patientData,
+         email: null, phone: null, birthDate: null, gender: null, height: null,
+         medicalNotes: null, dietRestrictions: null, objectives: null,
+         createdAt: new Date(), updatedAt: new Date(),
+       };
+       prismaClientMock.patient.create.mockResolvedValue(mockCreatedPatient);
+
+       // Configurar el mock de Prisma para que biometricRecord.create falle
+       prismaClientMock.biometricRecord.create.mockRejectedValue(new Error(errorMessage));
+
+       // Mockear la transacción para que simule la ejecución secuencial y propague el error
+       // Aquí, la mockImplementation debe ejecutar patient.create y luego, al intentar biometricRecord.create, lanzar el error.
+       prismaClientMock.$transaction.mockImplementation(async (callback) => {
+            // Ejecutar el callback con el mock de prisma
+            // El callback internamente llamará a patient.create (que resolverá) y luego a biometricRecord.create (que rechazará)
+            return callback(prismaClientMock);
+       });
+
+       // Aserción de que la llamada a la función del servicio lanza el error
+       await expect(createPatientForProfessional(professionalId, patientData, initialBiometrics)).rejects.toThrow(errorMessage);
+
+       // Verificar que se llamó a patient.create
+       expect(prismaClientMock.patient.create).toHaveBeenCalledOnce();
+        expect(prismaClientMock.patient.create).toHaveBeenCalledWith({
+         data: {
+           ...patientData,
+           professionalId: professionalId,
+         },
+       });
+       // Verificar que se llamó a biometricRecord.create (aunque falló)
+       expect(prismaClientMock.biometricRecord.create).toHaveBeenCalledOnce();
+       expect(prismaClientMock.biometricRecord.create).toHaveBeenCalledWith({
+            data: expect.objectContaining({
+                 patientId: mockCreatedPatient.id,
+                 weight: initialBiometrics.weight,
+                 // recordDate será Date, no podemos verificar null aquí
+            })
+       });
+       // Nota: Verificar la *reversión* de la transacción (que patient.create se deshace) es difícil con mocks puros.
+       // Esto se verifica mejor con pruebas de integración.
+   });
 }); 

@@ -134,4 +134,86 @@ export const getPatientDetailsForProfessional = async (
     console.error(`Error en getPatientDetailsForProfessional: ${error}`);
     throw error;
   }
-}; 
+};
+
+/**
+ * Crea un nuevo paciente para un profesional específico y opcionalmente añade un registro biométrico inicial.
+ * @param professionalId El ID del profesional autenticado.
+ * @param patientData Los datos del paciente a crear.
+ * @param initialBiometrics Datos biométricos iniciales opcionales.
+ * @returns Una promesa que resuelve al objeto del paciente creado.
+ */
+export const createPatientForProfessional = async (
+  professionalId: number,
+  patientData: {
+    firstName: string;
+    lastName: string;
+    email?: string | null;
+    phone?: string | null;
+    birthDate?: Date | null;
+    gender?: string | null;
+    height?: number | null;
+    medicalNotes?: string | null;
+    dietRestrictions?: string | null;
+    objectives?: string | null;
+  },
+  initialBiometrics?: {
+    recordDate?: Date | null;
+    weight?: number | null;
+    bodyFatPercentage?: number | null;
+    musclePercentage?: number | null;
+    waterPercentage?: number | null;
+    backChestDiameter?: number | null;
+    waistDiameter?: number | null;
+    armsDiameter?: number | null;
+    legsDiameter?: number | null;
+    calvesDiameter?: number | null;
+    notes?: string | null;
+  } | null
+): Promise<Patient> => {
+  try {
+    // Usar una transacción para asegurar que ambas creaciones (paciente y biométrico) sean atómicas
+    const result = await prisma.$transaction(async (prisma) => {
+      // 1. Crear el paciente
+      const createdPatient = await prisma.patient.create({
+        data: {
+          ...patientData,
+          professionalId: professionalId, // Asociar el paciente al profesional
+          // Los campos createdAt y updatedAt se llenan automáticamente por Prisma
+        },
+      });
+
+      // 2. Si hay datos biométricos iniciales, crear el registro
+      if (initialBiometrics) {
+        // Asegurarse de que recordDate sea una fecha válida o la fecha actual si no se provee
+        const recordDate = initialBiometrics.recordDate instanceof Date && !isNaN(initialBiometrics.recordDate.getTime())
+                           ? initialBiometrics.recordDate
+                           : new Date(); // Usar fecha actual si recordDate es null o inválido
+
+        await prisma.biometricRecord.create({
+          data: {
+            ...initialBiometrics,
+            patientId: createdPatient.id, // Asociar el registro biométrico al paciente creado
+            recordDate: recordDate, // Usar la fecha validada/determinada
+            // El campo createdAt se llena automáticamente por Prisma
+            // Eliminamos patientId y recordDate si venían en initialBiometrics para evitar duplicados en el 'data' spread
+            // Nota: El spread ...initialBiometrics incluirá todos los campos, así que sobreescribimos patientId y recordDate
+            // asegurando que sean los correctos.
+          },
+        });
+      }
+
+      return createdPatient; // Retornar el paciente creado (se usará si la transacción es exitosa)
+    });
+
+    return result; // Retornar el paciente creado de la transacción
+
+  } catch (error) {
+    console.error(`Error en createPatientForProfessional: ${error}`);
+    // Relanzar el error para que el controlador lo maneje
+    throw error;
+  }
+};
+
+// Aquí se añadirán otras funciones del servicio (updatePatient, deletePatient, etc.)
+// ... existing code ... 

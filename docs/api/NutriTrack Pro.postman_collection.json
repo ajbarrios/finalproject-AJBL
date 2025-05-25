@@ -170,6 +170,48 @@
 						"description": "Obtiene los detalles de un paciente específico por su ID. Asegúrate de haber iniciado sesión y que la variable `authToken` esté seteada. Modifica el valor del parámetro de ruta `:patientId`."
 					},
 					"response": []
+				},
+				{
+					"name": "Crear Nuevo Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Nuevo\",\n  \"lastName\": \"Paciente\",\n  \"email\": \"nuevo.paciente@example.com\",\n  \"phone\": \"+34123456789\",\n  \"birthDate\": \"1990-01-15\", \n  \"gender\": \"Prefiero no especificar\",\n  \"height\": 170.5,\n  \"medicalNotes\": \"Historial de alergias leves.\",\n  \"dietRestrictions\": \"Ninguna\",\n  \"objectives\": \"Mejorar composición corporal\",\n  \"initialBiometrics\": {\n    \"recordDate\": \"2023-11-20\",\n    \"weight\": 75.2,\n    \"bodyFatPercentage\": 20.1,\n    \"musclePercentage\": 35.5,\n    \"waterPercentage\": 50.3,\n    \"waistDiameter\": 85.0,\n    \"notes\": \"Medición inicial.\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients"
+							]
+						},
+						"description": "Crea un nuevo paciente para el profesional autenticado. Incluye campos opcionales y datos biométricos iniciales. Asegúrate de haber iniciado sesión y que la variable `authToken` esté seteada."
+					},
+					"response": []
 				}
 			],
 			"description": "Endpoints relacionados con la gestión de pacientes"
