@@ -28,6 +28,7 @@ const GuestRoute: React.FC<RouteProps> = ({ children }) => {
 
 import Navbar from './components/common/Navbar';
 import PatientDashboardPage from './pages/PatientDashboardPage';
+import PatientProfilePage from './pages/PatientProfilePage';
 
 // Componente para la página de inicio temporal (si no hay otra)
 const HomePage = () => (
@@ -62,6 +63,7 @@ function App() {
 
             {/* Rutas protegidas */}
             <Route path="/dashboard" element={<ProtectedRoute><PatientDashboardPage /></ProtectedRoute>} />
+            <Route path="/patients/:patientId" element={<ProtectedRoute><PatientProfilePage /></ProtectedRoute>} />
 
             {/* Ruta principal: redirige a dashboard si está autenticado, sino a login */}
             <Route 
