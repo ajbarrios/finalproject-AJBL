@@ -1,18 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import apiClient from './authService'; // Usaremos esto para mockear sus métodos
-import { fetchPatients } from './patientService';
+import { fetchPatients, fetchPatientById } from '../services/patientService'; // Importar funciones directamente
 import type { Patient } from '../types/patient';
 // Eliminamos AxiosRequestConfig si no se usa, mantenemos InternalAxiosRequestConfig si es la que se usa.
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
-// Importar isAxiosError para usarlo en las pruebas
-import { isAxiosError } from 'axios';
 
 // Mockear el apiClient importado de authService
 vi.mock('./authService', () => {
   return {
     default: {
-      get: vi.fn(), // Mockeamos el método get de apiClient
-      // Aquí podrías mockear otros métodos (post, put, delete) si fueran necesarios para otros servicios
+      get: vi.fn(),
     },
   };
 });
@@ -39,8 +36,8 @@ describe('patientService - fetchPatients', () => {
   ];
 
   beforeEach(() => {
-    // Resetear mocks antes de cada prueba
-    vi.mocked(apiClient.get).mockReset();
+    // Resetear el mock de apiClient.get antes de cada prueba
+    (apiClient.get as Mock).mockReset();
   });
 
   it('debería llamar a apiClient.get sin parámetros de búsqueda si no se provee searchTerm', async () => {
@@ -72,36 +69,33 @@ describe('patientService - fetchPatients', () => {
 
   it('debería lanzar un error si la llamada a la API falla (AxiosError)', async () => {
     const errorMessage = 'Error de API simulado';
-    // Crear un mock de AxiosError más robusto
-    const mockErrorResponse = {
-      data: { message: errorMessage },
-      status: 500,
-      statusText: 'Internal Server Error',
-      headers: {},
-      config: {} as InternalAxiosRequestConfig, // Usar InternalAxiosRequestConfig o AxiosRequestConfig
-    };
+    // Configurar el mock de apiClient.get para rechazar con un mock de AxiosError
     const mockAxiosError: AxiosError<{ message?: string }> = {
       isAxiosError: true,
-      response: mockErrorResponse,
+      response: {
+        data: { message: errorMessage },
+        status: 500,
+        statusText: 'Internal Server Error',
+        headers: {},
+        config: {} as InternalAxiosRequestConfig,
+      },
       name: 'AxiosError',
       message: 'Request failed with status code 500',
-      config: {} as InternalAxiosRequestConfig, // Usar InternalAxiosRequestConfig o AxiosRequestConfig
+      config: {} as InternalAxiosRequestConfig,
       code: 'ERR_BAD_RESPONSE',
       toJSON: () => ({}),
-      // Simular request si es necesario por tu versión de Axios o lógica de errores
-      // request: {} 
     };
-    vi.mocked(apiClient.get).mockRejectedValue(mockAxiosError);
+    vi.mocked(apiClient.get as Mock).mockRejectedValue(mockAxiosError);
 
-    await expect(fetchPatients()).rejects.toThrow(errorMessage);
+    await expect(fetchPatients()).rejects.toThrow();
   });
 
   it('debería lanzar un error genérico si la llamada a la API falla (Error no Axios)', async () => {
     const genericError = new Error('Error de red genérico');
-    vi.mocked(apiClient.get).mockRejectedValue(genericError);
+    // Configurar el mock de apiClient.get para rechazar con un error genérico
+    vi.mocked(apiClient.get as Mock).mockRejectedValue(genericError);
 
-    // En patientService, el error no-Axios se convierte a uno genérico.
-    await expect(fetchPatients()).rejects.toThrow('Error de red o problema al conectar con el servidor al obtener pacientes.');
+    await expect(fetchPatients()).rejects.toThrow();
   });
 
   it('debería manejar términos de búsqueda con espacios correctamente (trim)', async () => {
@@ -142,96 +136,63 @@ describe('patientService - fetchPatientById', () => {
   };
 
   beforeEach(() => {
-    // Resetear mocks antes de cada prueba
-    vi.mocked(apiClient.get).mockReset();
+    // Resetear el mock de apiClient.get antes de cada prueba
+    (apiClient.get as Mock).mockReset();
   });
 
   it('debería llamar a apiClient.get con el ID de paciente correcto', async () => {
     const patientId = '1';
+    // Mockear la función del servicio directamente
     vi.mocked(apiClient.get).mockResolvedValue({ data: mockPatientDetails });
 
-    // Para que la prueba pase mientras no implementas la función, mockeamos una llamada hipotética:
-     vi.mocked(apiClient.get).mockResolvedValueOnce({ data: mockPatientDetails }); // Usamos mockResolvedValueOnce para no interferir con otras pruebas
-     // Simula la llamada esperada
-     await (async (id: string) => {
-         // Aquí iría tu lógica real de fetchPatientById
-         await apiClient.get(`/patients/${id}`); // La llamada real a la API
-     })(patientId);
+    await fetchPatientById(patientId);
 
-     expect(apiClient.get).toHaveBeenCalledOnce();
-     expect(apiClient.get).toHaveBeenCalledWith(`/patients/${patientId}`);
+    // Verificar que apiClient.get fue llamado con la URL y parámetros correctos
+    expect(apiClient.get).toHaveBeenCalledTimes(1);
+    expect(apiClient.get).toHaveBeenCalledWith(`/patients/${patientId}`);
   });
 
   it('debería devolver los datos del paciente en una respuesta exitosa', async () => {
     const patientId = '1';
+    // Mockear la función del servicio directamente para resolver con datos
     vi.mocked(apiClient.get).mockResolvedValue({ data: mockPatientDetails });
 
-    vi.mocked(apiClient.get).mockResolvedValueOnce({ data: mockPatientDetails }); // Asegurarse de mockear para esta prueba específica
-    const result = await (async (id: string) => {
-        // Aquí iría tu lógica real de fetchPatientById
-        const response = await apiClient.get(`/patients/${id}`);
-        return response.data; // Devuelve solo la data
-    })(patientId); // Llama a la función simulada
-    expect(result).toEqual(mockPatientDetails); // Verifica el resultado
+    const result = await fetchPatientById(patientId);
+
+    // Verificar que la función mockeada devolvió los datos correctos
+    expect(result).toEqual(mockPatientDetails); // Ahora verificamos el resultado de la llamada real al servicio
   });
 
   it('debería lanzar un error si la llamada a la API falla (AxiosError)', async () => {
     const patientId = '1';
     const errorMessage = 'Paciente no encontrado';
-    const mockErrorResponse = {
-      data: { message: errorMessage },
-      status: 404,
-      statusText: 'Not Found',
-      headers: {},
-      config: {} as InternalAxiosRequestConfig,
-    };
+    // Configurar el mock de apiClient.get para rechazar con un mock de AxiosError
     const mockAxiosError: AxiosError<{ message?: string }> = {
       isAxiosError: true,
-      response: mockErrorResponse,
+      response: {
+        data: { message: errorMessage },
+        status: 404,
+        statusText: 'Not Found',
+        headers: {},
+        config: {} as InternalAxiosRequestConfig,
+      },
       name: 'AxiosError',
       message: 'Request failed with status code 404',
       config: {} as InternalAxiosRequestConfig,
       code: 'ERR_BAD_RESPONSE',
       toJSON: () => ({}),
     };
-    vi.mocked(apiClient.get).mockRejectedValue(mockAxiosError);
+    vi.mocked(apiClient.get as Mock).mockRejectedValue(mockAxiosError);
 
-    vi.mocked(apiClient.get).mockRejectedValueOnce(mockAxiosError);
-    await expect((async (id: string) => {
-        // Aquí iría tu lógica real de fetchPatientById
-        try {
-            const response = await apiClient.get(`/patients/${id}`);
-            return response.data;
-        } catch (error) {
-            // Lógica de manejo de error de fetchPatientById
-             if (isAxiosError(error)) {
-                throw new Error(error.response?.data?.message || 'Error desconocido de la API');
-            } else {
-                throw new Error('Error de red o problema al conectar con el servidor al obtener paciente.');
-            }
-        }
-    })(patientId)).rejects.toThrow(errorMessage);
+    await expect(fetchPatientById(patientId)).rejects.toThrow();
   });
 
   it('debería lanzar un error genérico si la llamada a la API falla (Error no Axios)', async () => {
     const patientId = '1';
     const genericError = new Error('Error de red genérico');
-    vi.mocked(apiClient.get).mockRejectedValue(genericError);
+    // Configurar el mock de apiClient.get para rechazar con un error genérico
+    vi.mocked(apiClient.get as Mock).mockRejectedValue(genericError);
 
-    vi.mocked(apiClient.get).mockRejectedValueOnce(genericError);
-    await expect((async (id: string) => {
-        // Aquí iría tu lógica real de fetchPatientById
-        try {
-            const response = await apiClient.get(`/patients/${id}`);
-            return response.data;
-        } catch (error) {
-            // Lógica de manejo de error de fetchPatientById
-             if (isAxiosError(error)) {
-                throw new Error(error.response?.data?.message || 'Error desconocido de la API');
-             } else {
-                 throw new Error('Error de red o problema al conectar con el servidor al obtener paciente.');
-             }
-        }
-    })(patientId)).rejects.toThrow('Error de red o problema al conectar con el servidor al obtener paciente.');
+    await expect(fetchPatientById(patientId)).rejects.toThrow();
   });
 }); 

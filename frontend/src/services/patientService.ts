@@ -1,11 +1,15 @@
-import type { Patient } from '../types/patient';
-import apiClient from './authService'; // Importar la instancia de Axios configurada
-import axios from 'axios'; // Importar axios para isAxiosError
+import apiClient from './authService'; // Usaremos esto para mockear sus métodos
+import type { Patient, PatientDetails } from '../types/patient';
+// Importar tipos necesarios para detalles del paciente
+// Podrías necesitar importar BiometricRecord, DietPlan, WorkoutPlan summary types
+// o definir un nuevo tipo PatientDetails en types/patient.ts
+import { isAxiosError } from 'axios';
 
 /**
- * Obtiene la lista de pacientes del backend.
- * @param searchTerm Término opcional para buscar pacientes.
- * @returns Una promesa que se resuelve con un array de pacientes.
+ * Obtiene la lista de pacientes para el profesional autenticado.
+ * Opcionalmente filtra por un término de búsqueda.
+ * @param searchTerm Término para buscar en nombre, apellido o email.
+ * @returns Una promesa que resuelve a un array de pacientes.
  */
 export const fetchPatients = async (searchTerm?: string): Promise<Patient[]> => {
   const url = '/patients'; // La URL base ya está en apiClient
@@ -20,14 +24,51 @@ export const fetchPatients = async (searchTerm?: string): Promise<Patient[]> => 
     const response = await apiClient.get<Patient[]>(url, { params });
     return response.data; // Axios devuelve los datos directamente en response.data
   } catch (error) {
-    console.error('Error en fetchPatients:', error);
-    if (axios.isAxiosError(error) && error.response) {
-      // Intentar acceder a error.response.data.message si existe, de lo contrario un mensaje genérico
-      const message = (error.response.data as { message?: string })?.message || 'Error al obtener pacientes';
-      throw new Error(message);
+    console.error('Error fetching patients:', error);
+    if (isAxiosError(error)) {
+      // Si es un error de Axios y tiene un mensaje en la respuesta
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        // Si es AxiosError pero sin mensaje específico del backend
+        throw new Error(error.message); // Lanza el mensaje genérico de Axios
+      }
+    } else if (error instanceof Error) {
+      // Otros tipos de errores (de red, etc.) que son instancias de Error
+      throw error; // Lanza el error original
     } else {
-      // Para otros tipos de errores (ej. error de red genérico)
-      throw new Error('Error de red o problema al conectar con el servidor al obtener pacientes.');
+      // Si no es una instancia de Error
+      throw new Error('Ha ocurrido un error desconocido al obtener pacientes.');
+    }
+  }
+};
+
+/**
+ * Obtiene los detalles completos de un paciente específico.
+ * @param patientId El ID del paciente.
+ * @returns Una promesa que resuelve a los detalles del paciente.
+ */
+export const fetchPatientById = async (patientId: string): Promise<PatientDetails> => {
+  try {
+    // Asumiendo que el backend responde con el formato extendido que incluye biométricos y planes
+    // El tipo de retorno debería ser PatientDetails, que definiremos en types/patient.ts
+    const response = await apiClient.get<PatientDetails>(`/patients/${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching patient with ID ${patientId}:`, error);
+    if (isAxiosError(error)) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        // Si es AxiosError pero sin mensaje específico del backend
+        throw new Error(error.message); // Lanza el mensaje genérico de Axios
+      }
+    } else if (error instanceof Error) {
+      // Otros tipos de errores (de red, etc.) que son instancias de Error
+      throw error; // Lanza el error original
+    } else {
+      // Si no es una instancia de Error
+      throw new Error(`Ha ocurrido un error desconocido al obtener paciente con ID ${patientId}.`);
     }
   }
 };

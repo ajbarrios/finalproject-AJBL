@@ -241,6 +241,21 @@ Contexto: Corrección de errores de linter y tipado en `patient.controller.test.
 **Prompt 32 (Relacionado con TB-008 - Frontend - Corrección Linter Tests Service):**
 "Corrige los errores del linter por favor." *(Seguido de iteraciones de corrección automática)*
 
+**Prompt 33 (Relacionado con TF-009 - Plan de Acción Inicial):**
+"Lee @tickets_frontend.md y desarrolla un plan para resolver el ticket "TF-009". Iremos paso por paso."
+
+**Prompt 34 (Relacionado con TF-009 - Creación Componente Page):**
+"Implementa el primer paso del plan: crear el componente base para la página de perfil del paciente (`PatientProfilePage.tsx`)."
+
+**Prompt 35 (Relacionado con TF-009 - Implementación Fetching y Estados):**
+"Continua con el plan: implementa la lógica para obtener los datos del paciente y manejar los estados de carga, error y éxito en `PatientProfilePage.tsx`."
+
+**Prompt 36 (Relacionado con TF-009 - Corrección Linter Tipos/Servicio):**
+"Corrige los errores del linter relacionados con la función `fetchPatientById` no encontrada y los errores de tipado en `PatientProfilePage.tsx`." *(Este prompt cubre las iteraciones de corrección del servicio y los tipos)*
+
+**Prompt 37 (Relacionado con TF-009 - Creación Tests Unitarios):**
+"Continua con el plan: crea los tests unitarios para `PatientProfilePage.tsx`."
+
 ---
 
 ### 7. Pull Requests

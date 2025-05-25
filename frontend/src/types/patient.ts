@@ -56,3 +56,46 @@ export type UpdatePatientData = Partial<NewPatientData>;
 // Ejemplo de cómo podrías usarlo:
 // import { Patient } from './patient';
 // const unPaciente: Patient = { ... }; 
+
+// Define types for the summary information returned with patient details
+export type BiometricRecord = {
+  id: string;
+  patientId: string;
+  recordDate: string; // ISO date string
+  weight: number | null;
+  bodyFatPercentage: number | null;
+  musclePercentage: number | null;
+  waterPercentage: number | null;
+  backChestDiameter: number | null;
+  waistDiameter: number | null;
+  armsDiameter: number | null;
+  legsDiameter: number | null;
+  calvesDiameter: number | null;
+  notes: string | null;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+};
+
+export type DietPlanSummary = {
+  id: string;
+  title: string;
+  isActive: boolean;
+  startDate: string | null; // ISO date string
+  endDate: string | null; // ISO date string
+};
+
+export type WorkoutPlanSummary = {
+  id: string;
+  title: string;
+  isActive: boolean;
+  startDate: string | null; // ISO date string
+  endDate: string | null; // ISO date string
+};
+
+// Define a type for the detailed patient response
+export type PatientDetails = Patient & {
+  lastBiometricRecord: BiometricRecord | null;
+  dietPlansSummary: DietPlanSummary[];
+  workoutPlansSummary: WorkoutPlanSummary[];
+  // Add other related data if the backend returns it with the patient details
+}; 
