@@ -179,44 +179,31 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 "Las paginas de login y registro entre otras, presentar un espacio en blanco que se nota respecto al fondo gris. Puedes eliminarlo y hacer lo mismo para todas?"
 
 **Prompt 17 (Relacionado con TB-008 - Backend - Plan de Acción Inicial):**
-"Plantea un plan de accion para el desarrollo del ticket "TB-008" de @tickets_backend.md"
+"Plantea un plan de accion para el desarrollo del ticket \"TB-008\" de @tickets_backend.md"
 
 **Prompt 18 (Relacionado con TB-008 - Backend - Corrección Estructura de Carpetas):**
-"Hay cosas que no estan bien. Tienes que respectar la estructura de carpetas existente. Por ejemplo dentro de src/api existen las carpetas "routes" para las rutas como "auth.routes.ts" y la carpeta "controllers" donde esta el controlador de auth.controller. Haz lo mismo para estos archivos que has generado de patients."
+"Hay cosas que no estan bien. Tienes que respectar la estructura de carpetas existente. Por ejemplo dentro de src/api existen las carpetas \"routes\" para las rutas como \"auth.routes.ts\" y la carpeta \"controllers\" donde esta el controlador de auth.controller. Haz lo mismo para estos archivos que has generado de patients."
 
 **Prompt 19 (Relacionado con TB-008 - Backend - Middleware de Autenticación y Lógica Controlador/Servicio Inicial):**
-Contexto: Este prompt agrupa la creación inicial del middleware de autenticación, la actualización del controlador `listPatients` para usar `professionalId` y llamar al servicio, y la creación inicial de `patient.service.ts` con la lógica de `getPatientsForProfessional`. (La conversación original fue paso a paso, aquí se resume la intención del bloque de trabajo)
 "Continuemos con el Paso 3: Desarrollo de la Lógica en Controlador y Servicio, comenzando por el middleware de autenticación y luego el servicio y controlador de pacientes."
 
 **Prompt 20 (Relacionado con TB-008 - Backend - Debug Puerto y Generación cURL):**
-Contexto: Se detectó que el puerto de la API era 3000 y no 8000. Se solicitó actualizar la documentación y los cURL.
 "La api corre en el puerto 3000. Recuerdalo. Puedes actualizar la documentacion donde esta mal y asi no lo induzcas mal para la proxima vez? Ahora vuelve a generarme los curls anteriores con esta modificacion del puerto. Tambien puedes crearme un curl para autenticarme y coger el token?"
 
 **Prompt 21 (Relacionado con TB-008 - Backend - Debug Token Expirado/Inválido - Error 401):**
-Contexto: El usuario obtenía un 401 al listar pacientes. Se investigó el token y la configuración de expiración.
-"He lanzado el curl de listar pacientes y me devuelve un 401 no autorizado. ¿Puedes ayudarme? Token: [TOKEN_PROPORCIONADO_POR_USUARIO]" y posterior "Ya funciona. La variable en .env estaba mal seteada, tenia "1h" en lugar de 3600"
+"He lanzado el curl de listar pacientes y me devuelve un 401 no autorizado. ¿Puedes ayudarme? Token: [TOKEN_PROPORCIONADO_POR_USUARIO]" (y posterior corrección de la variable de entorno)
 
 **Prompt 22 (Relacionado con TB-008 - Backend - Creación y Refinamiento Script Seed Prisma):**
-Contexto: Creación inicial del script de seed, corrección de errores de linter (`process` no definido, importación de PrismaClient), adición de un profesional específico, manejo de conflictos de email único, y modificación para borrar datos antes de la creación.
-"Lee el esquema de la base de datos y dame una forma de popular la tabla "patients" con unos 5." (Siguieron múltiples prompts de corrección y adición resumidos aquí)
-  - "El fichero @seed.ts tienes errores (referente a `process` no definido)"
-  - "Añade al script de seed, crear un profesional con estos datos: 1, antonio@email.com, $2b$10$4CQ.1AOYRpE5M4IXFaW00.denRK1rym7gqPnpf/5WWpEbiha.ttXm, Antonio Jose Barrios Leon, NUTRITIONIST"
-  - "He lanzado el seed y en el terminal @zsh me da error (referente a `Unique constraint failed on the fields: (\`email\`)`)"
-  - "Quiero que el script borre a todos los profesionales y cree solo a antonioProfessionalData. Lo mismo para los pacientes, borrarlos todos y crear los 5 de ejemplo."
+"Lee el esquema de la base de datos y dame una forma de popular la tabla \"patients\" con unos 5." (y correcciones posteriores del script seed)
 
 **Prompt 23 (Relacionado con TB-008 - Backend - Debug Listar Pacientes Devuelve `[]`):**
-Contexto: Tras ejecutar el seed, el endpoint devolvía un array vacío. Se verificó el flujo del `professionalId` desde el token.
-"Al listar pacientes, el endpoint me devuelve []" y posterior confirmación "Ya esta he hecho login de nuevo y funciona"
+"Al listar pacientes, el endpoint me devuelve []" (y posterior solución al problema del token)
 
 **Prompt 24 (Relacionado con TB-008 - Backend - Inicio Pruebas Unitarias Servicio `patient.service.ts`):**
 "Vamos a realizar las pruebas unitarias (para `patient.service.ts`)"
 
 **Prompt 25 (Relacionado con TB-008 - Backend - Corrección Mocks Prisma en Tests Servicio):**
-Contexto: Múltiples iteraciones para corregir el mock de Prisma en `patient.service.test.ts`, lidiando con errores de inicialización (`Cannot access 'prismaMock' before initialization`) y la correcta aplicación del mock automático de Vitest (`__mocks__` directory) y la posterior corrección de la aserción (`expected undefined to deeply equal ...`).
-  - "Hay un test que falla en @node (referente a `Cannot access 'prismaMock' before initialization`)"
-  - "Sigue fallando @node (referente a `Cannot access '__vi_import_0__' before initialization`)"
-  - "Sigue fallando, echa un vistazo a @node (referente a `Cannot access 'mockPrismaInstance' before initialization`)"
-  - "Ha fallado un test en @node (referente a `AssertionError: expected undefined to deeply equal ...`)"
+"Hay un test que falla en @node" (y correcciones de mocks de Prisma en tests de servicio)
 
 **Prompt 26 (Relacionado con TB-008 - Backend - Implementación Casos de Prueba Servicio `patient.service.ts`):**
 "Ya pasa, fantastico!. Continuemos con el resto de unit tests (para `patient.service.ts`)"
@@ -225,9 +212,7 @@ Contexto: Múltiples iteraciones para corregir el mock de Prisma en `patient.ser
 "Pasemos a las pruebas del controlador"
 
 **Prompt 28 (Relacionado con TB-008 - Backend - Corrección Mocks/Tipos en Tests Controlador):**
-Contexto: Corrección de errores de linter y tipado en `patient.controller.test.ts` al configurar mocks para `req`, `res`, `next` y la función de servicio mockeada, específicamente el uso de `vi.mocked` y el tipado de los datos devueltos por el servicio mockeado.
-  - "For the code present, we get this error: La propiedad 'mockResolvedValue' no existe en el tipo..."
-  - "Los test fallan, echa un vistazo a @node (referente a `TypeError: ... is not a spy or a call to a spy!` para `mockNext`)"
+"For the code present, we get this error: La propiedad 'mockResolvedValue' no existe en el tipo..." (y correcciones de mocks/tipos en tests de controlador)
 
 **Prompt 29 (Relacionado con TB-008 - Backend - Implementación Casos de Prueba Controlador `patient.controller.ts`):**
 "Continua construyendo tests para el controlador por favor"
@@ -239,10 +224,10 @@ Contexto: Corrección de errores de linter y tipado en `patient.controller.test.
 "¿Puedes actualizar los test unitarios de @patientService.test.ts en base a los nuevos cambios de  @patient.service.ts ?"
 
 **Prompt 32 (Relacionado con TB-008 - Frontend - Corrección Linter Tests Service):**
-"Corrige los errores del linter por favor." *(Seguido de iteraciones de corrección automática)*
+"Corrige los errores del linter por favor."
 
 **Prompt 33 (Relacionado con TF-009 - Plan de Acción Inicial):**
-"Lee @tickets_frontend.md y desarrolla un plan para resolver el ticket "TF-009". Iremos paso por paso."
+"Lee @tickets_frontend.md y desarrolla un plan para resolver el ticket \"TF-009\". Iremos paso por paso."
 
 **Prompt 34 (Relacionado con TF-009 - Creación Componente Page):**
 "Implementa el primer paso del plan: crear el componente base para la página de perfil del paciente (`PatientProfilePage.tsx`)."
@@ -251,7 +236,7 @@ Contexto: Corrección de errores de linter y tipado en `patient.controller.test.
 "Continua con el plan: implementa la lógica para obtener los datos del paciente y manejar los estados de carga, error y éxito en `PatientProfilePage.tsx`."
 
 **Prompt 36 (Relacionado con TF-009 - Corrección Linter Tipos/Servicio):**
-"Corrige los errores del linter relacionados con la función `fetchPatientById` no encontrada y los errores de tipado en `PatientProfilePage.tsx`." *(Este prompt cubre las iteraciones de corrección del servicio y los tipos)*
+"Corrige los errores del linter relacionados con la función `fetchPatientById` no encontrada y los errores de tipado en `PatientProfilePage.tsx`."
 
 **Prompt 37 (Relacionado con TF-009 - Creación Tests Unitarios):**
 "Continua con el plan: crea los tests unitarios para `PatientProfilePage.tsx`."
@@ -267,6 +252,30 @@ Contexto: Corrección de errores de linter y tipado en `patient.controller.test.
 
 **Prompt 41 (Relacionado con Validación de Formulario y Tests TF-XXX):**
 "Con este campo, actualiza los test unitarios de @NewPatientPage.test.tsx"
+
+**Prompt 42 (Relacionado con TB-006 - Backend - Plan de Acción Inicial):**
+"Lee el ticket @tickets_backend.md y plantea un plan de desarrollo para resolver el ticket TB-006. Vamos a validarlo. No hagas nada aun."
+
+**Prompt 43 (Relacionado con TB-006 - Backend - Implementación Endpoint, Servicio y Controlador):**
+"Si, comienza el desarrollo segun el plan."
+
+**Prompt 44 (Relacionado con TB-006 - Backend - Inicio Tests Unitarios Controlador):**
+"Ahora crearemos una prueba básica para la actualización de pacientes:"
+
+**Prompt 45 (Relacionado con TB-006 - Backend - Corrección Tests Controlador - Vitest/Jest):**
+"Cambia el archivo @patient.controller.test.ts para los test unitarios relacionados con la historia TB-006. Estas usando jest cuando los test existentes usan vitest."
+
+**Prompt 46 (Relacionado con TB-006 - Backend - Corrección Tests Controlador - Ejecución):**
+"Ahora, vamos a ejecutar nuevamente los tests para verificar que este fallo se haya resuelto y que todos los tests relacionados con `updatePatientForProfessional` pasen."
+
+**Prompt 47 (Relacionado con TB-006 - Backend - Inicio Tests Unitarios Servicio):**
+"Actualiza los test unitarios para @patient.service.test.ts con los ultimos cambios del ticket TB-006."
+
+**Prompt 48 (Relacionado con TB-006 - Backend - Corrección Tests Servicio - Error Falla Test):**
+"Hay un test que falla en la consola en @patient.service.test.ts. ¿Puedes mirarlo? Te adjunto la salida de la consola @node"
+
+**Prompt 49 (Relacionado con TB-006 - Backend - Añadir Endpoints Actualización a Postman):**
+"¿Puedes actualizar la coleccion de postman @NutriTrack Pro.postman_collection.json con los ultimso endpoints añadidos de actualización de pacientes?"
 
 ---
 

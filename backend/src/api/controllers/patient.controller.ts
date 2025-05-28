@@ -198,4 +198,91 @@ export const createPatient = async (req: AuthenticatedRequest, res: Response, ne
   }
 };
 
-// Aquí se añadirán otras funciones del controlador (PUT, DELETE) 
+// Controlador para actualizar un paciente existente (PUT /api/patients/:patientId)
+export const updatePatient = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const professionalPayload = req.professional;
+    const patientId = parseInt(req.params.patientId, 10);
+
+    // Verificar token y validar patientId
+    if (!professionalPayload || !professionalPayload.professionalId) {
+      res.status(403).json({ message: 'Acceso denegado: Información del profesional no encontrada.' });
+      return;
+    }
+
+    if (isNaN(patientId)) {
+      res.status(400).json({ message: 'ID de paciente no válido.' });
+      return;
+    }
+
+    // Extraer datos de la solicitud
+    const { 
+      firstName, 
+      lastName, 
+      email, 
+      phone, 
+      birthDate, 
+      gender, 
+      height, 
+      medicalNotes, 
+      dietRestrictions, 
+      objectives 
+    } = req.body;
+
+    // Validar formato de email si está presente
+    if (email !== undefined && email !== null && typeof email === 'string' && email.trim() !== '' && 
+        !/^[\w-]+(?:\.[\w-]+)*@(?:[\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
+      res.status(400).json({ message: 'Formato de correo electrónico no válido.' });
+      return;
+    }
+
+    // Validar formato de fecha de nacimiento si está presente
+    if (birthDate !== undefined && birthDate !== null && typeof birthDate === 'string' && 
+        isNaN(Date.parse(birthDate))) {
+      res.status(400).json({ message: 'Formato de fecha de nacimiento no válido (esperado YYYY-MM-DD).' });
+      return;
+    }
+
+    // Validar altura si está presente
+    if (height !== undefined && height !== null && typeof height !== 'number') {
+      res.status(400).json({ message: 'Altura debe ser un número.' });
+      return;
+    }
+
+    // Preparar objeto con datos a actualizar
+    const patientDataToUpdate: any = {};
+
+    // Solo añadir al objeto los campos que se han proporcionado
+    if (firstName !== undefined) patientDataToUpdate.firstName = firstName;
+    if (lastName !== undefined) patientDataToUpdate.lastName = lastName;
+    if (email !== undefined) patientDataToUpdate.email = email;
+    if (phone !== undefined) patientDataToUpdate.phone = phone;
+    if (birthDate !== undefined) patientDataToUpdate.birthDate = birthDate ? new Date(birthDate) : null;
+    if (gender !== undefined) patientDataToUpdate.gender = gender;
+    if (height !== undefined) patientDataToUpdate.height = height;
+    if (medicalNotes !== undefined) patientDataToUpdate.medicalNotes = medicalNotes;
+    if (dietRestrictions !== undefined) patientDataToUpdate.dietRestrictions = dietRestrictions;
+    if (objectives !== undefined) patientDataToUpdate.objectives = objectives;
+
+    // Actualizar paciente a través del servicio
+    const updatedPatient = await patientService.updatePatientForProfessional(
+      professionalPayload.professionalId,
+      patientId,
+      patientDataToUpdate
+    );
+
+    // Manejar caso de paciente no encontrado o no pertenece al profesional
+    if (!updatedPatient) {
+      res.status(404).json({ message: 'Paciente no encontrado o no tiene permiso para actualizarlo.' });
+      return;
+    }
+
+    // Devolver paciente actualizado
+    res.status(200).json(updatedPatient);
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Aquí se añadirán otras funciones del controlador (DELETE) 

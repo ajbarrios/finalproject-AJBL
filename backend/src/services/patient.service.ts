@@ -215,5 +215,58 @@ export const createPatientForProfessional = async (
   }
 };
 
-// Aquí se añadirán otras funciones del servicio (updatePatient, deletePatient, etc.)
+/**
+ * Actualiza la información de un paciente existente para un profesional específico.
+ * @param professionalId El ID del profesional autenticado.
+ * @param patientId El ID del paciente a actualizar.
+ * @param patientData Los datos del paciente a actualizar (todos los campos son opcionales).
+ * @returns Una promesa que resuelve al objeto del paciente actualizado o null si no se encuentra o no pertenece al profesional.
+ */
+export const updatePatientForProfessional = async (
+  professionalId: number,
+  patientId: number,
+  patientData: {
+    firstName?: string;
+    lastName?: string;
+    email?: string | null;
+    phone?: string | null;
+    birthDate?: Date | null;
+    gender?: string | null;
+    height?: number | null;
+    medicalNotes?: string | null;
+    dietRestrictions?: string | null;
+    objectives?: string | null;
+  }
+): Promise<Patient | null> => {
+  try {
+    // 1. Verificar que el paciente existe y pertenece al profesional
+    const existingPatient = await prisma.patient.findFirst({
+      where: {
+        id: patientId,
+        professionalId: professionalId,
+      },
+    });
+
+    // Si el paciente no existe o no pertenece a este profesional, retornar null
+    if (!existingPatient) {
+      return null;
+    }
+
+    // 2. Actualizar el paciente con los campos proporcionados
+    const updatedPatient = await prisma.patient.update({
+      where: {
+        id: patientId,
+      },
+      data: patientData, // Solo actualiza los campos proporcionados
+    });
+
+    return updatedPatient;
+
+  } catch (error) {
+    console.error(`Error en updatePatientForProfessional: ${error}`);
+    throw error;
+  }
+};
+
+// Aquí se añadirán otras funciones del servicio (deletePatient, etc.)
 // ... existing code ... 

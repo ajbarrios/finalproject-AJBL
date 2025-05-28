@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { listPatients, getPatientById, createPatient } from '../controllers/patient.controller'; // Importar la nueva función controladora
+import { listPatients, getPatientById, createPatient, updatePatient } from '../controllers/patient.controller'; // Importar la nueva función controladora
 
 // Importaremos el middleware de autenticación aquí cuando esté listo
 // import { authenticateToken } from '../../middleware/auth.middleware'; // La ruta anterior era placeholder
@@ -29,6 +29,13 @@ router.get(
   getPatientById // Usar la nueva función controladora
 );
 
-// Aquí se añadirán otras rutas de pacientes (POST para crear, PUT, DELETE)
+// Ruta para actualizar la información de un paciente (PUT /api/patients/:patientId)
+router.put(
+  '/:patientId',
+  authenticateToken, // Proteger esta ruta
+  updatePatient // Usar la nueva función controladora
+);
+
+// Aquí se añadirán otras rutas de pacientes (DELETE)
 
 export default router; 
