@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { listPatients } from './patient.controller'; // Ajusta la ruta si es necesario
+import { listPatients, getPatientById, createPatient, updatePatient } from './patient.controller'; // Ajusta la ruta si es necesario
 import * as patientService from '../../services/patient.service'; // Para mockear el servicio
 import { AuthenticatedRequest } from '../../middleware/auth.middleware'; // Para tipar req
 import { Response, NextFunction } from 'express';
@@ -8,6 +8,9 @@ import { mockDeep, DeepMockProxy } from 'vitest-mock-extended'; // Para mocks de
 // Mockear completamente el módulo patient.service
 vi.mock('../../services/patient.service', () => ({
   getPatientsForProfessional: vi.fn(), // Mockeamos la función específica que usa listPatients
+  getPatientDetailsForProfessional: vi.fn(),
+  createPatientForProfessional: vi.fn(),
+  updatePatientForProfessional: vi.fn()
 }));
 
 // Tipos para los mocks de Express
@@ -136,5 +139,144 @@ describe('PatientController - listPatients', () => {
     // Verificar que next fue llamado con el error
     expect(vi.mocked(mockNext)).toHaveBeenCalledOnce();
     expect(vi.mocked(mockNext)).toHaveBeenCalledWith(error);
+  });
+});
+
+// Tests para updatePatient
+describe('PatientController - updatePatient', () => {
+  let mockReq: MockRequest;
+  let mockRes: MockResponse;
+  let mockNext: NextFunction;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    
+    mockReq = mockDeep<AuthenticatedRequest>();
+    mockRes = mockDeep<Response>();
+    mockNext = vi.fn() as unknown as NextFunction;
+
+    mockRes.status.mockImplementation((statusCode: number) => {
+        mockRes.statusCode = statusCode;
+        return mockRes;
+    });
+
+    // Configuración común para cada test
+    mockReq.professional = { professionalId: 1, email: 'test@pro.com' };
+    mockReq.params = { patientId: '1' };
+    mockReq.body = {
+      firstName: 'John Updated',
+      lastName: 'Doe Updated',
+      email: 'john.updated@example.com'
+    };
+  });
+
+  it('debería actualizar un paciente exitosamente', async () => {
+    const mockUpdatedPatient = { 
+      id: 1, 
+      firstName: 'John Updated', 
+      lastName: 'Doe Updated',
+      email: 'john.updated@example.com'
+    };
+    
+    vi.mocked(patientService.updatePatientForProfessional).mockResolvedValue(mockUpdatedPatient as any);
+
+    await updatePatient(mockReq, mockRes, mockNext);
+
+    expect(patientService.updatePatientForProfessional).toHaveBeenCalledWith(
+      1,
+      1,
+      expect.objectContaining({
+        firstName: 'John Updated',
+        lastName: 'Doe Updated',
+        email: 'john.updated@example.com'
+      })
+    );
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockUpdatedPatient);
+    expect(vi.mocked(mockNext)).not.toHaveBeenCalled();
+  });
+
+  it('debería retornar 404 cuando el paciente no se encuentra o no está autorizado', async () => {
+    vi.mocked(patientService.updatePatientForProfessional).mockResolvedValue(null);
+
+    await updatePatient(mockReq, mockRes, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(404);
+    expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
+      message: expect.stringContaining('Paciente no encontrado o no tiene permiso')
+    }));
+    expect(vi.mocked(mockNext)).not.toHaveBeenCalled();
+  });
+
+  it('debería validar el formato del email', async () => {
+    mockReq.body = {
+      ...mockReq.body,
+      email: 'invalid-email'
+    };
+
+    await updatePatient(mockReq, mockRes, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
+      message: expect.stringContaining('Formato de correo electrónico no válido')
+    }));
+    expect(patientService.updatePatientForProfessional).not.toHaveBeenCalled();
+    expect(vi.mocked(mockNext)).not.toHaveBeenCalled();
+  });
+
+  it('debería validar el formato de fecha', async () => {
+    mockReq.body = {
+      ...mockReq.body,
+      birthDate: 'invalid-date'
+    };
+
+    await updatePatient(mockReq, mockRes, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
+      message: expect.stringContaining('Formato de fecha de nacimiento no válido')
+    }));
+    expect(patientService.updatePatientForProfessional).not.toHaveBeenCalled();
+    expect(vi.mocked(mockNext)).not.toHaveBeenCalled();
+  });
+
+  it('debería validar que la altura sea un número', async () => {
+    mockReq.body = {
+      ...mockReq.body,
+      height: 'not-a-number' as any
+    };
+
+    await updatePatient(mockReq, mockRes, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
+      message: expect.stringContaining('Altura debe ser un número')
+    }));
+    expect(patientService.updatePatientForProfessional).not.toHaveBeenCalled();
+    expect(vi.mocked(mockNext)).not.toHaveBeenCalled();
+  });
+
+  it('debería manejar un ID de paciente inválido', async () => {
+    mockReq.params = { patientId: 'abc' };
+
+    await updatePatient(mockReq, mockRes, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
+      message: expect.stringContaining('ID de paciente no válido')
+    }));
+    expect(patientService.updatePatientForProfessional).not.toHaveBeenCalled();
+    expect(vi.mocked(mockNext)).not.toHaveBeenCalled();
+  });
+
+  it('debería pasar los errores a la función next', async () => {
+    const error = new Error('Test error');
+    vi.mocked(patientService.updatePatientForProfessional).mockRejectedValue(error);
+
+    await updatePatient(mockReq, mockRes, mockNext);
+
+    expect(vi.mocked(mockNext)).toHaveBeenCalledWith(error);
+    expect(mockRes.status).not.toHaveBeenCalled();
+    expect(mockRes.json).not.toHaveBeenCalled();
   });
 }); 

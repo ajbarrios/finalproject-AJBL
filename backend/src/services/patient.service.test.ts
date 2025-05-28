@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 // Importa el cliente Prisma TAL COMO LO HACE EL SERVICIO. 
 // Vitest debería reemplazar esto con el contenido de __mocks__/prisma.client.ts
 import prismaFromServicePerspective from '../config/db/prisma.client'; 
-import { getPatientsForProfessional, createPatientForProfessional } from './patient.service';
+import { getPatientsForProfessional, createPatientForProfessional, updatePatientForProfessional } from './patient.service';
 import { type Patient } from '../generated/prisma';
 import { type DeepMockProxy } from 'vitest-mock-extended'; // Solo necesitamos el tipo aquí
 import { type PrismaClient } from '../generated/prisma'; // Solo el tipo
@@ -529,4 +529,278 @@ describe('PatientService - createPatientForProfessional', () => {
        // Nota: Verificar la *reversión* de la transacción (que patient.create se deshace) es difícil con mocks puros.
        // Esto se verifica mejor con pruebas de integración.
    });
+});
+
+describe('PatientService - updatePatientForProfessional', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('debería actualizar un paciente exitosamente cuando el profesional es propietario', async () => {
+    const professionalId = 1;
+    const patientId = 101;
+    const patientDataToUpdate = {
+      firstName: 'Nombre Actualizado',
+      lastName: 'Apellido Actualizado',
+      email: 'actualizado@example.com'
+    };
+
+    // Mock para simular que el paciente existe y pertenece al profesional
+    prismaClientMock.patient.findFirst.mockResolvedValue({
+      id: patientId,
+      professionalId: professionalId,
+      firstName: 'Nombre Original',
+      lastName: 'Apellido Original',
+      email: 'original@example.com',
+      phone: null,
+      birthDate: null,
+      gender: null,
+      height: null,
+      medicalNotes: null,
+      dietRestrictions: null,
+      objectives: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // Mock para simular la actualización exitosa
+    const mockUpdatedPatient = {
+      id: patientId,
+      professionalId: professionalId,
+      firstName: 'Nombre Actualizado',
+      lastName: 'Apellido Actualizado',
+      email: 'actualizado@example.com',
+      phone: null,
+      birthDate: null,
+      gender: null,
+      height: null,
+      medicalNotes: null,
+      dietRestrictions: null,
+      objectives: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    prismaClientMock.patient.update.mockResolvedValue(mockUpdatedPatient);
+
+    // Ejecutar la función del servicio
+    const result = await updatePatientForProfessional(professionalId, patientId, patientDataToUpdate);
+
+    // Aserciones
+    expect(result).toEqual(mockUpdatedPatient);
+    expect(prismaClientMock.patient.findFirst).toHaveBeenCalledOnce();
+    expect(prismaClientMock.patient.findFirst).toHaveBeenCalledWith({
+      where: {
+        id: patientId,
+        professionalId: professionalId
+      }
+    });
+    expect(prismaClientMock.patient.update).toHaveBeenCalledOnce();
+    expect(prismaClientMock.patient.update).toHaveBeenCalledWith({
+      where: { id: patientId },
+      data: patientDataToUpdate
+    });
+  });
+
+  it('debería devolver null cuando el paciente no existe', async () => {
+    const professionalId = 1;
+    const patientId = 999; // ID inexistente
+    const patientDataToUpdate = {
+      firstName: 'Nombre Actualizado'
+    };
+
+    // Mock para simular que el paciente no existe
+    prismaClientMock.patient.findFirst.mockResolvedValue(null);
+
+    // Ejecutar la función del servicio
+    const result = await updatePatientForProfessional(professionalId, patientId, patientDataToUpdate);
+
+    // Aserciones
+    expect(result).toBeNull();
+    expect(prismaClientMock.patient.findFirst).toHaveBeenCalledOnce();
+    expect(prismaClientMock.patient.findFirst).toHaveBeenCalledWith({
+      where: {
+        id: patientId,
+        professionalId: professionalId
+      }
+    });
+    expect(prismaClientMock.patient.update).not.toHaveBeenCalled();
+  });
+
+  it('debería devolver null cuando el paciente no pertenece al profesional', async () => {
+    const professionalId = 1;
+    const otherProfessionalId = 2; // Otro profesional
+    const patientId = 101;
+    const patientDataToUpdate = {
+      firstName: 'Nombre Actualizado'
+    };
+
+    // Mock para simular que el paciente existe pero pertenece a otro profesional
+    // En este escenario, prisma.patient.findFirst con where: { id: patientId, professionalId: professionalId }
+    // debería devolver null porque professionalId no coincide con otherProfessionalId del paciente encontrado.
+    prismaClientMock.patient.findFirst.mockResolvedValue(null); // Ajustado para devolver null
+
+    // Ejecutar la función del servicio
+    const result = await updatePatientForProfessional(professionalId, patientId, patientDataToUpdate);
+
+    // Aserciones
+    expect(result).toBeNull();
+    expect(prismaClientMock.patient.findFirst).toHaveBeenCalledOnce();
+    expect(prismaClientMock.patient.findFirst).toHaveBeenCalledWith({
+      where: {
+        id: patientId,
+        professionalId: professionalId
+      }
+    });
+    expect(prismaClientMock.patient.update).not.toHaveBeenCalled();
+  });
+
+  it('debería actualizar solo los campos proporcionados', async () => {
+    const professionalId = 1;
+    const patientId = 101;
+    // Solo actualizamos email y medicalNotes
+    const patientDataToUpdate = {
+      email: 'nuevo.email@example.com',
+      medicalNotes: 'Nuevas notas médicas'
+    };
+
+    // Mock para simular que el paciente existe y pertenece al profesional
+    prismaClientMock.patient.findFirst.mockResolvedValue({
+      id: patientId,
+      professionalId: professionalId,
+      firstName: 'Nombre Original',
+      lastName: 'Apellido Original',
+      email: 'original@example.com',
+      phone: '123456789',
+      birthDate: new Date('1990-01-01'),
+      gender: 'Masculino',
+      height: 175,
+      medicalNotes: 'Notas originales',
+      dietRestrictions: 'Sin restricciones',
+      objectives: 'Objetivo original',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // Mock para simular la actualización exitosa
+    const mockUpdatedPatient = {
+      id: patientId,
+      professionalId: professionalId,
+      firstName: 'Nombre Original', // No cambia
+      lastName: 'Apellido Original', // No cambia
+      email: 'nuevo.email@example.com', // Cambia
+      phone: '123456789', // No cambia
+      birthDate: new Date('1990-01-01'), // No cambia
+      gender: 'Masculino', // No cambia
+      height: 175, // No cambia
+      medicalNotes: 'Nuevas notas médicas', // Cambia
+      dietRestrictions: 'Sin restricciones', // No cambia
+      objectives: 'Objetivo original', // No cambia
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    prismaClientMock.patient.update.mockResolvedValue(mockUpdatedPatient);
+
+    // Ejecutar la función del servicio
+    const result = await updatePatientForProfessional(professionalId, patientId, patientDataToUpdate);
+
+    // Aserciones
+    expect(result).toEqual(mockUpdatedPatient);
+    expect(prismaClientMock.patient.update).toHaveBeenCalledWith({
+      where: { id: patientId },
+      data: patientDataToUpdate // Solo debe contener email y medicalNotes
+    });
+  });
+
+  it('debería manejar la actualización de un campo a null', async () => {
+    const professionalId = 1;
+    const patientId = 101;
+    // Actualizamos email a null explícitamente
+    const patientDataToUpdate = {
+      email: null
+    };
+
+    // Mock para simular que el paciente existe y pertenece al profesional
+    prismaClientMock.patient.findFirst.mockResolvedValue({
+      id: patientId,
+      professionalId: professionalId,
+      firstName: 'Nombre',
+      lastName: 'Apellido',
+      email: 'email.existente@example.com', // Tiene un email
+      phone: null,
+      birthDate: null,
+      gender: null,
+      height: null,
+      medicalNotes: null,
+      dietRestrictions: null,
+      objectives: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // Mock para simular la actualización exitosa
+    const mockUpdatedPatient = {
+      id: patientId,
+      professionalId: professionalId,
+      firstName: 'Nombre',
+      lastName: 'Apellido',
+      email: null, // Email ahora es null
+      phone: null,
+      birthDate: null,
+      gender: null,
+      height: null,
+      medicalNotes: null,
+      dietRestrictions: null,
+      objectives: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    prismaClientMock.patient.update.mockResolvedValue(mockUpdatedPatient);
+
+    // Ejecutar la función del servicio
+    const result = await updatePatientForProfessional(professionalId, patientId, patientDataToUpdate);
+
+    // Aserciones
+    expect(result).toEqual(mockUpdatedPatient);
+    expect(prismaClientMock.patient.update).toHaveBeenCalledWith({
+      where: { id: patientId },
+      data: { email: null }
+    });
+  });
+
+  it('debería lanzar un error si Prisma arroja un error', async () => {
+    const professionalId = 1;
+    const patientId = 101;
+    const patientDataToUpdate = {
+      firstName: 'Nombre Actualizado'
+    };
+    const errorMessage = 'Error de base de datos al actualizar';
+
+    // Mock para simular que el paciente existe y pertenece al profesional
+    prismaClientMock.patient.findFirst.mockResolvedValue({
+      id: patientId,
+      professionalId: professionalId,
+      firstName: 'Nombre Original',
+      lastName: 'Apellido Original',
+      email: null,
+      phone: null,
+      birthDate: null,
+      gender: null,
+      height: null,
+      medicalNotes: null,
+      dietRestrictions: null,
+      objectives: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // Mock para simular un error en la actualización
+    prismaClientMock.patient.update.mockRejectedValue(new Error(errorMessage));
+
+    // Verificar que la función lanza un error
+    await expect(updatePatientForProfessional(professionalId, patientId, patientDataToUpdate))
+      .rejects.toThrow(errorMessage);
+
+    expect(prismaClientMock.patient.findFirst).toHaveBeenCalledOnce();
+    expect(prismaClientMock.patient.update).toHaveBeenCalledOnce();
+  });
 }); 
