@@ -74,36 +74,29 @@ export const fetchPatientById = async (patientId: string): Promise<PatientDetail
 };
 
 // Podrías añadir aquí otras funciones relacionadas con pacientes en el futuro:
-// import type { NewPatientData, UpdatePatientData } from '../types/patient';
+import type { NewPatientData } from '../types/patient'; // Asegurarse de que este tipo exista y sea correcto
 
-// export const getPatientById = async (id: string): Promise<Patient> => {
-//   try {
-//     const response = await apiClient.get<Patient>(`/patients/${id}`);
-//     return response.data;
-//   } catch (error) {
-//     console.error(`Error en getPatientById ${id}:`, error);
-//     if (axios.isAxiosError(error) && error.response) {
-//       const message = (error.response.data as { message?: string })?.message || 'Error al obtener el paciente';
-//       throw new Error(message);
-//     } else {
-//       throw new Error('Error de red o problema al conectar con el servidor.');
-//     }
-//   }
-// };
-
-// export const createPatient = async (patientData: NewPatientData): Promise<Patient> => {
-//   try {
-//     const response = await apiClient.post<Patient>('/patients', patientData);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error en createPatient:', error);
-//     if (axios.isAxiosError(error) && error.response) {
-//       const message = (error.response.data as { message?: string })?.message || 'Error al crear el paciente';
-//       throw new Error(message);
-//     } else {
-//       throw new Error('Error de red o problema al conectar con el servidor.');
-//     }
-//   }
-// };
+export const createPatient = async (patientData: NewPatientData): Promise<Patient> => {
+  try {
+    const response = await apiClient.post<Patient>('/patients', patientData);
+    return response.data;
+  } catch (error) {
+    console.error('Error en createPatient:', error);
+    if (isAxiosError(error)) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        // Si es AxiosError pero sin mensaje específico del backend
+        throw new Error(error.message); // Lanza el mensaje genérico de Axios
+      }
+    } else if (error instanceof Error) {
+      // Otros tipos de errores (de red, etc.) que son instancias de Error
+      throw error; // Lanza el error original
+    } else {
+      // Si no es una instancia de Error
+      throw new Error('Ha ocurrido un error desconocido al crear el paciente.');
+    }
+  }
+};
 
 // etc. 

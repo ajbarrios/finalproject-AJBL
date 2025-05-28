@@ -34,17 +34,31 @@ export interface Patient {
  * Puede omitir campos generados por el servidor como id, createdAt, updatedAt.
  */
 export interface NewPatientData {
-  email?: string | null;
+  email?: string | null | undefined;
   firstName: string;
   lastName:string;
-  phone?: string | null;
-  birthDate?: string | null; 
-  gender?: string | null;
-  height?: number | null;
-  medicalNotes?: string | null;
-  dietRestrictions?: string | null;
-  objectives?: string | null;
+  phone?: string | null | undefined;
+  birthDate?: Date | null | undefined; // Ajustado para coincidir con el formato enviado desde el formulario
+  gender?: string | null | undefined;
+  height?: number | null | undefined;
+  medicalNotes?: string | null | undefined;
+  dietRestrictions?: string | null | undefined;
+  objectives?: string | null | undefined;
   // professionalId se tomará del usuario autenticado en el backend
+  initialBiometrics?: { // Añadir estructura para datos biométricos iniciales opcionales
+    recordDate?: Date | null | undefined; // Asumiendo que se podría enviar una fecha o null/undefined
+    weight?: number | null | undefined;
+    bodyFatPercentage?: number | null | undefined;
+    musclePercentage?: number | null | undefined;
+    waterPercentage?: number | null | undefined;
+    backChestDiameter?: number | null | undefined;
+    waistDiameter?: number | null | undefined;
+    armsDiameter?: number | null | undefined;
+    legsDiameter?: number | null | undefined;
+    calvesDiameter?: number | null | undefined;
+    notes?: string | null | undefined;
+    // Añadir otros campos biométricos si se usan en el formulario
+  } | null | undefined;
 }
 
 /**
