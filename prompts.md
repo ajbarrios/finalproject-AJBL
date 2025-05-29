@@ -277,6 +277,17 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 49 (Relacionado con TB-006 - Backend - Añadir Endpoints Actualización a Postman):**
 "¿Puedes actualizar la coleccion de postman @NutriTrack Pro.postman_collection.json con los ultimso endpoints añadidos de actualización de pacientes?"
 
+**Prompt 50 (Relacionado con TF-006 - Frontend - Implementación y Toasts):**
+"Elimina la dependencia de react-toastify y usa la que ya existe en el proyecto, react-hot-toast en la pagina de @PatientEditPage.tsx"
+
+**Prompt 51 (Relacionado con TF-006 - Frontend - Debug Toasts Duplicados):**
+"Hay un pequeño problema. Al editar el paciente, el toast de exito se pone arriba y debajo de la pagina de @PatientEditPage.tsx . ¿Puedes solucionarlo? Te adjunto captura"
+
+**Prompt 52 (Relacionado con TF-006 - Frontend - Corrección Navegación):**
+"Veo un fallo en la pagina @PatientProfilePage.tsx . Despues de editar, se navega a esta ultima para ver su detalle actualizado y al pulsar en el boton \"volver al listado\", en lugar de volver al dashboard, vuelve a la pagina de edicion. ¿Puedes arreglarlo?"
+
+**Prompt 53 (Relacionado con TF-006 - Frontend - Implementación Tests Unitarios Servicio):**
+"Vamos a desarrollar los unit test correspondientes a la implementacion del ticket TF-006. Por favor, ten en cuenta la estructura y el estilo de test que ya se han realizado para mantener consistencia."
 ---
 
 ### 7. Pull Requests
