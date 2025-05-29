@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { listPatients, getPatientById, createPatient, updatePatient } from '../controllers/patient.controller'; // Importar la nueva función controladora
+import { listPatients, getPatientById, createPatient, updatePatient, createBiometricRecord } from '../controllers/patient.controller'; // Importar la nueva función controladora
 
 // Importaremos el middleware de autenticación aquí cuando esté listo
 // import { authenticateToken } from '../../middleware/auth.middleware'; // La ruta anterior era placeholder
@@ -34,6 +34,13 @@ router.put(
   '/:patientId',
   authenticateToken, // Proteger esta ruta
   updatePatient // Usar la nueva función controladora
+);
+
+// Ruta para registrar nuevas medidas biométricas (POST /api/patients/:patientId/biometric-records)
+router.post(
+  '/:patientId/biometric-records',
+  authenticateToken, // Proteger esta ruta
+  createBiometricRecord
 );
 
 // Aquí se añadirán otras rutas de pacientes (DELETE)
