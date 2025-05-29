@@ -4,29 +4,25 @@
  * y el modelo Patient de Prisma, pero solo incluyendo los campos necesarios para el frontend.
  */
 export interface Patient {
-  id: string; // o number, dependiendo de lo que devuelva la API (Prisma usa Int, pero podría ser string en la API response)
-  professionalId: string; // o number
+  id: string;
+  professionalId: string; // Asumiendo que el frontend necesita saber esto, aunque no se use directamente en edición
   email?: string | null;
   firstName: string;
   lastName: string;
   phone?: string | null;
-  birthDate?: string | null; // Formato ISO Date (YYYY-MM-DD) como string es común en APIs
-  gender?: string | null;
-  height?: number | null; // En cm
+  birthDate?: string | null; // O Date
+  gender?: string | null; // O un enum si se usa en frontend
+  height?: number | null; // Puede que se edite aquí, o solo en biométricos
   medicalNotes?: string | null;
   dietRestrictions?: string | null;
   objectives?: string | null;
-  createdAt: string; // Formato ISO DateTime como string
-  updatedAt: string; // Formato ISO DateTime como string
+  createdAt: string; // O Date
+  updatedAt: string; // O Date
 
-  // Campos adicionales que podrían ser útiles en el frontend, derivados o de relaciones
-  // Por ejemplo, si la API devuelve el nombre completo ya concatenado:
-  // fullName?: string;
-  
-  // Si la API devuelve un resumen del último registro biométrico o planes:
-  // lastBiometricRecordSummary?: any; 
-  // activeDietPlanSummary?: any;
-  // activeWorkoutPlanSummary?: any;
+  // Campos adicionales devueltos por getPatientById
+  lastBiometricRecord?: BiometricRecordSummary | null;
+  dietPlansSummary: PlanSummary[];
+  workoutPlansSummary: PlanSummary[];
 }
 
 /**
@@ -65,7 +61,18 @@ export interface NewPatientData {
  * Interfaz para actualizar un paciente existente.
  * Todos los campos son opcionales, ya que solo se envían los que cambian.
  */
-export type UpdatePatientData = Partial<NewPatientData>;
+export interface UpdatePatientData {
+  firstName?: string;
+  lastName?: string;
+  email?: string | null;
+  phone?: string | null;
+  birthDate?: string | null; // O Date
+  gender?: string | null; // O un enum
+  height?: number | null;
+  medicalNotes?: string | null;
+  dietRestrictions?: string | null;
+  objectives?: string | null;
+}
 
 // Ejemplo de cómo podrías usarlo:
 // import { Patient } from './patient';
@@ -93,17 +100,17 @@ export type BiometricRecord = {
 export type DietPlanSummary = {
   id: string;
   title: string;
-  isActive: boolean;
   startDate: string | null; // ISO date string
   endDate: string | null; // ISO date string
+  status: 'Active' | 'Draft'; // Añadido para coincidir con PlanSummary
 };
 
 export type WorkoutPlanSummary = {
   id: string;
   title: string;
-  isActive: boolean;
   startDate: string | null; // ISO date string
   endDate: string | null; // ISO date string
+  status: 'Active' | 'Draft'; // Añadido para coincidir con PlanSummary
 };
 
 // Define a type for the detailed patient response
@@ -113,3 +120,22 @@ export type PatientDetails = Patient & {
   workoutPlansSummary: WorkoutPlanSummary[];
   // Add other related data if the backend returns it with the patient details
 }; 
+
+export interface BiometricRecordSummary {
+  id: string;
+  recordDate: string; // O Date, dependiendo de cómo se maneje la fecha en el frontend
+  weight?: number | null;
+  bodyFatPercentage?: number | null;
+  musclePercentage?: number | null;
+  waterPercentage?: number | null;
+  waistDiameter?: number | null;
+  notes?: string | null;
+}
+
+export interface PlanSummary {
+  id: string;
+  title: string;
+  startDate?: string | null; // O Date
+  endDate?: string | null; // O Date
+  status: 'Active' | 'Draft'; // Ajusta si hay más estados
+} 

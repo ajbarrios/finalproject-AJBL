@@ -30,6 +30,7 @@ import Navbar from './components/common/Navbar';
 import PatientDashboardPage from './pages/PatientDashboardPage';
 import PatientProfilePage from './pages/PatientProfilePage';
 import NewPatientPage from './pages/NewPatientPage';
+import PatientEditPage from './pages/PatientEditPage';
 
 // Componente para la página de inicio temporal (si no hay otra)
 const HomePage = () => (
@@ -66,6 +67,7 @@ function App() {
             <Route path="/dashboard" element={<ProtectedRoute><PatientDashboardPage /></ProtectedRoute>} />
             <Route path="/patients/:patientId" element={<ProtectedRoute><PatientProfilePage /></ProtectedRoute>} />
             <Route path="/patients/new" element={<ProtectedRoute><NewPatientPage /></ProtectedRoute>} />
+            <Route path="/patients/:patientId/edit" element={<ProtectedRoute><PatientEditPage /></ProtectedRoute>} />
 
             {/* Ruta principal: redirige a dashboard si está autenticado, sino a login */}
             <Route 
@@ -77,7 +79,6 @@ function App() {
             <Route path="*" element={<div className="text-center mt-10"><h1 className="text-2xl">404 - Página No Encontrada</h1><Link to="/" className="text-indigo-600 hover:underline">Volver al inicio</Link></div>} />
           </Routes>
         </main>
-        <Toaster position="bottom-right" />
       </AuthProvider>
     </Router>
   )
