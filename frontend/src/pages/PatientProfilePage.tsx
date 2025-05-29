@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchPatientById } from '../services/patientService';
-import type { PatientDetails } from '../types/patient';
+import type { Patient } from '../types/patient';
 
 const PatientProfilePage: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
 
-  const [patient, setPatient] = useState<PatientDetails | null>(null);
+  const [patient, setPatient] = useState<Patient | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +33,7 @@ const PatientProfilePage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <button 
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/dashboard')}
         className="mb-4 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200"
       >
         &larr; Volver al Listado
@@ -76,7 +76,7 @@ const PatientProfilePage: React.FC = () => {
              {patient.dietPlansSummary && patient.dietPlansSummary.length > 0 ? (
                <ul>
                  {patient.dietPlansSummary.map(plan => (
-                   <li key={plan.id}>- {plan.title} ({plan.isActive ? 'Activo' : 'Borrador'})</li>
+                   <li key={plan.id}>- {plan.title} ({plan.status === 'Active' ? 'Activo' : 'Borrador'})</li>
                  ))}
                </ul>
              ) : (
@@ -89,7 +89,7 @@ const PatientProfilePage: React.FC = () => {
              {patient.workoutPlansSummary && patient.workoutPlansSummary.length > 0 ? (
                <ul>
                  {patient.workoutPlansSummary.map(plan => (
-                   <li key={plan.id}>- {plan.title} ({plan.isActive ? 'Activo' : 'Borrador'})</li>
+                   <li key={plan.id}>- {plan.title} ({plan.status === 'Active' ? 'Activo' : 'Borrador'})</li>
                  ))}
                </ul>
              ) : (
@@ -98,7 +98,12 @@ const PatientProfilePage: React.FC = () => {
            </div>
 
            <div className="bg-white p-6 rounded-lg shadow col-span-full flex space-x-4">
-               <button className="bg-blue-500 text-white px-4 py-2 rounded">Editar Paciente (TF-006)</button>
+               <button 
+                 onClick={() => navigate(`/patients/${patientId}/edit`)}
+                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
+                >
+                 Editar Paciente
+               </button>
                <button className="bg-green-500 text-white px-4 py-2 rounded">Añadir Biométrica (TF-010)</button>
                <button className="bg-purple-500 text-white px-4 py-2 rounded">Ver Historial Biométrico (TF-011)</button>
                <button className="bg-yellow-500 text-white px-4 py-2 rounded">Crear Plan Dieta (TF-012)</button>

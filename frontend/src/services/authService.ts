@@ -1,4 +1,5 @@
-import axios, { AxiosHeaders } from 'axios';
+import axios from 'axios';
+import api from './api'; // Importar la instancia de api centralizada
 
 // Define el tipo para las credenciales de login
 interface LoginCredentials {
@@ -22,20 +23,11 @@ interface AuthApiResponse {
   data: ApiUserData; 
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
-
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 // Actualizamos el tipo de retorno de la promesa a AuthApiResponse
 export const loginUser = async (credentials: LoginCredentials): Promise<AuthApiResponse> => {
   try {
-    // Especificamos que el tipo de respuesta de apiClient.post es AuthApiResponse
-    const response = await apiClient.post<AuthApiResponse>('/auth/login', credentials);
+    // Usamos la instancia api centralizada para la llamada post
+    const response = await api.post<AuthApiResponse>('/auth/login', credentials);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -47,20 +39,3 @@ export const loginUser = async (credentials: LoginCredentials): Promise<AuthApiR
     }
   }
 };
-
-// Interceptor para añadir el token JWT a las cabeceras
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    // Asegurarse de que config.headers existe
-    if (!config.headers) {
-      config.headers = new AxiosHeaders();
-    }
-    config.headers.set('Authorization', `Bearer ${token}`);
-  }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
-
-export default apiClient; 

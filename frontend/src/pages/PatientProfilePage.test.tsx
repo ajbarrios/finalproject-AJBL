@@ -58,11 +58,11 @@ const mockPatientDetails: PatientDetails = {
     updatedAt: new Date().toISOString(),
   },
   dietPlansSummary: [
-    { id: 'diet1', title: 'Plan Inicial', isActive: true, startDate: '2023-10-01T00:00:00.000Z', endDate: '2023-11-01T00:00:00.000Z' },
-    { id: 'diet2', title: 'Plan Mantenimiento', isActive: false, startDate: '2023-11-02T00:00:00.000Z', endDate: '2023-12-02T00:00:00.000Z' },
+    { id: 'diet1', title: 'Plan Inicial', status: 'Active', startDate: '2023-10-01T00:00:00.000Z', endDate: '2023-11-01T00:00:00.000Z' },
+    { id: 'diet2', title: 'Plan Mantenimiento', status: 'Draft', startDate: '2023-11-02T00:00:00.000Z', endDate: '2023-12-02T00:00:00.000Z' },
   ],
   workoutPlansSummary: [
-    { id: 'workout1', title: 'Rutina Fuerza', isActive: true, startDate: '2023-10-01T00:00:00.000Z', endDate: '2023-11-01T00:00:00.000Z' },
+    { id: 'workout1', title: 'Rutina Fuerza', status: 'Active', startDate: '2023-10-01T00:00:00.000Z', endDate: '2023-11-01T00:00:00.000Z' },
   ],
 };
 
@@ -146,7 +146,7 @@ describe('PatientProfilePage', () => {
 
     // Verificar que mockNavigate fue llamado con -1
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 
   it('debería mostrar un mensaje de error si la carga falla', async () => {

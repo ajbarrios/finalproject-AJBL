@@ -1,18 +1,24 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
-import apiClient from './authService'; // Usaremos esto para mockear sus métodos
-import { fetchPatients, fetchPatientById, createPatient } from '../services/patientService'; // Importar funciones directamente
+import { describe, it, expect, vi, beforeEach, type Mock, type Mocked } from 'vitest';
+// import apiClient from './authService'; // Usaremos esto para mockear sus métodos
+// import { fetchPatients, fetchPatientById, createPatient, updatePatient } from '../services/patientService'; // Importar funciones directamente
 import type { Patient } from '../types/patient';
 import type { NewPatientData } from '../types/patient'; // Importar tipo para datos de creación
 // Eliminamos AxiosRequestConfig si no se usa, mantenemos InternalAxiosRequestConfig si es la que se usa.
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-// Mockear el apiClient importado de authService
-vi.mock('./authService', () => {
+// Mockear el apiClient importado de ./api
+vi.mock('./api', () => {
+  const mockApiClient = {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    // Si api en ./api tiene otras propiedades o métodos necesarios, añadirlos aquí
+    // Por ejemplo, si `api` es una instancia completa de Axios, podría tener interceptors, defaults, etc.
+    // Para este mock simple, solo necesitamos los métodos HTTP que se usan en patientService.
+  };
   return {
-    default: {
-      get: vi.fn(),
-      post: vi.fn(),
-    },
+    __esModule: true, // Indica que es un módulo ES
+    default: mockApiClient, // Mockea la exportación por defecto
   };
 });
 
@@ -32,37 +38,84 @@ vi.mock('axios', async (importOriginal) => {
 });
 
 describe('patientService - fetchPatients', () => {
+  // Importar dinámicamente la función después de configurar el mock
+  let fetchPatients: typeof import('../services/patientService').fetchPatients;
+   // Obtener una referencia al mock de apiClient
+  let mockApiClient: Mocked<typeof import('./api').default>;
+
   const mockPatients: Patient[] = [
-    { id: '1', firstName: 'Ana', lastName: 'Gomez', email: 'ana@example.com', professionalId: 'prof1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: '2', firstName: 'Luis', lastName: 'Perez', email: 'luis@example.com', professionalId: 'prof1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { 
+      id: '1', 
+      firstName: 'Ana', 
+      lastName: 'Gomez', 
+      email: 'ana@example.com', 
+      professionalId: 'prof1', 
+      createdAt: new Date().toISOString(), 
+      updatedAt: new Date().toISOString(),
+      birthDate: null, 
+      gender: null,
+      height: null, 
+      medicalNotes: null,
+      dietRestrictions: null,
+      objectives: null,
+      lastBiometricRecord: null, 
+      dietPlansSummary: [], 
+      workoutPlansSummary: [], 
+    },
+    { 
+      id: '2', 
+      firstName: 'Luis', 
+      lastName: 'Perez', 
+      email: 'luis@example.com', 
+      professionalId: 'prof1', 
+      createdAt: new Date().toISOString(), 
+      updatedAt: new Date().toISOString(),
+      birthDate: null, 
+      gender: null,
+      height: null, 
+      medicalNotes: null,
+      dietRestrictions: null,
+      objectives: null,
+      lastBiometricRecord: null, 
+      dietPlansSummary: [], 
+      workoutPlansSummary: [], 
+    },
   ];
 
-  beforeEach(() => {
-    // Resetear el mock de apiClient.get antes de cada prueba
-    (apiClient.get as Mock).mockReset();
+  beforeEach(async () => {
+    // Importar dinámicamente el módulo mockeado
+    const api = await import('./api');
+    mockApiClient = api.default as Mocked<typeof import('./api').default>;
+
+    // Resetear el mock de apiClient.get antes de cada prueba usando la referencia al mock
+    mockApiClient.get.mockReset();
+
+     // Importar dinámicamente la función del servicio aquí
+    const patientService = await import('../services/patientService');
+    fetchPatients = patientService.fetchPatients;
   });
 
   it('debería llamar a apiClient.get sin parámetros de búsqueda si no se provee searchTerm', async () => {
-    vi.mocked(apiClient.get).mockResolvedValue({ data: mockPatients });
+    vi.mocked(mockApiClient.get).mockResolvedValue({ data: mockPatients });
 
     await fetchPatients();
 
-    expect(apiClient.get).toHaveBeenCalledOnce();
-    expect(apiClient.get).toHaveBeenCalledWith('/patients', { params: {} });
+    expect(mockApiClient.get).toHaveBeenCalledOnce();
+    expect(mockApiClient.get).toHaveBeenCalledWith('http://localhost:3000/api/patients', { params: {} });
   });
 
   it('debería llamar a apiClient.get con el parámetro de búsqueda correcto si se provee searchTerm', async () => {
     const searchTerm = 'Ana';
-    vi.mocked(apiClient.get).mockResolvedValue({ data: [mockPatients[0]] });
+    vi.mocked(mockApiClient.get).mockResolvedValue({ data: [mockPatients[0]] });
 
     await fetchPatients(searchTerm);
 
-    expect(apiClient.get).toHaveBeenCalledOnce();
-    expect(apiClient.get).toHaveBeenCalledWith('/patients', { params: { search: searchTerm } });
+    expect(mockApiClient.get).toHaveBeenCalledOnce();
+    expect(mockApiClient.get).toHaveBeenCalledWith('http://localhost:3000/api/patients', { params: { search: searchTerm } });
   });
 
   it('debería devolver los datos de los pacientes en una respuesta exitosa', async () => {
-    vi.mocked(apiClient.get).mockResolvedValue({ data: mockPatients });
+    vi.mocked(mockApiClient.get).mockResolvedValue({ data: mockPatients });
 
     const result = await fetchPatients();
 
@@ -87,7 +140,7 @@ describe('patientService - fetchPatients', () => {
       code: 'ERR_BAD_RESPONSE',
       toJSON: () => ({}),
     };
-    vi.mocked(apiClient.get as Mock).mockRejectedValue(mockAxiosError);
+    vi.mocked(mockApiClient.get as Mock).mockRejectedValue(mockAxiosError);
 
     await expect(fetchPatients()).rejects.toThrow();
   });
@@ -95,23 +148,27 @@ describe('patientService - fetchPatients', () => {
   it('debería lanzar un error genérico si la llamada a la API falla (Error no Axios)', async () => {
     const genericError = new Error('Error de red genérico');
     // Configurar el mock de apiClient.get para rechazar con un error genérico
-    vi.mocked(apiClient.get as Mock).mockRejectedValue(genericError);
+    vi.mocked(mockApiClient.get as Mock).mockRejectedValue(genericError);
 
     await expect(fetchPatients()).rejects.toThrow();
   });
 
-  it('debería manejar términos de búsqueda con espacios correctamente (trim)', async () => {
+  it('debería manejar términos de búsqueda con espacios correctamente (sin trim)', async () => {
     const searchTermWithSpaces = '  Luis  ';
-    const trimmedSearchTerm = 'Luis';
-    vi.mocked(apiClient.get).mockResolvedValue({ data: [mockPatients[1]] });
+    vi.mocked(mockApiClient.get).mockResolvedValue({ data: [mockPatients[1]] });
 
     await fetchPatients(searchTermWithSpaces);
 
-    expect(apiClient.get).toHaveBeenCalledWith('/patients', { params: { search: trimmedSearchTerm } });
+    expect(mockApiClient.get).toHaveBeenCalledWith('http://localhost:3000/api/patients', { params: { search: searchTermWithSpaces } });
   });
 });
 
 describe('patientService - fetchPatientById', () => {
+  // Importar dinámicamente la función después de configurar el mock
+  let fetchPatientById: typeof import('../services/patientService').fetchPatientById;
+    // Obtener una referencia al mock de apiClient
+  let mockApiClient: Mocked<typeof import('./api').default>;
+
   const mockPatientDetails = {
     id: '1',
     firstName: 'Ana',
@@ -120,6 +177,12 @@ describe('patientService - fetchPatientById', () => {
     professionalId: 'prof1',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    birthDate: null, 
+    gender: null,
+    height: 165,
+    medicalNotes: null,
+    dietRestrictions: null,
+    objectives: null,
     lastBiometricRecord: {
       id: 'rec1',
       patientId: '1',
@@ -137,27 +200,35 @@ describe('patientService - fetchPatientById', () => {
     ],
   };
 
-  beforeEach(() => {
-    // Resetear el mock de apiClient.get antes de cada prueba
-    (apiClient.get as Mock).mockReset();
+  beforeEach(async () => {
+     // Importar dinámicamente el módulo mockeado
+    const api = await import('./api');
+    mockApiClient = api.default as Mocked<typeof import('./api').default>;
+
+    // Resetear el mock de apiClient.get antes de cada prueba usando la referencia al mock
+    mockApiClient.get.mockReset();
+
+     // Importar dinámicamente la función aquí
+    const patientService = await import('../services/patientService');
+    fetchPatientById = patientService.fetchPatientById;
   });
 
   it('debería llamar a apiClient.get con el ID de paciente correcto', async () => {
     const patientId = '1';
     // Mockear la función del servicio directamente
-    vi.mocked(apiClient.get).mockResolvedValue({ data: mockPatientDetails });
+    vi.mocked(mockApiClient.get).mockResolvedValue({ data: mockPatientDetails });
 
     await fetchPatientById(patientId);
 
-    // Verificar que apiClient.get fue llamado con la URL y parámetros correctos
-    expect(apiClient.get).toHaveBeenCalledTimes(1);
-    expect(apiClient.get).toHaveBeenCalledWith(`/patients/${patientId}`);
+    // Verificar que apiClient.get fue llamado con la URL completa correcta
+    expect(mockApiClient.get).toHaveBeenCalledTimes(1);
+    expect(mockApiClient.get).toHaveBeenCalledWith(`http://localhost:3000/api/patients/${patientId}`);
   });
 
   it('debería devolver los datos del paciente en una respuesta exitosa', async () => {
     const patientId = '1';
     // Mockear la función del servicio directamente para resolver con datos
-    vi.mocked(apiClient.get).mockResolvedValue({ data: mockPatientDetails });
+    vi.mocked(mockApiClient.get).mockResolvedValue({ data: mockPatientDetails });
 
     const result = await fetchPatientById(patientId);
 
@@ -184,7 +255,7 @@ describe('patientService - fetchPatientById', () => {
       code: 'ERR_BAD_RESPONSE',
       toJSON: () => ({}),
     };
-    vi.mocked(apiClient.get as Mock).mockRejectedValue(mockAxiosError);
+    vi.mocked(mockApiClient.get as Mock).mockRejectedValue(mockAxiosError);
 
     await expect(fetchPatientById(patientId)).rejects.toThrow();
   });
@@ -193,13 +264,18 @@ describe('patientService - fetchPatientById', () => {
     const patientId = '1';
     const genericError = new Error('Error de red genérico');
     // Configurar el mock de apiClient.get para rechazar con un error genérico
-    vi.mocked(apiClient.get as Mock).mockRejectedValue(genericError);
+    vi.mocked(mockApiClient.get as Mock).mockRejectedValue(genericError);
 
     await expect(fetchPatientById(patientId)).rejects.toThrow();
   });
 });
 
 describe('patientService - createPatient', () => {
+  // Importar dinámicamente la función después de configurar el mock
+  let createPatient: typeof import('../services/patientService').createPatient;
+    // Obtener una referencia al mock de apiClient
+  let mockApiClient: Mocked<typeof import('./api').default>;
+
   const mockPatientData: NewPatientData = {
     firstName: 'Nuevo',
     lastName: 'Paciente',
@@ -230,21 +306,29 @@ describe('patientService - createPatient', () => {
     updatedAt: new Date().toISOString(),
   };
 
-  beforeEach(() => {
-    // Resetear el mock de apiClient.post antes de cada prueba
-    (apiClient.post as Mock).mockReset();
+  beforeEach(async () => {
+     // Importar dinámicamente el módulo mockeado
+    const api = await import('./api');
+    mockApiClient = api.default as Mocked<typeof import('./api').default>;
+
+    // Resetear el mock de apiClient.post antes de cada prueba usando la referencia al mock
+    mockApiClient.post.mockReset();
+
+     // Importar dinámicamente la función aquí
+    const patientService = await import('../services/patientService');
+    createPatient = patientService.createPatient;
   });
 
   it('debería llamar a apiClient.post con los datos correctos y devolver el paciente creado', async () => {
     // Configurar el mock de apiClient.post para resolver con el paciente creado
-    vi.mocked(apiClient.post as Mock).mockResolvedValue({ data: mockCreatedPatient });
+    vi.mocked(mockApiClient.post as Mock).mockResolvedValue({ data: mockCreatedPatient });
 
     // Llamar a la función del servicio
     const result = await createPatient(mockPatientData);
 
-    // Aserciones
-    expect(apiClient.post).toHaveBeenCalledOnce();
-    expect(apiClient.post).toHaveBeenCalledWith('/patients', mockPatientData);
+    // Aserciones con URL completa
+    expect(mockApiClient.post).toHaveBeenCalledOnce();
+    expect(mockApiClient.post).toHaveBeenCalledWith('http://localhost:3000/api/patients', mockPatientData);
     expect(result).toEqual(mockCreatedPatient);
   });
 
@@ -266,7 +350,7 @@ describe('patientService - createPatient', () => {
       code: 'ERR_BAD_REQUEST',
       toJSON: () => ({}),
     };
-    vi.mocked(apiClient.post as Mock).mockRejectedValue(mockAxiosError);
+    vi.mocked(mockApiClient.post as Mock).mockRejectedValue(mockAxiosError);
 
     // Verificar que la función lanza un error
     await expect(createPatient(mockPatientData)).rejects.toThrow();
@@ -275,9 +359,101 @@ describe('patientService - createPatient', () => {
   it('debería lanzar un error genérico si la llamada a la API falla (Error no Axios)', async () => {
     const genericError = new Error('Error de red genérico');
     // Configurar el mock de apiClient.post para rechazar con un error genérico
-    vi.mocked(apiClient.post as Mock).mockRejectedValue(genericError);
+    vi.mocked(mockApiClient.post as Mock).mockRejectedValue(genericError);
 
     // Verificar que la función lanza un error
     await expect(createPatient(mockPatientData)).rejects.toThrow();
+  });
+});
+
+describe('patientService - updatePatient', () => {
+  // Importar dinámicamente la función después de configurar el mock
+  let updatePatient: typeof import('../services/patientService').updatePatient;
+    // Obtener una referencia al mock de apiClient
+  let mockApiClient: Mocked<typeof import('./api').default>;
+
+  const patientId = 'patient-to-update-123';
+  const updateData = {
+    firstName: 'Paciente Actualizado',
+    phone: '+34987654321',
+  };
+  const mockUpdatedPatient = {
+    id: patientId,
+    firstName: 'Paciente Actualizado',
+    lastName: 'Original', 
+    email: 'original@example.com',
+    phone: '+34987654321', 
+    professionalId: 'prof-abc',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    // Añadir campos opcionales/nullable con valores para satisfacer el tipo Patient
+    birthDate: null, 
+    gender: null,
+    height: null, 
+    medicalNotes: null,
+    dietRestrictions: null,
+    objectives: null,
+    lastBiometricRecord: null, // Asumiendo que también es opcional/nullable
+    dietPlansSummary: [], // Asumiendo que es un array potencialmente vacío
+    workoutPlansSummary: [], // Asumiendo que es un array potencialmente vacío
+  };
+
+  beforeEach(async () => {
+     // Importar dinámicamente el módulo mockeado
+    const api = await import('./api');
+    mockApiClient = api.default as Mocked<typeof import('./api').default>;
+
+    // Resetear el mock de apiClient.put antes de cada prueba usando la referencia al mock
+    mockApiClient.put.mockReset();
+
+     // Importar dinámicamente la función aquí
+    const patientService = await import('../services/patientService');
+    updatePatient = patientService.updatePatient;
+  });
+
+  it('debería llamar a apiClient.put con el ID y los datos de actualización correctos', async () => {
+    vi.mocked(mockApiClient.put as Mock).mockResolvedValue({ data: mockUpdatedPatient });
+
+    await updatePatient(patientId, updateData);
+
+    expect(mockApiClient.put).toHaveBeenCalledOnce();
+    expect(mockApiClient.put).toHaveBeenCalledWith(`http://localhost:3000/api/patients/${patientId}`, updateData);
+  });
+
+  it('debería devolver los datos del paciente actualizado en una respuesta exitosa', async () => {
+    vi.mocked(mockApiClient.put as Mock).mockResolvedValue({ data: mockUpdatedPatient });
+
+    const result = await updatePatient(patientId, updateData);
+
+    expect(result).toEqual(mockUpdatedPatient);
+  });
+
+  it('debería lanzar un error si la llamada a la API falla (AxiosError)', async () => {
+    const errorMessage = 'Error de actualización simulado';
+    const mockAxiosError: AxiosError<{ message?: string }> = {
+      isAxiosError: true,
+      response: {
+        data: { message: errorMessage },
+        status: 400,
+        statusText: 'Bad Request',
+        headers: {},
+        config: {} as InternalAxiosRequestConfig,
+      },
+      name: 'AxiosError',
+      message: 'Request failed with status code 400',
+      config: {} as InternalAxiosRequestConfig,
+      code: 'ERR_BAD_REQUEST',
+      toJSON: () => ({}),
+    };
+    vi.mocked(mockApiClient.put as Mock).mockRejectedValue(mockAxiosError);
+
+    await expect(updatePatient(patientId, updateData)).rejects.toThrow();
+  });
+
+  it('debería lanzar un error genérico si la llamada a la API falla (Error no Axios)', async () => {
+    const genericError = new Error('Error de red genérico durante actualización');
+    vi.mocked(mockApiClient.put as Mock).mockRejectedValue(genericError);
+
+    await expect(updatePatient(patientId, updateData)).rejects.toThrow();
   });
 }); 
