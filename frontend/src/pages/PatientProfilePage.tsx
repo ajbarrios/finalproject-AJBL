@@ -102,7 +102,7 @@ const PatientProfilePage: React.FC = () => {
                  onClick={() => navigate(`/patients/${patientId}/edit`)}
                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
                 >
-                 Editar Paciente (TF-006)
+                 Editar Paciente
                </button>
                <button className="bg-green-500 text-white px-4 py-2 rounded">Añadir Biométrica (TF-010)</button>
                <button className="bg-purple-500 text-white px-4 py-2 rounded">Ver Historial Biométrico (TF-011)</button>
