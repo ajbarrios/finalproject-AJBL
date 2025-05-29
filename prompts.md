@@ -288,6 +288,22 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 
 **Prompt 53 (Relacionado con TF-006 - Frontend - Implementación Tests Unitarios Servicio):**
 "Vamos a desarrollar los unit test correspondientes a la implementacion del ticket TF-006. Por favor, ten en cuenta la estructura y el estilo de test que ya se han realizado para mantener consistencia."
+
+**Prompt 54 (Relacionado con TB-010 - Backend - Inicio Implementación):**
+"Comienza con la implementación."
+
+**Prompt 55 (Relacionado con TB-010 - Backend - Inicio Pruebas Unitarias):**
+"Vamos a desarrollar las pruebas unitarias."
+
+**Prompt 56 (Relacionado con TB-010 - Backend - Debug Tests Fallidos):**
+"Hay varios test de los recientemente creados que estan fallando. Te adjunto la salida de la consola @node"
+
+**Prompt 57 (Relacionado con TB-010 - Backend - Consolidar Tests Controlador):**
+"Tengo dos archivos de test que corresponden al  mismo controlador. Puedes traerte los test unitarios de @patient.controller.test.ts a @patient.controller.test.ts y adaptarlos si hace falta?"
+
+**Prompt 58 (Relacionado con TB-010 - Backend - Actualizar Colección Postman):**
+"Actualiza la coleccion de postman @NutriTrack Pro.postman_collection.json para añadir los endpoints de la implementacion que acabamos de realizar."
+
 ---
 
 ### 7. Pull Requests

@@ -268,5 +268,68 @@ export const updatePatientForProfessional = async (
   }
 };
 
+/**
+ * Verifica si un paciente pertenece a un profesional específico.
+ * @param professionalId El ID del profesional.
+ * @param patientId El ID del paciente.
+ * @returns Una promesa que resuelve a true si el paciente pertenece al profesional, false en caso contrario.
+ */
+export const checkPatientOwnership = async (
+  professionalId: number,
+  patientId: number
+): Promise<boolean> => {
+  try {
+    const patient = await prisma.patient.findFirst({
+      where: {
+        id: patientId,
+        professionalId: professionalId,
+        // Considerar añadir filtro de soft delete aquí si aplica
+      },
+      select: { id: true }, // Solo necesitamos verificar si existe
+    });
+    return patient !== null;
+  } catch (error) {
+    console.error(`Error en checkPatientOwnership: ${error}`);
+    throw error;
+  }
+};
+
+/**
+ * Crea un nuevo registro biométrico para un paciente específico.
+ * @param patientId El ID del paciente.
+ * @param recordData Los datos del registro biométrico a crear.
+ * @returns Una promesa que resuelve al objeto del registro biométrico creado.
+ */
+export const createBiometricRecordForPatient = async (
+  patientId: number,
+  recordData: {
+    recordDate: Date;
+    weight?: number | null;
+    bodyFatPercentage?: number | null;
+    musclePercentage?: number | null;
+    waterPercentage?: number | null;
+    backChestDiameter?: number | null;
+    waistDiameter?: number | null;
+    armsDiameter?: number | null;
+    legsDiameter?: number | null;
+    calvesDiameter?: number | null;
+    notes?: string | null;
+  }
+): Promise<BiometricRecord> => {
+  try {
+    const createdRecord = await prisma.biometricRecord.create({
+      data: {
+        ...recordData,
+        patientId: patientId, // Asociar el registro al paciente
+        // El campo createdAt se llena automáticamente por Prisma
+      },
+    });
+    return createdRecord;
+  } catch (error) {
+    console.error(`Error en createBiometricRecordForPatient: ${error}`);
+    throw error;
+  }
+};
+
 // Aquí se añadirán otras funciones del servicio (deletePatient, etc.)
 // ... existing code ... 

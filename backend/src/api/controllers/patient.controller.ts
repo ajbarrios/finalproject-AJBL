@@ -285,4 +285,103 @@ export const updatePatient = async (req: AuthenticatedRequest, res: Response, ne
   }
 };
 
+// Controlador para registrar nuevas medidas biométricas (POST /api/patients/:patientId/biometric-records)
+export const createBiometricRecord = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const professionalPayload = req.professional; // Payload del JWT
+    const patientId = parseInt(req.params.patientId, 10); // Obtener ID del paciente de los parámetros de la ruta
+
+    // 2. Verificación de Autorización y Propiedad del Paciente
+    if (!professionalPayload || !professionalPayload.professionalId) {
+      res.status(403).json({ message: 'Acceso denegado: Información del profesional no encontrada.' });
+      return;
+    }
+    const professionalId = professionalPayload.professionalId;
+
+    // Validar si patientId es un número válido
+    if (isNaN(patientId)) {
+        res.status(400).json({ message: 'ID de paciente no válido.' });
+        return;
+    }
+
+    // 3. Implementar Validación de Datos de Entrada (BiometricRecordCreation)
+    const { recordDate, weight, bodyFatPercentage, musclePercentage, waterPercentage, backChestDiameter, waistDiameter, armsDiameter, legsDiameter, calvesDiameter, notes } = req.body;
+
+    // Validar que recordDate es obligatoria y tiene formato de fecha válido.
+    if (!recordDate || typeof recordDate !== 'string' || isNaN(Date.parse(recordDate))) {
+        res.status(400).json({ message: 'Fecha de registro (recordDate) es obligatoria y debe ser una fecha válida.' });
+        return;
+    }
+
+     // Validar tipos de datos para las medidas si están presentes
+    const measurements = [
+        { key: 'weight', value: weight },
+        { key: 'bodyFatPercentage', value: bodyFatPercentage },
+        { key: 'musclePercentage', value: musclePercentage },
+        { key: 'waterPercentage', value: waterPercentage },
+        { key: 'backChestDiameter', value: backChestDiameter },
+        { key: 'waistDiameter', value: waistDiameter },
+        { key: 'armsDiameter', value: armsDiameter },
+        { key: 'legsDiameter', value: legsDiameter },
+        { key: 'calvesDiameter', value: calvesDiameter }
+    ];
+
+    for (const measurement of measurements) {
+        if (measurement.value !== undefined && measurement.value !== null && typeof measurement.value !== 'number') {
+             res.status(400).json({ message: `El valor para '${measurement.key}' debe ser numérico si está presente.` });
+             return;
+        }
+    }
+
+    // Validar notas si están presentes y son del tipo correcto
+    if (notes !== undefined && notes !== null && typeof notes !== 'string') {
+        res.status(400).json({ message: 'Las notas deben ser una cadena de texto si están presentes.' });
+        return;
+    }
+
+    // Validar que al menos uno de los campos de medida numérica o la nota esté presente.
+    const hasValidMeasurementValue = measurements.some(m => m.value !== undefined && m.value !== null);
+
+    if (!hasValidMeasurementValue && (notes === undefined || notes === null || notes.trim() === '')) {
+        res.status(400).json({ message: 'Se debe proporcionar al menos una medida numérica o una nota.' });
+        return;
+    }
+
+    // 4. Lógica de Creación de Registro Biométrico (llamará al servicio)
+    // Primero, verificar la propiedad del paciente llamando a un servicio.
+    const isPatientOwned = await patientService.checkPatientOwnership(professionalId, patientId);
+
+    if (!isPatientOwned) {
+        res.status(403).json({ message: 'Acceso denegado: El paciente no pertenece a este profesional.' });
+        return;
+    }
+
+    // Llamar al servicio para crear el registro biométrico
+    const biometricRecordData = {
+        recordDate: new Date(recordDate), // Convertir a Date
+        weight,
+        bodyFatPercentage,
+        musclePercentage,
+        waterPercentage,
+        backChestDiameter,
+        waistDiameter,
+        armsDiameter,
+        legsDiameter,
+        calvesDiameter,
+        notes
+    };
+
+    const createdRecord = await patientService.createBiometricRecordForPatient(
+        patientId,
+        biometricRecordData
+    );
+
+    // 5. Definir Respuestas del API (201 Created)
+    res.status(201).json(createdRecord);
+
+  } catch (error) {
+    next(error); // Pasar errores al manejador de errores de Express
+  }
+};
+
 // Aquí se añadirán otras funciones del controlador (DELETE) 
