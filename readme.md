@@ -30,6 +30,31 @@ NutriTrack Pro es una aplicación web para profesionales de la nutrición y entr
 
 > Puedes tenerlo alojado en público o en privado, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/). También puedes compartir por correo un archivo zip con el contenido
 
+#### **Frontend (React con Vite y Tailwind CSS)**
+
+1.  **Navega al directorio `frontend`:**
+    ```bash
+    cd frontend
+    ```
+
+2.  **Instala las dependencias:**
+    ```bash
+    npm install
+    ```
+
+3.  **Configura las variables de entorno:**
+    Crea un archivo `.env` en el directorio `frontend` (copiando `frontend/.env.example` si existiera) y configura la URL base de la API:
+    ```env
+    # frontend/.env
+    VITE_API_BASE_URL=http://localhost:3000/api # Asegúrate que coincide con el puerto y prefijo de tu backend
+    ```
+
+4.  **Inicia el servidor de desarrollo del frontend:**
+    ```bash
+    npm run dev
+    ```
+    La aplicación frontend debería abrirse en tu navegador (por defecto en `http://localhost:5173`).
+
 ---
 
 ## 1. Descripción general del producto
@@ -42,13 +67,13 @@ El objetivo de NutriTrack Pro es proporcionar a nutricionistas y entrenadores de
 
 ### **1.2. Características y funcionalidades principales:**
 
-- **Registro y Login:** Permite a nutricionistas y entrenadores registrarse y acceder al sistema de manera segura.
-- **Gestión de Pacientes:** Registro de pacientes con datos personales, biométricos y objetivos específicos de dieta o entrenamiento.
-- **Dashboard de Pacientes:** Un panel principal que permite la búsqueda y gestión de pacientes de manera eficiente.
-- **Vista Detalle de Paciente:** Muestra la evolución física del paciente mediante gráficas detalladas de porcentaje de grasa, porcentaje muscular, peso, etc.
-- **Generación de Dietas y Entrenamientos:** Dashboard dedicado para crear y personalizar dietas y planes de entrenamiento para cada paciente.
-- **Creación de Documentos PDF:** Generación de dietas mensuales y planes de entrenamiento en formato PDF para facilitar su distribución.
-- **Envío de Información:** Envío de dietas y entrenamientos a través de correo electrónico o WhatsApp utilizando plantillas predefinidas para una comunicación efectiva.
+- **Registro y Login de Profesionales:** Permite a nutricionistas y entrenadores registrarse y acceder al sistema de manera segura.
+- **Gestión Completa de Pacientes (CRUD):** Permite a los profesionales registrar nuevos pacientes, visualizar sus perfiles detallados, editar su información y eliminarlos.
+- **Visualización de la Evolución Biometrica:** Muestra la progresión física del paciente a lo largo del tiempo mediante registros biométricos detallados y gráficos de evolución.
+- **Dashboard de Pacientes:** Un panel principal con funcionalidad de búsqueda que permite la gestión eficiente de los pacientes.
+- **Generación de Dietas y Entrenamientos (Pendiente):** Dashboard dedicado para crear y personalizar dietas y planes de entrenamiento para cada paciente. (Esta funcionalidad aún está en desarrollo o planificada)
+- **Creación de Documentos PDF (Pendiente):** Generación de dietas mensuales y planes de entrenamiento en formato PDF para facilitar su distribución. (Esta funcionalidad aún está en desarrollo o planificada)
+- **Envío de Información (Pendiente):** Envío de dietas y entrenamientos a través de correo electrónico o WhatsApp utilizando plantillas predefinidas para una comunicación efectiva. (Esta funcionalidad aún está en desarrollo o planificada)
 
 ### **1.3. Diseño y experiencia de usuario:**
 
@@ -117,8 +142,6 @@ NutriTrack Pro cuenta con un diseño minimalista, fresco y moderno, que se adapt
     npm run dev
     ```
     El servidor debería iniciarse (por defecto en `http://localhost:3000` si usaste ese puerto).
-
-(Aquí irían las instrucciones para el Frontend)
 
 ---
 
@@ -267,29 +290,32 @@ Esta arquitectura monolítica modular representa la opción más pragmática par
 - **Tailwind CSS**: Framework de utilidades CSS para crear diseños personalizados sin salir del HTML. Facilita la creación de interfaces responsivas y consistentes.
 - **React Router**: Biblioteca para la gestión de rutas en aplicaciones React. Permite la navegación entre diferentes vistas sin recargar la página.
 - **Axios**: Cliente HTTP basado en promesas para realizar peticiones a la API del backend de forma sencilla y con manejo de errores mejorado.
+- **Recharts**: Librería de gráficos componible construida con React y D3 para visualizar datos de manera interactiva. Utilizada para mostrar la evolución de las métricas biométricas.
 
 #### **Backend (Servidor)**
 - **Node.js**: Entorno de ejecución de JavaScript del lado del servidor. Proporciona un modelo de E/S sin bloqueo y orientado a eventos para aplicaciones en tiempo real.
 - **Express**: Framework minimalista para Node.js que facilita la creación de APIs RESTful. Gestiona rutas, middleware y peticiones HTTP.
 - **JWT (JSON Web Tokens)**: Mecanismo para la autenticación y autorización de usuarios mediante tokens codificados. Permite verificar la identidad del usuario en cada petición sin necesidad de consultar la base de datos.
 - **Bcrypt**: Librería para el hash seguro de contraseñas. Protege las credenciales de los usuarios mediante algoritmos de encriptación robustos.
+- **Zod**: Librería para la declaración y validación de esquemas en TypeScript/JavaScript. Utilizada para validar los datos de entrada en las rutas API.
+- **Middleware de autenticación**: Implementado para proteger rutas API que requieren que el usuario esté autenticado.
 
 #### **Base de Datos**
 - **PostgreSQL**: Sistema de gestión de bases de datos relacional. Ofrece soporte para tipos de datos avanzados, transacciones ACID y consultas complejas.
 - **Prisma**: ORM (Object-Relational Mapping) moderno que simplifica el acceso a la base de datos. Proporciona un esquema declarativo, migraciones automatizadas y un cliente tipado para consultas seguras.
 
 #### **Servicios Externos**
-- **Servicio de Correo Electrónico**: Integración con servicios como SendGrid o Nodemailer para el envío de dietas y planes de entrenamiento por correo electrónico.
-- **WhatsApp API**: Integración con la API de WhatsApp Business para el envío de notificaciones y documentos a los pacientes.
-- **Generador de PDF**: Utilización de bibliotecas como PDFKit o jsPDF para la generación de documentos PDF con dietas y planes de entrenamiento.
+- **Servicio de Correo Electrónico**: Integración con servicios como SendGrid o Nodemailer para el envío de dietas y planes de entrenamiento por correo electrónico. (Pendiente)
+- **WhatsApp API**: Integración con la API de WhatsApp Business para el envío de notificaciones y documentos a los pacientes. (Pendiente)
+- **Generador de PDF**: Utilización de bibliotecas como PDFKit o jsPDF para la generación de documentos PDF con dietas y planes de entrenamiento. (Pendiente)
 
 #### **Infraestructura**
 - **Docker**: Plataforma para la creación, despliegue y ejecución de aplicaciones en contenedores. Garantiza la consistencia entre entornos de desarrollo y producción.
 - **Render**: Servicio de alojamiento en la nube que facilita el despliegue de aplicaciones web y APIs. Proporciona escalabilidad automática y SSL gratuito.
 
 #### **Herramientas de Desarrollo**
-- **Vitest**: Framework de pruebas unitarias para JavaScript. Ofrece ejecución rápida y soporte nativo para TypeScript y ESM.
-- **Cypress**: Herramienta de pruebas end-to-end. Permite automatizar la interacción con la aplicación en un navegador real.
+- **Vitest**: Framework de pruebas unitarias para JavaScript. Ofrece ejecución rápida y soporte nativo para TypeScript y ESM. Utilizado para los tests unitarios en backend y frontend.
+- **Cypress**: Herramienta de pruebas end-to-end. Permite automatizar la interacción con la aplicación en un navegador real. (Pendiente)
 - **Git/GitHub**: Sistema de control de versiones y plataforma para la colaboración en el desarrollo. Facilita el seguimiento de cambios y la integración continua.
 
 ### **2.3. Descripción de alto nivel del proyecto y estructura de ficheros**
@@ -427,6 +453,20 @@ Esta organización facilita:
 ### **2.6. Tests**
 
 > Describe brevemente algunos de los tests realizados
+
+En NutriTrack Pro, la estrategia de testing se enfoca principalmente en pruebas unitarias para asegurar la fiabilidad de los componentes individuales y la lógica de negocio.
+
+- **Tests Unitarios con Vitest**: Se utilizan pruebas unitarias escritas con Vitest para verificar el correcto funcionamiento de funciones, servicios, controladores y componentes de React de forma aislada. Estos tests se ejecutan rápidamente y son esenciales para el desarrollo iterativo y la detección temprana de errores.
+
+  - **Backend**: Se han implementado tests unitarios para: 
+    - Controladores (ej. `auth.controller.test.ts`, `patient.controller.test.ts`): Verifican que los controladores manejen correctamente las solicitudes y respuestas, interactuando con los servicios simulados (mocks).
+    - Servicios (ej. `auth.service.test.ts`, `patient.service.test.ts`): Prueban la lógica de negocio aislada, a menudo simulando las interacciones con la base de datos (mocks de Prisma).
+
+  - **Frontend**: Se han implementado tests unitarios de componentes de React (con `@testing-library/react` y Vitest) para verificar que se rendericen correctamente, respondan a interacciones básicas y muestren los datos o estados esperados (ej. `RegisterForm.test.tsx`, `PatientDashboardPage.test.tsx`, `PatientBiometricHistoryPage.test.tsx`). También se han mockeado las llamadas API para aislar la lógica del componente.
+
+- **Pruebas End-to-End con Cypress**: (Pendiente) Aunque planificadas, las pruebas E2E con Cypress aún no se han implementado para verificar flujos de usuario completos a través de la aplicación.
+
+La ejecución de los tests unitarios se realiza a través de comandos npm definidos en `package.json` en las carpetas `backend` y `frontend`.
 
 ---
 
@@ -767,85 +807,53 @@ Representa un ejercicio específico dentro de un día de entrenamiento.
 
 ## 4. Especificación de la API
 
-La especificación completa de la API en formato OpenAPI 3.0 se encuentra en el siguiente archivo:
+La especificación completa de la API en formato OpenAPI 3.0 se mantiene en el siguiente archivo. Esta especificación se ha ido actualizando a medida que se han desarrollado nuevos endpoints para funcionalidades como el registro, login, gestión de pacientes y registros biométricos:
 
 [Ver Especificación OpenAPI](./docs/api/openapi_spec.yaml)
+
+### **4.1. Colección de Postman**
+
+Para facilitar las pruebas manuales de los endpoints de la API, puedes importar la siguiente colección de Postman:
+
+[Descargar Colección de Postman](./docs/api/NutriTrack%20Pro.postman_collection.json)
+
+Esta colección incluye ejemplos de las peticiones para los endpoints de autenticación, gestión de pacientes y registros biométricos implementados.
 
 ---
 
 ## 5. Historias de Usuario
 
-> Documenta 3 de las historias de usuario principales utilizadas durante el desarrollo, teniendo en cuenta las buenas prácticas de producto al respecto.
+Las historias de usuario que guían el desarrollo del proyecto se encuentran detalladas en el siguiente documento. Se han abordado varias historias clave relacionadas con la autenticación y la gestión de pacientes, incluyendo la visualización de su historial biométrico:
 
-**Historia de Usuario 1: HU-001 Registro de Nuevo Profesional**
-
-*   **ID:** HU-001
-*   **Título:** Registro de Nuevo Profesional
-*   **Como un:** Profesional (nutricionista/entrenador) que aún no tiene cuenta
-*   **Quiero:** Poder registrarme en la aplicación proporcionando mi nombre completo, email, una contraseña segura y mi tipo de profesión (nutricionista o entrenador)
-*   **Para que:** Pueda crear mi perfil, acceder a las funcionalidades del sistema y comenzar a gestionar mis pacientes y sus planes nutricionales o de entrenamiento.
-*   **Criterios de Aceptación Clave (Resumen):**
-    *   El sistema permite registrarse con nombre, email, contraseña y profesión.
-    *   Validaciones de campos en frontend y backend (email único, formato de contraseña).
-    *   Contraseña almacenada de forma segura (hasheada).
-    *   Feedback claro al usuario sobre éxito o errores (ej. email duplicado).
-    *   Redirección a login o dashboard tras registro exitoso.
-    *   *Para una descripción detallada de todos los criterios, ver HU-001 en `docs/user_stories.md`.*
-
-**Historia de Usuario 2: HU-005 Registro de Nuevo Paciente**
-
-*   **ID:** HU-005
-*   **Título:** Registro de Nuevo Paciente
-*   **Como un:** Profesional que ha iniciado sesión
-*   **Quiero:** Poder registrar un nuevo paciente en el sistema proporcionando su información personal básica (nombre, apellidos, email, teléfono, fecha de nacimiento, género), datos biométricos iniciales (altura, peso, etc.), notas médicas relevantes, restricciones alimentarias y sus objetivos.
-*   **Para que:** Pueda tener un perfil completo del paciente y comenzar a crear planes de dieta y entrenamiento personalizados y hacer seguimiento de su progreso.
-*   **Criterios de Aceptación Clave (Resumen):**
-    *   El profesional autenticado puede acceder a un formulario para registrar un nuevo paciente.
-    *   El formulario incluye campos para información personal, biométrica inicial, notas y objetivos.
-    *   Validaciones en frontend y backend.
-    *   El paciente creado se asocia automáticamente al profesional que lo registra.
-    *   Si se proporcionan datos biométricos iniciales, se crea un primer registro biométrico.
-    *   Feedback claro al usuario y redirección tras el registro exitoso.
-    *   *Para una descripción detallada de todos los criterios, ver HU-005 en `docs/user_stories.md`.*
-
-**Historia de Usuario 3: HU-012 Creación Básica de Plan de Dieta**
-
-*   **ID:** HU-012
-*   **Título:** Creación Básica de Plan de Dieta
-*   **Como un:** Profesional (especialmente nutricionista, pero también entrenador si aplica) que ha iniciado sesión
-*   **Quiero:** Poder crear un nuevo plan de dieta personalizado para un paciente específico, definiendo un título, descripción, fechas de vigencia, objetivos y las comidas para diferentes momentos del día.
-*   **Para que:** Pueda proporcionar al paciente una guía nutricional estructurada y adaptada a sus necesidades.
-*   **Criterios de Aceptación Clave (Resumen):**
-    *   El profesional autenticado puede acceder a un formulario para crear un plan de dieta para un paciente.
-    *   El formulario permite definir información general del plan (título, fechas, objetivos) y añadir múltiples comidas (tipo, contenido).
-    *   Validaciones en frontend y backend para los datos del plan y de cada comida.
-    *   El plan creado se asocia al paciente y al profesional. Las comidas se asocian al plan.
-    *   Operación de guardado transaccional.
-    *   Feedback claro y redirección tras creación exitosa.
-    *   *Para una descripción detallada de todos los criterios, ver HU-012 en `docs/user_stories.md`.*
+[Ver Historias de Usuario](./docs/user_stories.md)
 
 ---
 
 ## 6. Tickets de Trabajo
 
-A continuación, se detallan algunos tickets de trabajo representativos del proyecto, ofreciendo una visión de las tareas específicas de frontend, backend y base de datos.
+Los tickets de trabajo, derivados de las historias de usuario, se utilizan para planificar y seguir las tareas de desarrollo en detalle. Se han completado o avanzado significativamente en tickets relacionados con el scaffolding inicial, autenticación, gestión de pacientes (CRUD) y la implementación de la visualización del historial biométrico. Puedes encontrar los tickets en los siguientes archivos:
 
-### Ticket Frontend Ejemplo: TF-008
+[Ver Tickets Backend](./docs/tickets/tickets_backend.md)
+[Ver Tickets Frontend](./docs/tickets/tickets_frontend.md)
 
-**ID:** TF-008
+---
+
+### **6.X. Tickets Frontend - TF-011 (Visualización de la Evolución de Métricas)**
+
+**ID:** TF-011
 **Tipo:** Frontend
-**Historia de Usuario Relacionada:** HU-008 - Registro de Nuevo Paciente
-**Título:** Desarrollar Interfaz de Usuario para Registro de Nuevos Pacientes
+**Historia de Usuario Relacionada:** HU-011 - Visualización de la Evolución de Métricas
+**Título:** Desarrollar Interfaz de Usuario para Visualizar la Evolución de Métricas
 
 **Descripción:**
-Crear el formulario y la lógica de interfaz de usuario necesaria para que un nutricionista pueda registrar un nuevo paciente en el sistema. Esto incluye campos para información personal (nombre, contacto, fecha de nacimiento), historial médico básico y objetivos.
+Crear el formulario y la lógica de interfaz de usuario necesaria para que un nutricionista pueda visualizar la evolución de las métricas biométricas de un paciente a lo largo del tiempo.
 
 **Criterios de Aceptación:**
-1.  El formulario de registro es accesible desde el dashboard del nutricionista.
-2.  El formulario incluye campos para: Nombre completo, Correo electrónico, Teléfono, Fecha de Nacimiento, Género, Dirección, Notas de historial médico relevante, Objetivos del paciente.
-3.  Validación de campos en el lado del cliente (e.g., formato de email, campos obligatorios).
+1.  El formulario de visualización es accesible desde el dashboard del nutricionista.
+2.  El formulario incluye campos para: Fecha de la medición, Peso, Porcentaje de grasa corporal, Porcentaje de masa muscular, Porcentaje de agua, Diámetro espalda/pecho, Diámetro cintura, Diámetro brazos, Diámetro piernas, Diámetro gemelos.
+3.  Validación de campos en el lado del cliente (e.g., formato de fecha).
 4.  Al enviar el formulario, se realiza una petición al endpoint backend correspondiente.
-5.  Se muestra feedback al usuario sobre el resultado del registro (éxito o error).
+5.  Se muestra feedback al usuario sobre el resultado de la consulta (éxito o error).
 6.  La interfaz es responsiva y se visualiza correctamente en diferentes tamaños de pantalla.
 
 **Estimación de Esfuerzo:** 3 puntos

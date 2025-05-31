@@ -696,6 +696,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BiometricRecordResponse'
+        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
         '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
         '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
         '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
