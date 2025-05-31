@@ -32,7 +32,7 @@ import PatientProfilePage from './pages/PatientProfilePage';
 import NewPatientPage from './pages/NewPatientPage';
 import PatientEditPage from './pages/PatientEditPage';
 import NewBiometricRecordPage from './pages/NewBiometricRecordPage';
-import PatientBiometricHistoryPage from './pages/patients/PatientBiometricHistoryPage';
+import PatientBiometricHistoryPage from './pages/PatientBiometricHistoryPage';
 
 // Componente para la página de inicio temporal (si no hay otra)
 const HomePage = () => (

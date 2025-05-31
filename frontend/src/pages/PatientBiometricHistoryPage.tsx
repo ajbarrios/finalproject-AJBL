@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import api from '../../services/api'; // Asumiendo que tienes un servicio api configurado
+import api from '../services/api'; // Asumiendo que tienes un servicio api configurado
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface BiometricRecord {

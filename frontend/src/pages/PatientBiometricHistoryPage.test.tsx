@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom';
 import PatientBiometricHistoryPage from './PatientBiometricHistoryPage';
-import api from '../../services/api';
+import api from '../services/api';
 
 // Mock the api service
 vi.mock('../../services/api');
