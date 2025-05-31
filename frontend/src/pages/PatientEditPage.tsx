@@ -179,6 +179,17 @@ const PatientEditPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Botón Volver al Perfil - con estilos consistentes */}
+      <div className="mb-4">
+        <button 
+          onClick={() => navigate(`/patients/${patientId}`)}
+          className="flex items-center text-indigo-600 hover:text-indigo-800"
+        >
+          {/* Puedes añadir un icono SVG aquí si quieres consistencia total */}
+          &larr; Volver al Perfil del Paciente
+        </button>
+      </div>
+
       <h1 className="text-2xl font-bold mb-6">Editar Paciente</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className={sectionClass}> {/* Usar clase de sección principal */}
@@ -315,13 +326,6 @@ const PatientEditPage: React.FC = () => {
 
         {/* Botones de Acción */}
         <div className="flex justify-end mt-6"> {/* Añadir margen superior */}
-          <button
-            type="button"
-            onClick={() => navigate(`/patients/${patientId}`)}
-            className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            Cancelar
-          </button>
           <button
             type="submit"
             disabled={isSubmitting}

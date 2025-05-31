@@ -38,12 +38,16 @@ const PatientProfilePage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <button 
-        onClick={() => navigate('/dashboard')}
-        className="mb-4 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200"
-      >
-        &larr; Volver al Listado
-      </button>
+      {/* Botón Volver al Listado - con estilos consistentes */}
+      <div className="mb-4">
+        <button 
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center text-indigo-600 hover:text-indigo-800"
+        >
+          {/* Puedes añadir un icono SVG aquí si quieres consistencia total */}
+          &larr; Volver al Listado
+        </button>
+      </div>
 
       <h1 className="text-2xl font-bold mb-6">Perfil del Paciente: {patientId}</h1>
       {isLoading && <p>Cargando datos del paciente...</p>}
@@ -161,7 +165,12 @@ const PatientProfilePage: React.FC = () => {
                >
                  Añadir Registro Biométrico
                </button>
-               <button className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors duration-200">Ver Historial Biométrico</button>
+               <button 
+                 onClick={() => navigate(`/patients/${patientId}/biometric-records`)}
+                 className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors duration-200"
+               >
+                 Ver Historial Biométrico
+               </button>
                <button className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors duration-200">Crear Plan Dieta</button>
                <button className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition-colors duration-200">Crear Plan Entrenamiento</button>
            </div>
