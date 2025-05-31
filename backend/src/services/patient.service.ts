@@ -331,5 +331,49 @@ export const createBiometricRecordForPatient = async (
   }
 };
 
+/**
+ * Obtiene los registros biométricos de un paciente, opcionalmente filtrados por rango de fechas.
+ * @param patientId El ID del paciente.
+ * @param startDate Fecha de inicio opcional para filtrar registros.
+ * @param endDate Fecha de fin opcional para filtrar registros.
+ * @returns Una promesa que resuelve a un array de registros biométricos.
+ */
+export const getBiometricRecordsForPatient = async (
+  patientId: number,
+  startDate?: Date | null,
+  endDate?: Date | null
+): Promise<BiometricRecord[]> => {
+  try {
+    // Construir el objeto de filtro para la consulta
+    const whereClause: any = {
+      patientId: patientId
+    };
+
+    // Añadir filtros de fecha si se proporcionan
+    if (startDate || endDate) {
+      whereClause.recordDate = {};
+      if (startDate) {
+        whereClause.recordDate.gte = startDate;
+      }
+      if (endDate) {
+        whereClause.recordDate.lte = endDate;
+      }
+    }
+
+    // Obtener los registros biométricos
+    const records = await prisma.biometricRecord.findMany({
+      where: whereClause,
+      orderBy: {
+        recordDate: 'desc' // Ordenar por fecha descendente (más reciente primero)
+      }
+    });
+
+    return records;
+  } catch (error) {
+    console.error(`Error en getBiometricRecordsForPatient: ${error}`);
+    throw error;
+  }
+};
+
 // Aquí se añadirán otras funciones del servicio (deletePatient, etc.)
 // ... existing code ... 

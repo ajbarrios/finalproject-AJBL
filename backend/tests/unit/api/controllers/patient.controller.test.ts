@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { listPatients, getPatientById, createPatient, updatePatient, createBiometricRecord } from '../../../../src/api/controllers/patient.controller'; // Importamos todas las funciones necesarias
+import { listPatients, getPatientById, createPatient, updatePatient, createBiometricRecord, getBiometricRecords } from '../../../../src/api/controllers/patient.controller'; // Importamos todas las funciones necesarias
 import { AuthenticatedRequest } from '../../../../src/middleware/auth.middleware'; // Para tipar req
 import * as patientService from '../../../../src/services/patient.service'; // Para mockear el servicio
 import { Response, NextFunction } from 'express'; // Tipos de Express
@@ -543,6 +543,127 @@ describe('Patient Controller', () => {
         expect(mockRes.json).not.toHaveBeenCalled();
         expect(vi.mocked(mockNext)).toHaveBeenCalledWith(serviceError);
       });
+  });
+
+  describe('getBiometricRecords', () => {
+    beforeEach(() => {
+      mockReq.params = { patientId: '123' };
+      mockReq.professional = { professionalId: 1 };
+      mockReq.query = {};
+    });
+
+    it('should return biometric records successfully', async () => {
+      const mockRecords = [
+        {
+          id: 1,
+          patientId: 123,
+          recordDate: new Date('2023-10-27'),
+          weight: 70.5,
+          bodyFatPercentage: 15.2,
+          musclePercentage: 40,
+          waterPercentage: 60,
+          backChestDiameter: 100,
+          waistDiameter: 80,
+          armsDiameter: 30,
+          legsDiameter: 50,
+          calvesDiameter: 35,
+          notes: 'Test notes',
+          createdAt: new Date()
+        }
+      ];
+
+      vi.mocked(patientService.checkPatientOwnership).mockResolvedValueOnce(true);
+      vi.mocked(patientService.getBiometricRecordsForPatient).mockResolvedValueOnce(mockRecords);
+
+      await getBiometricRecords(mockReq, mockRes, mockNext);
+
+      expect(patientService.checkPatientOwnership).toHaveBeenCalledWith(1, 123);
+      expect(patientService.getBiometricRecordsForPatient).toHaveBeenCalledWith(123, null, null);
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockRecords);
+    });
+
+    it('should filter records by date range successfully', async () => {
+      mockReq.query = {
+        startDate: '2023-10-01',
+        endDate: '2023-10-31'
+      };
+
+      const mockRecords = [
+        {
+          id: 1,
+          patientId: 123,
+          recordDate: new Date('2023-10-27'),
+          weight: 70.5,
+          bodyFatPercentage: 15.2,
+          musclePercentage: 40,
+          waterPercentage: 60,
+          backChestDiameter: 100,
+          waistDiameter: 80,
+          armsDiameter: 30,
+          legsDiameter: 50,
+          calvesDiameter: 35,
+          notes: 'Test notes',
+          createdAt: new Date()
+        }
+      ];
+
+      vi.mocked(patientService.checkPatientOwnership).mockResolvedValueOnce(true);
+      vi.mocked(patientService.getBiometricRecordsForPatient).mockResolvedValueOnce(mockRecords);
+
+      await getBiometricRecords(mockReq, mockRes, mockNext);
+
+      expect(patientService.getBiometricRecordsForPatient).toHaveBeenCalledWith(
+        123,
+        new Date('2023-10-01'),
+        new Date('2023-10-31')
+      );
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockRecords);
+    });
+
+    it('should return 400 if patientId is invalid', async () => {
+      mockReq.params.patientId = 'abc';
+
+      await getBiometricRecords(mockReq, mockRes, mockNext);
+
+      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.json).toHaveBeenCalledWith({ message: 'ID de paciente no válido.' });
+    });
+
+    it('should return 400 if startDate is invalid', async () => {
+      mockReq.query = { startDate: 'invalid-date' };
+
+      await getBiometricRecords(mockReq, mockRes, mockNext);
+
+      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.json).toHaveBeenCalledWith({ message: 'Fecha de inicio no válida.' });
+    });
+
+    it('should return 400 if endDate is before startDate', async () => {
+      mockReq.query = {
+        startDate: '2023-10-31',
+        endDate: '2023-10-01'
+      };
+
+      await getBiometricRecords(mockReq, mockRes, mockNext);
+
+      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.json).toHaveBeenCalledWith({ 
+        message: 'La fecha de fin no puede ser anterior a la fecha de inicio.' 
+      });
+    });
+
+    it('should return 403 if patient does not belong to professional', async () => {
+      vi.mocked(patientService.checkPatientOwnership).mockResolvedValueOnce(false);
+
+      await getBiometricRecords(mockReq, mockRes, mockNext);
+
+      expect(mockRes.status).toHaveBeenCalledWith(403);
+      expect(mockRes.json).toHaveBeenCalledWith({ 
+        message: 'Acceso denegado: El paciente no pertenece a este profesional.' 
+      });
+    });
   });
 
   // You can add more describe blocks for other controller functions here
