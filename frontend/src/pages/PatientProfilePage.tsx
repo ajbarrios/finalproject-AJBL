@@ -30,6 +30,12 @@ const PatientProfilePage: React.FC = () => {
     getPatientDetails();
   }, [patientId]);
 
+  // Función auxiliar para formatear valores numéricos con unidades
+  const formatMeasurement = (value: number | null | undefined, unit: string): string => {
+    if (value === null || value === undefined) return 'N/A';
+    return `${value} ${unit}`;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <button 
@@ -59,13 +65,58 @@ const PatientProfilePage: React.FC = () => {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Último Registro Biométrico</h2>
+            <h2 className="text-xl font-semibold mb-6">Último Registro Biométrico</h2>
             {patient.lastBiometricRecord ? (
-              <>
-                <p><strong>Fecha:</strong> {new Date(patient.lastBiometricRecord.recordDate).toLocaleDateString()}</p>
-                <p><strong>Peso:</strong> {patient.lastBiometricRecord.weight || 'N/A'} kg</p>
-                <p><strong>% Grasa:</strong> {patient.lastBiometricRecord.bodyFatPercentage || 'N/A'} %</p>
-              </>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Fecha del registro */}
+                <div className="col-span-full bg-blue-50 p-4 rounded-lg">
+                  <p className="text-blue-800 font-medium mb-2">Fecha del Registro</p>
+                  <p className="text-blue-900">{new Date(patient.lastBiometricRecord.recordDate).toLocaleDateString()}</p>
+                </div>
+
+                {/* Medidas Principales */}
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <p className="text-green-800 font-medium mb-3">Medidas Principales</p>
+                  <div className="space-y-2">
+                    <p><strong>Peso:</strong> {formatMeasurement(patient.lastBiometricRecord.weight, 'kg')}</p>
+                    <p><strong>Altura:</strong> {formatMeasurement(patient.height, 'cm')}</p>
+                  </div>
+                </div>
+
+                {/* Composición Corporal */}
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <p className="text-purple-800 font-medium mb-3">Composición Corporal</p>
+                  <div className="space-y-2">
+                    <p><strong>% Grasa:</strong> {formatMeasurement(patient.lastBiometricRecord.bodyFatPercentage, '%')}</p>
+                    <p><strong>% Músculo:</strong> {formatMeasurement(patient.lastBiometricRecord.musclePercentage, '%')}</p>
+                    <p><strong>% Agua:</strong> {formatMeasurement(patient.lastBiometricRecord.waterPercentage, '%')}</p>
+                  </div>
+                </div>
+
+                {/* Perímetros Corporales */}
+                <div className="col-span-full bg-amber-50 p-4 rounded-lg">
+                  <p className="text-amber-800 font-medium mb-3">Perímetros Corporales</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p><strong>Espalda/Pecho:</strong> {formatMeasurement(patient.lastBiometricRecord.backChestDiameter, 'cm')}</p>
+                      <p><strong>Cintura:</strong> {formatMeasurement(patient.lastBiometricRecord.waistDiameter, 'cm')}</p>
+                    </div>
+                    <div>
+                      <p><strong>Brazos:</strong> {formatMeasurement(patient.lastBiometricRecord.armsDiameter, 'cm')}</p>
+                      <p><strong>Piernas:</strong> {formatMeasurement(patient.lastBiometricRecord.legsDiameter, 'cm')}</p>
+                      <p><strong>Gemelos:</strong> {formatMeasurement(patient.lastBiometricRecord.calvesDiameter, 'cm')}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notas */}
+                {patient.lastBiometricRecord.notes && (
+                  <div className="col-span-full bg-gray-50 p-4 rounded-lg">
+                    <p className="text-gray-800 font-medium mb-2">Notas</p>
+                    <p className="text-gray-600">{patient.lastBiometricRecord.notes}</p>
+                  </div>
+                )}
+              </div>
             ) : (
               <p>No hay registros biométricos aún.</p>
             )}

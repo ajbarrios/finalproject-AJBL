@@ -123,12 +123,16 @@ export type PatientDetails = Patient & {
 
 export interface BiometricRecordSummary {
   id: string;
-  recordDate: string; // O Date, dependiendo de cómo se maneje la fecha en el frontend
+  recordDate: string;
   weight?: number | null;
   bodyFatPercentage?: number | null;
   musclePercentage?: number | null;
   waterPercentage?: number | null;
+  backChestDiameter?: number | null;
   waistDiameter?: number | null;
+  armsDiameter?: number | null;
+  legsDiameter?: number | null;
+  calvesDiameter?: number | null;
   notes?: string | null;
 }
 
