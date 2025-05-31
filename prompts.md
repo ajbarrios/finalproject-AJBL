@@ -304,6 +304,12 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 58 (Relacionado con TB-010 - Backend - Actualizar Colección Postman):**
 "Actualiza la coleccion de postman @NutriTrack Pro.postman_collection.json para añadir los endpoints de la implementacion que acabamos de realizar."
 
+**Prompt 59 (Relacionado con TB-011 - Backend - Plan de Acción):**
+"Lee el documento @tickets_backend.md y plantea un plan de desarrollo la implementacion del ticket TB-011. No hagas nada aun."
+
+**Prompt 61 (Relacionado con TB-011 - Backend - Debug Tests Fallidos):**
+"Los test unitarios de @patient.controller.test.ts que hemos añadido nuevos estan fallando. Te paso la salida de la consola @node"
+
 ---
 
 ### 7. Pull Requests
