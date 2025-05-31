@@ -170,19 +170,19 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 "Para `RegisterForm.test.tsx`, ya tengo tests para el caso de éxito y el error 409. Necesito implementar los tests para los siguientes escenarios de error: error 400 (validación del backend con mensajes de campo), error genérico del servidor (ej. 500), y error de red (sin `error.response`). ¿Puedes proporcionarme el código para estos tests?"
 
 **Prompt 14 (Relacionado con TB-004 - Frontend - Cierre de Sesión - Plan de Acción):**
-"Plantea un plan de accion para resolver el ticket \"TB-004\" de @tickets_backend.md . Solo hay que hacer trabajo en la parte frontal."
+"Plantea un plan de accion para resolver el ticket "TB-004" de @tickets_backend.md . Solo hay que hacer trabajo en la parte frontal."
 
 **Prompt 15 (Relacionado con TB-004 - Frontend - Cierre de Sesión - Creación Navbar):**
-"Para resolver el ticket, desarrolla un component comun de tipo barra dentro de la carpeta \"components\" donde aparezca un icono de tipo logout al lado del nombre y apellidos del usuario. Al pulsar hará el comportamiento descrito en el ticket \"TB-004\"."
+"Para resolver el ticket, desarrolla un component comun de tipo barra dentro de la carpeta "components" donde aparezca un icono de tipo logout al lado del nombre y apellidos del usuario. Al pulsar hará el comportamiento descrito en el ticket "TB-004"."
 
 **Prompt 16 (Relacionado con TB-004 - Frontend - Cierre de Sesión - Corrección Estilos/Fondos):**
 "Las paginas de login y registro entre otras, presentar un espacio en blanco que se nota respecto al fondo gris. Puedes eliminarlo y hacer lo mismo para todas?"
 
 **Prompt 17 (Relacionado con TB-008 - Backend - Plan de Acción Inicial):**
-"Plantea un plan de accion para el desarrollo del ticket \"TB-008\" de @tickets_backend.md"
+"Plantea un plan de accion para el desarrollo del ticket "TB-008" de @tickets_backend.md"
 
 **Prompt 18 (Relacionado con TB-008 - Backend - Corrección Estructura de Carpetas):**
-"Hay cosas que no estan bien. Tienes que respectar la estructura de carpetas existente. Por ejemplo dentro de src/api existen las carpetas \"routes\" para las rutas como \"auth.routes.ts\" y la carpeta \"controllers\" donde esta el controlador de auth.controller. Haz lo mismo para estos archivos que has generado de patients."
+"Hay cosas que no estan bien. Tienes que respectar la estructura de carpetas existente. Por ejemplo dentro de src/api existen las carpetas "routes" para las rutas como "auth.routes.ts" y la carpeta "controllers" donde esta el controlador de auth.controller. Haz lo mismo para estos archivos que has generado de patients."
 
 **Prompt 19 (Relacionado con TB-008 - Backend - Middleware de Autenticación y Lógica Controlador/Servicio Inicial):**
 "Continuemos con el Paso 3: Desarrollo de la Lógica en Controlador y Servicio, comenzando por el middleware de autenticación y luego el servicio y controlador de pacientes."
@@ -194,7 +194,7 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 "He lanzado el curl de listar pacientes y me devuelve un 401 no autorizado. ¿Puedes ayudarme? Token: [TOKEN_PROPORCIONADO_POR_USUARIO]" (y posterior corrección de la variable de entorno)
 
 **Prompt 22 (Relacionado con TB-008 - Backend - Creación y Refinamiento Script Seed Prisma):**
-"Lee el esquema de la base de datos y dame una forma de popular la tabla \"patients\" con unos 5." (y correcciones posteriores del script seed)
+"Lee el esquema de la base de datos y dame una forma de popular la tabla "patients" con unos 5." (y correcciones posteriores del script seed)
 
 **Prompt 23 (Relacionado con TB-008 - Backend - Debug Listar Pacientes Devuelve `[]`):**
 "Al listar pacientes, el endpoint me devuelve []" (y posterior solución al problema del token)
@@ -227,7 +227,7 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 "Corrige los errores del linter por favor."
 
 **Prompt 33 (Relacionado con TF-009 - Plan de Acción Inicial):**
-"Lee @tickets_frontend.md y desarrolla un plan para resolver el ticket \"TF-009\". Iremos paso por paso."
+"Lee @docs/tickets/tickets_frontend.md y desarrolla un plan para resolver el ticket "TF-009". Iremos paso por paso."
 
 **Prompt 34 (Relacionado con TF-009 - Creación Componente Page):**
 "Implementa el primer paso del plan: crear el componente base para la página de perfil del paciente (`PatientProfilePage.tsx`)."
@@ -245,7 +245,7 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 "Puedes arreglar el test unitario que falla? Te adjunto salida de terminal @node"
 
 **Prompt 39 (Relacionado con Validación de Formulario y Tests TF-XXX):**
-"Editar el fichero @NewPatientPage.tsx para que cuando se pulse en registrar paciente, todos los campos tengan un mensaje de error justo abajo diciendo: \"el campo <nombre_del_campo> es obligatorio\"."
+"Editar el fichero @NewPatientPage.tsx para que cuando se pulse en registrar paciente, todos los campos tengan un mensaje de error justo abajo diciendo: "el campo <nombre_del_campo> es obligatorio"."
 
 **Prompt 40 (Relacionado con Validación de Formulario y Tests TF-XXX):**
 "Hay un fallo de ortografia, debe de empezar por mayuscula: El campo XXX es obligatorio."
@@ -259,7 +259,7 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 43 (Relacionado con TB-006 - Backend - Implementación Endpoint, Servicio y Controlador):**
 "Si, comienza el desarrollo segun el plan."
 
-**Prompt 44 (Relacionado con TB-006 - Backend - Inicio Tests Unitarios Controlador):**
+**Prompt 44 (Relacionado con TB-006 - Backend - Inicio Pruebas Unitarias Controlador):**
 "Ahora crearemos una prueba básica para la actualización de pacientes:"
 
 **Prompt 45 (Relacionado con TB-006 - Backend - Corrección Tests Controlador - Vitest/Jest):**
@@ -284,7 +284,7 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 "Hay un pequeño problema. Al editar el paciente, el toast de exito se pone arriba y debajo de la pagina de @PatientEditPage.tsx . ¿Puedes solucionarlo? Te adjunto captura"
 
 **Prompt 52 (Relacionado con TF-006 - Frontend - Corrección Navegación):**
-"Veo un fallo en la pagina @PatientProfilePage.tsx . Despues de editar, se navega a esta ultima para ver su detalle actualizado y al pulsar en el boton \"volver al listado\", en lugar de volver al dashboard, vuelve a la pagina de edicion. ¿Puedes arreglarlo?"
+"Veo un fallo en la pagina @PatientProfilePage.tsx . Despues de editar, se navega a esta ultima para ver su detalle actualizado y al pulsar en el boton "volver al listado", en lugar de volver al dashboard, vuelve a la pagina de edicion. ¿Puedes arreglarlo?"
 
 **Prompt 53 (Relacionado con TF-006 - Frontend - Implementación Tests Unitarios Servicio):**
 "Vamos a desarrollar los unit test correspondientes a la implementacion del ticket TF-006. Por favor, ten en cuenta la estructura y el estilo de test que ya se han realizado para mantener consistencia."
@@ -309,6 +309,79 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 
 **Prompt 61 (Relacionado con TB-011 - Backend - Debug Tests Fallidos):**
 "Los test unitarios de @patient.controller.test.ts que hemos añadido nuevos estan fallando. Te paso la salida de la consola @node"
+
+---
+
+### **6.X. Tickets Frontend - TF-011 (Visualización de la Evolución de Métricas)**
+
+**Prompt 62 (Relacionado con TF-011 - Plan de Desarrollo Inicial):**
+"Lee @docs/tickets/tickets_frontend.md y planteame un plan de desarrollo para el ticket TF-011 'Visualización de la Evolución de Métricas'."
+
+**Prompt 63 (Relacionado con TF-011 - Creación de la Página):**
+"Ok, comencemos el desarrollo. Recuerda que la parte frontend esta en la carpeta frontend."
+
+**Prompt 64 (Relacionado con TF-011 - Implementación Fetching):**
+"Ok, implementa la obtención de los datos biométricos reales desde el backend para el paciente especificado."
+
+**Prompt 65 (Relacionado con TF-011 - Implementación Filtro de Fechas):**
+"Puedes añadir un filtro de fechas "Desde" y "Hasta" a la pagina y modificar la peticion para que incluya estas fechas como parametros de consulta?"
+
+**Prompt 66 (Relacionado con TF-011 - Instalación Recharts):**
+"Por favor instala la libreria de recharts en la terminal."
+
+**Prompt 67 (Relacionado con TF-011 - Integración Gráficos):**
+"Ok, puedes integrar los graficos en la pagina. Comienza con los graficos de peso, % de grasa y cintura."
+
+**Prompt 68 (Relacionado con TF-011 - Adición Botones Navegación):**
+"Puedes añadir el boton "+ Añadir Registro" y el enlace "← Volver al Perfil del Paciente" en la parte superior de la pagina?"
+
+**Prompt 69 (Relacionado con TF-011 - Corrección Errores Linter):**
+"Puedes corregir los errores de linter por favor?"
+
+**Prompt 70 (Relacionado con TF-011 - Debug Navegación Botón Perfil):**
+"Al pulsar en el boton "Ver historial biometrico" de la vista de detalle del paciente no hace nada. Te adjunto captura."
+
+**Prompt 71 (Relacionado con TF-011 - Debug Ruta Incorrecta):**
+"La ruta sigue sin ser correcta. Puedes verificar las rutas que se han creado?"
+
+**Prompt 72 (Relacionado con TF-011 - Debug Petición API URL Duplicada):**
+"Tengo un error en la peticion. La url a la que llama la peticion incluye "/api/api/" en lugar de "/api/". Te adjunto el comando curl."
+
+**Prompt 73 (Relacionado con TF-011 - Ajustes de Estilo Botones):**
+"Me gustaria ajustar algunos estilos para que sean consistentes con otras partes de la aplicacion. Puedes hacer que el boton de volver a arriba tenga los mismos estilos que el boton de volver a la vista de detalle de paciente? Y el boton de añadir registro que tenga los mismos estilos que el boton de añadir paciente de la vista de listado?"
+
+**Prompt 74 (Relacionado con TF-011 - Consistencia Estilos Botón Volver):**
+"Me gustaria que los botones de volver de todas las paginas, incluyendo la de historial biometrico, tuvieran los mismos estilos que el boton de volver de la pagina de añadir un nuevo registro biometrico."
+
+**Prompt 75 (Relacionado con TF-011 - Debug Fecha Inválida y Datos Incompletos):**
+"Al navegar a esta pagina, la fecha me sale como "Invalid Date" y en la tabla faltan metricas por mostrarse, solo sale el peso, porcentaje de grasa y cintura. Te adjunto captura."
+
+**Prompt 76 (Relacionado con TF-011 - Actualización Datos Tabla):**
+"Ok, puedes hacer que la tabla muestre todos los datos de la fila, no solo el peso, grasa y cintura?"
+
+**Prompt 77 (Relacionado con TF-011 - Actualización Datos Gráfico):**
+"Puedes hacer que en el grafico muestre todos los valores que se muestran en la tabla?"
+
+**Prompt 78 (Relacionado con TF-011 - Estilos Tabla Centrado):**
+"Puedes hacer que los valores de las celdas y sus cabeceras esten centrados en la tabla?"
+
+**Prompt 79 (Relacionado con TF-011 - Creación Tests Unitarios Inicial):**
+"Me gustaria que crearas los test unitarios que faltan por desarrollar. Comienza con los de la pagina de historial biometrico."
+
+**Prompt 80 (Relacionado con TF-011 - Debug Tests Fallidos):**
+"Los test estan fallando en @PatientBiometricHistoryPage.test.tsx . Te adjunto salida de consola @node"
+
+**Prompt 81 (Relacionado con TF-011 - Corrección Tests - Error Fecha):**
+"Ahora falla este test: [Error en Test - Fecha]"
+
+**Prompt 82 (Relacionado con TF-011 - Estilos Tabla Modernos):**
+"Puedes hacer que la tabla tenga unos estilos mas modernos? Parece algo basico."
+
+**Prompt 83 (Relacionado con TF-011 - Estilos Tabla Paleta Colores):**
+"Me gustaria que usaras la paleta de colores que se esta usando en otras partes de la app. Por ejemplo el color indigo en la cabecera o algo que vaya bien y tenga una tabla algo colorida pero sin excederse."
+
+**Prompt 84 (Relacionado con TF-011 - Estilos Tabla Coherencia Tarjetas):**
+"Me gustaria que la tabla luciera con los mismo estilos y colores que se han hecho las tarjetas de @PatientDashboardPage.tsx "
 
 ---
 
