@@ -53,6 +53,7 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 "Actua como un arquitecto software profesional. Explica de forma muy clara y concisa los componentes principales tanto backend como frontend del sistema. Lee el @readme elaborado hasta ahora por si tienes alguna duda y pregunta lo que necesites."
 
 **Prompt 2:**
+"Eres un arquitecto software experto. Escanea el proyecto actual y checkea si la guia de componentes principales, diagramas Mermaid, esquema ERD y tecnologías usadas esta actualizado. Si ves cualquier tipo de discordancia, notificamelo antes de actualizar el archivo @readme.md". La idea es actualizarlo en este momento tras varias pull request que han sido mergeadas."
 
 **Prompt 3:**
 
@@ -84,11 +85,13 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 ### **2.6. Tests**
 
 **Prompt 1:**
+"Escanea el proyecto actual en la parte de @frontend para obtener un contexto actualizado. Generame un plan para a paso para instalar las herramientas necesarias y la estructura y configuración del proyecto para añadir Vitest. La documentación oficial para añadir Vitest a cualquier proyecto es https://vitest.dev/guide/"
 
 **Prompt 2:**
+"Escanea el proyecto actual en la parte de @backend para obtener un contexto actualizado. Generame un plan para a paso para instalar las herramientas necesarias y la estructura y configuración del proyecto para añadir Vitest. Inspirate en la configuración de Vitest que ya tengo en la parte @frontend. Pregunta cualquier duda que tengas antes de instalar dependencias innecesarias."
 
 **Prompt 3:**
-
+"Escanea el proyecto @frontend y @backend para entender las herramientas instaladas de testing y la estructura de las mismas en ambos proyectos. Actualiza el archivo @readme si es necesario con instrucciones y detalles importantes para que cualquier desarrollador entienda y pueda ejecutar los test unitarios tras añadir cualquier funcioanalidad nueva al proyecto."
 ---
 
 ### 3. Modelo de Datos
@@ -108,23 +111,22 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 ### 4. Especificación de la API
 
 **Prompt 1:**
-Ya hemos cubierto las funcionalidades principales del MVP. Ahora necesito cubrir las especificaciones de la API en formato OpenApi que derivan de todas las historias que acabamos de elaborar. El resultado debe ser completar el punto ## 4. Especificación de la API del archivo @readme.md 
+"Ya hemos cubierto las funcionalidades principales del MVP. Ahora necesito cubrir las especificaciones de la API en formato OpenApi que derivan de todas las historias que acabamos de elaborar. El resultado debe ser completar el punto ## 4. Especificación de la API del archivo @readme.md."
 
 **Prompt 2:**
+"Creame un archivo de coleccion de Postman para toda la api existente hasta ahora en el repositorio @backend. Este lo usaré para probar manualmente los endpoints que vayamos contruyendo en @tickets_backend.md. Usa el nuevoi formato de collecion Postman 2.1"
 
 **Prompt 3:**
-
+"Actualiza el archivo @NutriTrack Pro.postman_collection.json con los endpoints faltantes con los cambios introducidos desde su ultima actualización. Para ello escanea el directorio @backend y añade los nuevos."
 ---
 
 ### 5. Historias de Usuario
 
 **Prompt 1:**
-Actua como un project manager experto. Estoy contruyendo una aplicación mvp para trackear el progreso deportivo y nutricional de pacientes como nutricionista o como entrenador. Escanea el proyecto partiendo del @readme.md para obtener contexto y stack tecnologico.
+"Actua como un project manager experto. Estoy contruyendo una aplicación mvp para trackear el progreso deportivo y nutricional de pacientes como nutricionista o como entrenador. Escanea el proyecto partiendo del @readme.md para obtener contexto y stack tecnologico."
 
 **Prompt 2:**
 Necesito crear un archivo markdown en la seccion docs con todas las historias de usuario que se han definido en el documento @prd.md.  En  estas historias de usuario el objetivo es ser lo mas especifico posible para que un desarrollador backend, frontend y qa no tenga problemas para realizar su trabajo. Vamos a ir una por una y paso a paso.
-
-**Prompt 3:**
 
 ---
 
@@ -310,10 +312,6 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 61 (Relacionado con TB-011 - Backend - Debug Tests Fallidos):**
 "Los test unitarios de @patient.controller.test.ts que hemos añadido nuevos estan fallando. Te paso la salida de la consola @node"
 
----
-
-### **6.X. Tickets Frontend - TF-011 (Visualización de la Evolución de Métricas)**
-
 **Prompt 62 (Relacionado con TF-011 - Plan de Desarrollo Inicial):**
 "Lee @docs/tickets/tickets_frontend.md y planteame un plan de desarrollo para el ticket TF-011 'Visualización de la Evolución de Métricas'."
 
@@ -387,8 +385,14 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 
 ### 7. Pull Requests
 
+Aquí esta el link al repositorio Github del proyecto final con todos los pull request cerrados hasta ahora:
+[Pull Requests](https://github.com/ajbarrios/finalproject-AJBL/pulls?q=is%3Apr+is%3Aclosed)
+
 **Prompt 1:**
+"Genera un resumen de los cambios generados en esta rama para el desarrollo del ticket TB-002 del archivo @tickets_backend.md en formato markdown, con un tono formal, claro y conciso para añadir a la pull request de Github."
 
 **Prompt 2:**
+"Genera un resumen de los cambios generados en esta rama para el desarrollo del ticket TF-002 del archivo @frontend.md en formato markdown, con un tono formal, claro y conciso para añadir a la pull request de Github."
 
 **Prompt 3:**
+"Genera un resumen de los cambios generados en esta rama para el desarrollo del ticket TB-DB01 del archivo @tickets_backend.md en formato markdownm, con un tono formal, claro y conciso para añadir a la pull request de Github."
