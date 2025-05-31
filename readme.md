@@ -909,6 +909,7 @@ Este ticket aborda la configuración fundamental de la base de datos para NutriT
 ## 7. Pull requests
 
 > Documenta 3 de las Pull Requests realizadas durante la ejecución del proyecto
+Todas las pull request cerradas del proyecto estan [aqui](https://github.com/ajbarrios/finalproject-AJBL/pulls?q=is%3Apr+is%3Aclosed)
 
 **Pull Request 1**
 
@@ -916,4 +917,8 @@ Este ticket aborda la configuración fundamental de la base de datos para NutriT
 
 **Pull Request 2**
 
+[Pull request dashboard pacientes ](https://github.com/ajbarrios/finalproject-AJBL/pull/20)
+
 **Pull Request 3**
+
+[Pull request registro medidas biométricas](https://github.com/ajbarrios/finalproject-AJBL/pull/34)
