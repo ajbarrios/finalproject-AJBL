@@ -384,4 +384,77 @@ export const createBiometricRecord = async (req: AuthenticatedRequest, res: Resp
   }
 };
 
+// Controlador para obtener registros biométricos de un paciente (GET /api/patients/:patientId/biometric-records)
+export const getBiometricRecords = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const professionalPayload = req.professional;
+    const patientId = parseInt(req.params.patientId, 10);
+    const { startDate, endDate } = req.query;
+
+    // Validar que patientId es un número válido
+    if (isNaN(patientId)) {
+      res.status(400).json({ message: 'ID de paciente no válido.' });
+      return;
+    }
+
+    // Validar y convertir fechas si se proporcionan
+    let parsedStartDate: Date | null = null;
+    let parsedEndDate: Date | null = null;
+
+    if (startDate && typeof startDate === 'string') {
+      const startDateObj = new Date(startDate);
+      if (isNaN(startDateObj.getTime())) {
+        res.status(400).json({ message: 'Fecha de inicio no válida.' });
+        return;
+      }
+      parsedStartDate = startDateObj;
+    }
+
+    if (endDate && typeof endDate === 'string') {
+      const endDateObj = new Date(endDate);
+      if (isNaN(endDateObj.getTime())) {
+        res.status(400).json({ message: 'Fecha de fin no válida.' });
+        return;
+      }
+      parsedEndDate = endDateObj;
+    }
+
+    // Validar que la fecha de fin no sea anterior a la fecha de inicio
+    if (parsedStartDate && parsedEndDate && parsedEndDate < parsedStartDate) {
+      res.status(400).json({ message: 'La fecha de fin no puede ser anterior a la fecha de inicio.' });
+      return;
+    }
+
+    // Verificar autorización
+    if (!professionalPayload || !professionalPayload.professionalId) {
+      res.status(403).json({ message: 'Acceso denegado: Información del profesional no encontrada.' });
+      return;
+    }
+
+    // Verificar propiedad del paciente
+    const isPatientOwned = await patientService.checkPatientOwnership(
+      professionalPayload.professionalId,
+      patientId
+    );
+
+    if (!isPatientOwned) {
+      res.status(403).json({ message: 'Acceso denegado: El paciente no pertenece a este profesional.' });
+      return;
+    }
+
+    // Obtener los registros biométricos
+    const records = await patientService.getBiometricRecordsForPatient(
+      patientId,
+      parsedStartDate,
+      parsedEndDate
+    );
+
+    // Devolver los registros
+    res.status(200).json(records);
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Aquí se añadirán otras funciones del controlador (DELETE) 
