@@ -1,7 +1,6 @@
 ## Índice
 
 0. [Ficha del proyecto](#0-ficha-del-proyecto)
-0.6. [Demo del Proyecto](#06-demo-del-proyecto)
 1. [Descripción general del producto](#1-descripción-general-del-producto)
 2. [Arquitectura del sistema](#2-arquitectura-del-sistema)
 3. [Modelo de datos](#3-modelo-de-datos)
