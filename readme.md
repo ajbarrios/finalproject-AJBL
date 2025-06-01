@@ -1,6 +1,7 @@
 ## Índice
 
 0. [Ficha del proyecto](#0-ficha-del-proyecto)
+0.6. [Demo del Proyecto](#06-demo-del-proyecto)
 1. [Descripción general del producto](#1-descripción-general-del-producto)
 2. [Arquitectura del sistema](#2-arquitectura-del-sistema)
 3. [Modelo de datos](#3-modelo-de-datos)
@@ -23,6 +24,8 @@ NutriTrack Pro
 NutriTrack Pro es una aplicación web para profesionales de la nutrición y entrenadores deportivos que quieran llevar a todas partes la progresión de sus clientes.
 
 ### **0.4. URL del proyecto:**
+
+Aún no esta desplegado publicamente pero se puede ejecutar en local siguiendo las instrucciones o ver la demo del apartado 0.6. [Demo del Proyecto](#06-demo-del-proyecto) 
 > Puede ser pública o privada, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/).
 
 ### 0.5. URL o archivo comprimido del repositorio
@@ -54,6 +57,14 @@ NutriTrack Pro es una aplicación web para profesionales de la nutrición y entr
     npm run dev
     ```
     La aplicación frontend debería abrirse en tu navegador (por defecto en `http://localhost:5173`).
+
+---
+
+## 0.6. Demo del Proyecto
+
+Aquí puedes encontrar una demo del proyecto NutriTrack Pro corriendo en entorno local:
+
+[Ver Demo del Proyecto](./docs/demo/NutriTrack-Pro-entrega2-demo.webm)
 
 ---
 
