@@ -32,6 +32,9 @@ Puedes añadir adicionalmente la conversación completa como link o archivo adju
 - Creación de la dieta mensual y el entrenamiento en formato pdf.
 - Envío de la dieta y el entrenamiento mediante correo electrónico o Whatsapp mediante una plantilla."
 
+**Prompt 4:**
+He añadido una demo del proyecto corriendo en entorno local en @demo. ¿Puedes añadir este apartado en el @readme.md dentro de la sección más apropiada de la documentación?
+
 ---
 
 ## 2. Arquitectura del Sistema
