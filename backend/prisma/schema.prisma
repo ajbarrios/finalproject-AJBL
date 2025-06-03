@@ -137,6 +137,7 @@ model DietMeal {
   dietPlanId Int
   mealType   MealType
   content    String   @db.Text
+  dayOfWeek  DayOfWeek
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -144,6 +145,7 @@ model DietMeal {
 
   @@index([dietPlanId])
   @@index([mealType])
+  @@index([dayOfWeek])
 }
 
 model WorkoutPlan {
