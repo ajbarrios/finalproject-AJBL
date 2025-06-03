@@ -42,8 +42,8 @@ vi.mock('../components/patients/PatientCard', () => ({
 
 describe('PatientDashboardPage', () => {
   const mockPatients: Patient[] = [
-    { id: '1', firstName: 'Ana', lastName: 'Gomez', email: 'ana@example.com', professionalId: 'prof1', birthDate: '1990-01-01', objectives: 'Perder peso', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: '2', firstName: 'Luis', lastName: 'Perez', email: 'luis@example.com', professionalId: 'prof1', birthDate: '1985-05-15', objectives: 'Ganar músculo', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: '1', firstName: 'Ana', lastName: 'Gomez', email: 'ana@example.com', professionalId: 'prof1', birthDate: '1990-01-01', objectives: 'Perder peso', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), dietPlansSummary: [], workoutPlansSummary: [] },
+    { id: '2', firstName: 'Luis', lastName: 'Perez', email: 'luis@example.com', professionalId: 'prof1', birthDate: '1985-05-15', objectives: 'Ganar músculo', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), dietPlansSummary: [], workoutPlansSummary: [] },
   ];
 
   beforeEach(() => {

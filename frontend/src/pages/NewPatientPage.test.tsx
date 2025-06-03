@@ -104,6 +104,8 @@ describe('NewPatientPage', () => {
         professionalId: 'mock-prof-id',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        dietPlansSummary: [], // Añadir las propiedades que faltan
+        workoutPlansSummary: [], // Añadir las propiedades que faltan
         ...mockPatientData, // Incluir los datos enviados
         birthDate: mockPatientData.birthDate?.toISOString() || null, // Convertir Date a string ISO
         // Asegurarse de que todos los campos no opcionales de Patient estén aquí o en mockPatientData

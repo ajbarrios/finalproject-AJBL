@@ -11,6 +11,8 @@ const mockPatient: Patient = {
   professionalId: 'prof456',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
+  dietPlansSummary: [],
+  workoutPlansSummary: [],
   // Otros campos opcionales pueden ser añadidos si son relevantes para el renderizado
 };
 
