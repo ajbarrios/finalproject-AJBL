@@ -384,6 +384,19 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 84 (Relacionado con TF-011 - Estilos Tabla Coherencia Tarjetas):**
 "Me gustaria que la tabla luciera con los mismo estilos y colores que se han hecho las tarjetas de @PatientDashboardPage.tsx "
 
+
+**Prompt 85 (Relacionado con TB-012 - Revisión Cumplimiento Requisitos y ERD):**
+"Puedes revisar si la la parte de la api para crer planes de dieta cumple con los requisitos del ticket TB-012 y el esquema ERD?"
+
+**Prompt 86 (Relacionado con TB-012 - Corrección Discrepancias Status y Validación Fechas):**
+"Puedes corregir las discrepancias 2 y 3 y luego repasamos la 1?"
+
+**Prompt 87 (Relacionado con TB-012 - Revisión Convención Idioma Status):**
+"Revisa los modelos y el ERD. El valor status no deberia ser en ingles?"
+
+**Prompt 88 (Relacionado con TB-012 - Corrección Tests Tras Cambios Status):**
+"Los test unitarios estan fallando tras el ultimo cambio. Puedes arregarlo? @node"
+
 ---
 
 ### 7. Pull Requests
