@@ -27,19 +27,8 @@ vi.mock('../config/db/prisma.client', () => ({
     dietMeal: {
        createMany: vi.fn(),
     },
-    // Mockeamos $transaction para que ejecute el callback con una instancia mockeada
-    $transaction: vi.fn((callback) => callback({
-        patient: {
-          findFirst: vi.fn(),
-        },
-        dietPlan: {
-          create: vi.fn(),
-          findUnique: vi.fn(),
-        },
-         dietMeal: {
-           createMany: vi.fn(),
-         },
-    })), // El tipado del callback se infiere o se puede añadir si es necesario
+    // Mockeamos $transaction para que ejecute el callback con los mismos mocks configurados
+    $transaction: vi.fn(),
   },
 }));
 
@@ -132,6 +121,11 @@ describe('Diet Service', () => {
        // Acceder directamente a dietPlan.findUnique
        prismaMock.dietPlan.findUnique.mockResolvedValue(mockCreatedPlanWithMeals as any);
 
+       // Configurar el mock de $transaction para que ejecute el callback con prismaMock
+       prismaMock.$transaction.mockImplementation(async (callback: any) => {
+         return await callback(prismaMock);
+       });
+
 
       const createdPlan = await dietService.createDietPlan(patientId, professionalId, planData as any); // Usar any o tipado correcto
 
@@ -145,11 +139,13 @@ describe('Diet Service', () => {
       expect(prismaMock.dietPlan.create).toHaveBeenCalledWith({
         data: expect.objectContaining({ // Usamos objectContaining para flexibilidad con fechas/campos opcionales
           title: planData.title,
-          patientId: patientId, // Con connect ya no necesitas patient: { connect: ... }
-          professionalId: professionalId, // Con connect ya no necesitas professional: { connect: ... }
-          // Incluir otros campos obligatorios si los hay como isActive, createdAt, updatedAt
-          // is_active debería tener un default en el schema o establecerse aquí
-          // Asegúrate que los campos opcionales que son null/undefined en planData se manejen correctamente en el create
+          description: planData.description,
+          objectives: planData.objectives,
+          isActive: true,
+          notes: planData.notes,
+          patient: { connect: { id: patientId } },
+          professional: { connect: { id: professionalId } },
+          // startDate y endDate se convierten a Date objects
         }),
       });
 
@@ -182,11 +178,14 @@ describe('Diet Service', () => {
      it('should handle transaction errors and let them propagate', async () => {
          const transactionError = new Error('DB Error during transaction');
 
+         // Configurar el mock de $transaction para que ejecute el callback con prismaMock
+         prismaMock.$transaction.mockImplementation(async (callback: any) => {
+           return await callback(prismaMock);
+         });
+
          // Mockear una operación dentro de la transacción para que falle
          // Acceder directamente a dietPlan.create
          prismaMock.dietPlan.create.mockRejectedValue(transactionError);
-
-         // La implementación del mock de $transaction se encarga de ejecutar el callback y propagar el error
 
          // Aserción de que la llamada a la función del servicio lanza el error esperado
          await expect(dietService.createDietPlan(patientId, professionalId, planData as any)).rejects.toThrow('DB Error during transaction');
