@@ -397,6 +397,27 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 88 (Relacionado con TB-012 - Corrección Tests Tras Cambios Status):**
 "Los test unitarios estan fallando tras el ultimo cambio. Puedes arregarlo? @node"
 
+**Prompt 89 (Relacionado con TB-012 - Debug Error API "Paciente no se encuentra"):**
+"Tengo un error al crear planes de dieta. Cuando intento crear un plan de dieta para el paciente con ID 19, me sale el error 'paciente no se encuentra'. Puedes ayudarme a diagnosticar el problema? El endpoint que estoy usando es POST /api/patients/19/diet-plans pero parece que las rutas no están registradas correctamente en el backend."
+
+**Prompt 90 (Relacionado con TB-012 - Corrección Rutas API y Errores Prisma):**
+"Hay varios problemas en la implementación del backend para planes de dieta: 1) Las rutas no están registradas en app.ts, 2) Error de Prisma en orderBy que espera array en lugar de objeto, 3) Problemas de tipos TypeScript en el controlador. Puedes corregir estos errores para que la API funcione correctamente?"
+
+**Prompt 91 (Relacionado con TB-012 - Implementación Tests Unitarios Backend Completos):**
+"Necesito implementar tests unitarios completos para la funcionalidad de planes de dieta en el backend. Esto incluye tests para el controlador (diet.controller.test.ts), servicio (diet.service.test.ts) y validaciones (diet.validations.test.ts). Crea una suite completa de tests que cubra casos de éxito, errores, validaciones y manejo de excepciones."
+
+**Prompt 92 (Relacionado con TB-012 - Corrección Tests Backend - Error Prisma OrderBy):**
+"Los tests unitarios del backend están fallando porque esperan que `orderBy` sea un objeto `{dayOfWeek: 'asc', mealType: 'asc'}` pero el servicio usa un array `[{dayOfWeek: 'asc'}, {mealType: 'asc'}]`. Además, hay un test de validación que pasa cuando debería fallar porque `mealType` usa `z.string()` en lugar de un enum estricto. Corrige estos problemas en los tests."
+
+**Prompt 93 (Relacionado con TB-012 - Implementación Tests Frontend Completos):**
+"Implementa tests unitarios completos para la parte frontend de la funcionalidad de planes de dieta. Necesito tests para: 1) dietPlanService.test.ts (servicio API), 2) dietPlanSchema.test.ts (validaciones Zod), 3) DateInput.test.tsx (componente de fecha), 4) MealSection.test.tsx (componente de comidas). Asegúrate de cubrir casos de éxito, errores, validaciones y interacciones de usuario."
+
+**Prompt 94 (Relacionado con TB-012 - Corrección Tests Frontend - Múltiples Errores Tipos y Componentes):**
+"Los tests frontend tienen múltiples errores: 1) Errores de tipos TypeScript en dietPlanService.test.ts con DietPlan/DietPlanCreation, 2) Interfaz incorrecta en MealSection.test.tsx (espera props individuales pero componente usa array de meals), 3) Problemas en DateInput.test.tsx con labels que contienen asterisco (*), clases CSS incorrectas, y features no implementadas. Corrige estos errores para que todos los tests pasen."
+
+**Prompt 95 (Relacionado con TB-012 - Corrección Test Fecha Hardcodeada - Robustez):**
+"Hay fragilidad en el test de DateInput.test.tsx porque usa una fecha hardcodeada `'2025-06-01'` en lugar de usar `defaultProps.value`. Esto hace el test frágil y dependiente de valores específicos. Cambia `const input = screen.getByDisplayValue('2025-06-01');` por `const input = screen.getByDisplayValue(defaultProps.value);` para hacer el test más robusto y mantenible."
+
 ---
 
 ### 7. Pull Requests

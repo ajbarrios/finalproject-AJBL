@@ -153,26 +153,37 @@ const PatientProfilePage: React.FC = () => {
            </div>
 
            <div className="bg-white p-6 rounded-lg shadow col-span-full flex flex-wrap gap-3">
-               <button 
-                 onClick={() => navigate(`/patients/${patientId}/edit`)}
-                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
-                >
-                 Editar Paciente
-               </button>
-               <button 
-                 onClick={() => navigate(`/patients/${patientId}/biometric-records/new`)}
-                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors duration-200"
-               >
-                 Añadir Registro Biométrico
-               </button>
-               <button 
-                 onClick={() => navigate(`/patients/${patientId}/biometric-records`)}
-                 className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors duration-200"
-               >
-                 Ver Historial Biométrico
-               </button>
-               <button className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors duration-200">Crear Plan Dieta</button>
-               <button className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition-colors duration-200">Crear Plan Entrenamiento</button>
+              <button 
+                onClick={() => navigate(`/patients/${patientId}/edit`)}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
+              >
+                Editar Paciente
+              </button>
+              <button 
+                onClick={() => navigate(`/patients/${patientId}/biometric-records/new`)}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors duration-200"
+              >
+                Añadir Registro Biométrico
+              </button>
+              <button 
+                onClick={() => navigate(`/patients/${patientId}/biometric-records`)}
+                className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors duration-200"
+              >
+                Ver Historial Biométrico
+              </button>
+              <button 
+                onClick={() => navigate(`/patients/${patientId}/diet-plans/new`)}
+                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors duration-200"
+              >
+                Crear Plan Dieta
+              </button>
+              <button 
+              disabled 
+              title="próximamente" 
+              className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+              Crear Plan Entrenamiento
+            </button>
            </div>
         </div>
       )}

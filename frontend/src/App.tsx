@@ -33,6 +33,7 @@ import NewPatientPage from './pages/NewPatientPage';
 import PatientEditPage from './pages/PatientEditPage';
 import NewBiometricRecordPage from './pages/NewBiometricRecordPage';
 import PatientBiometricHistoryPage from './pages/PatientBiometricHistoryPage';
+import CreateDietPlanPage from './pages/CreateDietPlanPage';
 
 // Componente para la página de inicio temporal (si no hay otra)
 const HomePage = () => (
@@ -72,6 +73,7 @@ function App() {
             <Route path="/patients/:patientId/edit" element={<ProtectedRoute><PatientEditPage /></ProtectedRoute>} />
             <Route path="/patients/:patientId/biometric-records/new" element={<ProtectedRoute><NewBiometricRecordPage /></ProtectedRoute>} />
             <Route path="/patients/:patientId/biometric-records" element={<ProtectedRoute><PatientBiometricHistoryPage /></ProtectedRoute>} />
+            <Route path="/patients/:patientId/diet-plans/new" element={<ProtectedRoute><CreateDietPlanPage /></ProtectedRoute>} />
 
             {/* Ruta principal: redirige a dashboard si está autenticado, sino a login */}
             <Route 
