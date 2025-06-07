@@ -32,7 +32,7 @@ const createDietPlan = async (
         startDate: planData.startDate ? new Date(planData.startDate) : undefined, // Convertir a Date si existe
         endDate: planData.endDate ? new Date(planData.endDate) : undefined, // Convertir a Date si existe
         objectives: planData.objectives,
-        isActive: true, // Usar isActive que existe en el schema.prisma en lugar de status
+        isActive: planData.status === 'ACTIVE', // Mapear status a isActive: 'ACTIVE' -> true, 'DRAFT' -> false
         notes: planData.notes,
         patient: { connect: { id: patientId } },
         professional: { connect: { id: professionalId } },

@@ -95,7 +95,7 @@ describe('Diet Service', () => {
       startDate: '2023-10-27',
       endDate: '2023-11-27',
       objectives: 'Gain weight',
-      status: 'Active', // O el valor del enum si aplica
+      status: 'ACTIVE', // Usar el valor en inglés que espera el enum
       notes: 'Some notes',
       meals: [
         // Usamos los valores literales de string para los enums, ya que Prisma los maneja así en los datos
