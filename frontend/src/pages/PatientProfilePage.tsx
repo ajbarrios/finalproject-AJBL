@@ -159,7 +159,7 @@ const PatientProfilePage: React.FC = () => {
              {patient.workoutPlansSummary && patient.workoutPlansSummary.length > 0 ? (
                <ul>
                  {patient.workoutPlansSummary.map(plan => (
-                   <li key={plan.id}>- {plan.title} ({plan.status === 'Active' ? 'Activo' : 'Borrador'})</li>
+                   <li key={plan.id}>- {plan.title} ({plan.status === 'ACTIVE' ? 'Activo' : 'Borrador'})</li>
                  ))}
                </ul>
              ) : (
