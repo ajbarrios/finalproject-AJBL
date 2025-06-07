@@ -17,6 +17,42 @@ const findPatientByProfessional = async (
   });
 };
 
+// Nueva función para obtener un plan de dieta por ID con autorización
+const getDietPlanById = async (
+  dietPlanId: number,
+  professionalId: number
+) => {
+  // Buscar el plan de dieta e incluir las comidas y información del paciente para autorización
+  const dietPlan = await prisma.dietPlan.findUnique({
+    where: { id: dietPlanId },
+    include: {
+      meals: {
+        orderBy: [
+          { dayOfWeek: 'asc' },
+          { mealType: 'asc' }
+        ]
+      },
+      patient: {
+        select: { professionalId: true }
+      }
+    }
+  });
+
+  // Si no se encuentra el plan, retornar null
+  if (!dietPlan) {
+    return null;
+  }
+
+  // Verificar autorización: el plan debe pertenecer a un paciente del profesional autenticado
+  if (dietPlan.patient.professionalId !== professionalId) {
+    throw new Error('Acceso no autorizado: el plan no pertenece a este profesional.');
+  }
+
+  // Retornar el plan sin la información del paciente (ya no es necesaria)
+  const { patient, ...planWithoutPatient } = dietPlan;
+  return planWithoutPatient;
+};
+
 const createDietPlan = async (
   patientId: number,
   professionalId: number,
@@ -80,4 +116,4 @@ const createDietPlan = async (
   return newDietPlan; // Retornar el plan completo con comidas
 };
 
-export default { findPatientByProfessional, createDietPlan }; 
+export default { findPatientByProfessional, createDietPlan, getDietPlanById }; 

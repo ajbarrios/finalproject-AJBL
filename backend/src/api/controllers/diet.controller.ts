@@ -39,4 +39,49 @@ export const createDietPlanForPatient = async (
     console.error('Error creando plan de dieta:', error);
     next(error); // Pasar errores al middleware de manejo de errores
   }
+};
+
+// Nueva función para obtener un plan de dieta por ID
+export const getDietPlanById = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const dietPlanId = parseInt(req.params.dietPlanId, 10);
+    const professionalId = req.professional?.professionalId;
+
+    // Verificar si professionalId existe
+    if (!professionalId) {
+      res.status(401).json({ message: 'Profesional no autenticado o token inválido.' });
+      return;
+    }
+
+    // Validar que dietPlanId sea un número válido
+    if (isNaN(dietPlanId) || dietPlanId <= 0) {
+      res.status(400).json({ message: 'ID del plan de dieta inválido.' });
+      return;
+    }
+
+    // Obtener el plan de dieta con autorización
+    const dietPlan = await dietService.getDietPlanById(dietPlanId, professionalId);
+
+    // Si el plan no existe
+    if (!dietPlan) {
+      res.status(404).json({ message: 'Plan de dieta no encontrado.' });
+      return;
+    }
+
+    // Responder con el plan encontrado
+    res.status(200).json(dietPlan);
+  } catch (error) {
+    // Manejar error de autorización específicamente
+    if (error instanceof Error && error.message.includes('Acceso no autorizado')) {
+      res.status(403).json({ message: 'No tienes permisos para acceder a este plan de dieta.' });
+      return;
+    }
+
+    console.error('Error obteniendo plan de dieta:', error);
+    next(error); // Pasar errores al middleware de manejo de errores
+  }
 }; 

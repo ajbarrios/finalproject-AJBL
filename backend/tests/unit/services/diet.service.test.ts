@@ -434,4 +434,181 @@ describe('Diet Service', () => {
         .rejects.toThrow('Meals creation failed');
     });
   });
+
+  describe('getDietPlanById', () => {
+    const mockDietPlan = {
+      id: 101,
+      title: 'Plan de Pérdida de Peso',
+      description: 'Descripción del plan',
+      startDate: new Date('2025-06-01'),
+      endDate: new Date('2025-06-30'),
+      objectives: 'Perder 5kg',
+      isActive: true,
+      notes: 'Notas importantes',
+      patientId: 19,
+      professionalId: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      meals: [
+        {
+          id: 1,
+          mealType: 'BREAKFAST',
+          content: 'Avena con frutas',
+          dayOfWeek: 'MONDAY',
+          dietPlanId: 101,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 2,
+          mealType: 'LUNCH',
+          content: 'Ensalada con proteína',
+          dayOfWeek: 'MONDAY',
+          dietPlanId: 101,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      ],
+      patient: {
+        professionalId: 1
+      }
+    };
+
+    it('should return diet plan with meals for authorized professional', async () => {
+      prismaMock.dietPlan.findUnique.mockResolvedValue(mockDietPlan);
+
+      const result = await dietService.getDietPlanById(101, 1);
+
+      expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
+        where: { id: 101 },
+        include: {
+          meals: {
+            orderBy: [
+              { dayOfWeek: 'asc' },
+              { mealType: 'asc' }
+            ]
+          },
+          patient: {
+            select: { professionalId: true }
+          }
+        }
+      });
+
+      // Verify the result doesn't include patient data
+      const { patient, ...expectedResult } = mockDietPlan;
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('should return null if diet plan not found', async () => {
+      prismaMock.dietPlan.findUnique.mockResolvedValue(null);
+
+      const result = await dietService.getDietPlanById(999, 1);
+
+      expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
+        where: { id: 999 },
+        include: {
+          meals: {
+            orderBy: [
+              { dayOfWeek: 'asc' },
+              { mealType: 'asc' }
+            ]
+          },
+          patient: {
+            select: { professionalId: true }
+          }
+        }
+      });
+
+      expect(result).toBeNull();
+    });
+
+    it('should throw authorization error if plan belongs to different professional', async () => {
+      const unauthorizedPlan = {
+        ...mockDietPlan,
+        patient: {
+          professionalId: 2 // Different professional
+        }
+      };
+
+      prismaMock.dietPlan.findUnique.mockResolvedValue(unauthorizedPlan);
+
+      await expect(dietService.getDietPlanById(101, 1))
+        .rejects.toThrow('Acceso no autorizado: el plan no pertenece a este profesional.');
+
+      expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
+        where: { id: 101 },
+        include: {
+          meals: {
+            orderBy: [
+              { dayOfWeek: 'asc' },
+              { mealType: 'asc' }
+            ]
+          },
+          patient: {
+            select: { professionalId: true }
+          }
+        }
+      });
+    });
+
+    it('should return plan without meals if no meals exist', async () => {
+      const planWithoutMeals = {
+        ...mockDietPlan,
+        meals: []
+      };
+
+      prismaMock.dietPlan.findUnique.mockResolvedValue(planWithoutMeals);
+
+      const result = await dietService.getDietPlanById(101, 1);
+
+      const { patient, ...expectedResult } = planWithoutMeals;
+      expect(result).toEqual(expectedResult);
+      expect(result?.meals).toEqual([]);
+    });
+
+    it('should handle database errors', async () => {
+      const dbError = new Error('Database connection failed');
+      prismaMock.dietPlan.findUnique.mockRejectedValue(dbError);
+
+      await expect(dietService.getDietPlanById(101, 1))
+        .rejects.toThrow('Database connection failed');
+    });
+
+    it('should verify meals are ordered correctly', async () => {
+      prismaMock.dietPlan.findUnique.mockResolvedValue(mockDietPlan);
+
+      await dietService.getDietPlanById(101, 1);
+
+      expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
+        where: { id: 101 },
+        include: {
+          meals: {
+            orderBy: [
+              { dayOfWeek: 'asc' },
+              { mealType: 'asc' }
+            ]
+          },
+          patient: {
+            select: { professionalId: true }
+          }
+        }
+      });
+    });
+
+    it('should work with different professional IDs', async () => {
+      const planForDifferentProfessional = {
+        ...mockDietPlan,
+        patient: {
+          professionalId: 5
+        }
+      };
+
+      prismaMock.dietPlan.findUnique.mockResolvedValue(planForDifferentProfessional);
+
+      const result = await dietService.getDietPlanById(101, 5);
+
+      const { patient, ...expectedResult } = planForDifferentProfessional;
+      expect(result).toEqual(expectedResult);
+    });
+  });
 }); 
