@@ -39,6 +39,17 @@ export const createDietPlanSchema = z.object({
   path: ['endDate'], // El error se asociará al campo endDate
 });
 
+// Validación para parámetros de ruta
+export const dietPlanParamsSchema = z.object({
+  dietPlanId: z.string().refine((val) => {
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num > 0;
+  }, {
+    message: 'El ID del plan de dieta debe ser un número entero positivo.'
+  })
+});
+
 // Tipos inferidos para usar en la lógica
 export type CreateDietPlanInput = z.infer<typeof createDietPlanSchema>;
-export type DietMealInput = z.infer<typeof dietMealSchema>; 
+export type DietMealInput = z.infer<typeof dietMealSchema>;
+export type DietPlanParams = z.infer<typeof dietPlanParamsSchema>; 

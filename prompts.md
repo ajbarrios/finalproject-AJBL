@@ -418,6 +418,15 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 95 (Relacionado con TB-012 - Corrección Test Fecha Hardcodeada - Robustez):**
 "Hay fragilidad en el test de DateInput.test.tsx porque usa una fecha hardcodeada `'2025-06-01'` en lugar de usar `defaultProps.value`. Esto hace el test frágil y dependiente de valores específicos. Cambia `const input = screen.getByDisplayValue('2025-06-01');` por `const input = screen.getByDisplayValue(defaultProps.value);` para hacer el test más robusto y mantenible."
 
+**Prompt 96 (Relacionado con TB-013 - Análisis del Proyecto y Plan de Acción):**
+"Lee el proyecto para obtener contexto de la parte @/backend , @/frontend  y base de datos. Puedes comenzar por el @readme.md. Necesito elaborar un plan de accion para implementar una funcionalidad."
+
+**Prompt 97 (Relacionado con TB-013 - Lectura del Ticket y Elaboración del Plan):**
+"Lee el archivo @tickets_backend.md . Vamos a desarrollar un plan de accion para implementar la funcionalidad del ticket TB-013. No hagas nada aun."
+
+**Prompt 98 (Relacionado con TB-013 - Inicio del Desarrollo Backend):**
+"Comienza el desarrollo y paramos cuando lleguemos a la parte de unit testing. Ten en cuanto como estan escritos los unit tests actuales en el proyecto y manten el estilo y la forma de usar mocks."
+
 ---
 
 ### 7. Pull Requests
