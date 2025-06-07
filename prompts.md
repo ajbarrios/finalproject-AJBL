@@ -426,6 +426,14 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 
 **Prompt 98 (Relacionado con TB-013 - Inicio del Desarrollo Backend):**
 "Comienza el desarrollo y paramos cuando lleguemos a la parte de unit testing. Ten en cuanto como estan escritos los unit tests actuales en el proyecto y manten el estilo y la forma de usar mocks."
+**Prompt 99 (Relacionado con TB-013 - Debug Mock Axios y Tipos en Tests):**
+"Los tests de `dietPlanService.test.ts` tienen errores de TypeScript relacionados con: 1) `PlanStatus` no encontrado, 2) Tipos incompatibles en `meals` entre mock y `DietPlanCreation`, 3) Uso de `as any` que debe evitarse, 4) Problemas con mock de `AxiosError` e `InternalAxiosRequestConfig`. Corrige estos errores importando los tipos correctos y ajustando los mocks para que sean compatibles con las interfaces definidas."
+
+**Prompt 100 (Relacionado con TB-013 - Corrección Tipos Enums Import):**
+"Los errores persisten porque `PlanStatus`, `MealType` y `DayOfWeek` se importaron como tipos (`import type`) pero se usan como valores en el código. Cambia la importación para usar `import { PlanStatus, MealType, DayOfWeek }` como valores regulares en lugar de tipos, y actualiza los mocks para usar los enums correctamente (ej: `PlanStatus.ACTIVE`, `MealType.BREAKFAST`, `DayOfWeek.MONDAY`)."
+
+**Prompt 101 (Relacionado con TB-013 - Verificación Final Tests):**
+"Ejecuta los tests para verificar que todas las correcciones de TypeScript se han aplicado correctamente y no hay errores de compilación en `dietPlanService.test.ts`."
 
 ---
 
