@@ -122,12 +122,23 @@ export const getPatientDetailsForProfessional = async (
       },
     });
 
-    // 5. Combinar y retornar los resultados
+    // 5. Mapear isActive a status para los resúmenes
+    const mappedDietPlans = dietPlansSummary.map(plan => ({
+      ...plan,
+      status: plan.isActive ? 'ACTIVE' : 'DRAFT'
+    }));
+
+    const mappedWorkoutPlans = workoutPlansSummary.map(plan => ({
+      ...plan,
+      status: plan.isActive ? 'ACTIVE' : 'DRAFT'
+    }));
+
+    // 6. Combinar y retornar los resultados
     return {
       ...patient,
       lastBiometricRecord: lastBiometricRecord || null, // Asegurar que sea null si no se encuentra
-      dietPlansSummary: dietPlansSummary,
-      workoutPlansSummary: workoutPlansSummary,
+      dietPlansSummary: mappedDietPlans,
+      workoutPlansSummary: mappedWorkoutPlans,
     };
 
   } catch (error) {

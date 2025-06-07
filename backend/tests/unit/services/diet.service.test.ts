@@ -172,7 +172,15 @@ describe('Diet Service', () => {
       const result = await dietService.createDietPlan(19, 1, mockPlanData);
 
       expect(prismaMock.$transaction).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockPlanWithMeals);
+      
+      // Expected result should have status instead of isActive
+      const { isActive, ...expectedWithoutIsActive } = mockPlanWithMeals;
+      const expectedResult = {
+        ...expectedWithoutIsActive,
+        status: 'ACTIVE' // isActive: true maps to status: 'ACTIVE'
+      };
+      
+      expect(result).toEqual(expectedResult);
     });
 
     it('should create diet plan with correct data mapping', async () => {
@@ -254,9 +262,10 @@ describe('Diet Service', () => {
 
       prismaMock.$transaction.mockImplementation(mockTransaction);
 
-      await dietService.createDietPlan(19, 1, draftPlanData);
+      const result = await dietService.createDietPlan(19, 1, draftPlanData);
 
       expect(capturedCreateData.data.isActive).toBe(false);
+      expect(result.status).toBe('DRAFT'); // Check that the returned result has correct status
     });
 
     it('should handle plans without meals', async () => {
@@ -280,6 +289,7 @@ describe('Diet Service', () => {
       const result = await dietService.createDietPlan(19, 1, planDataWithoutMeals);
 
       expect(result.meals).toEqual([]);
+      expect(result.status).toBe('ACTIVE'); // Check status mapping
       
       // Verify createMany was not called since there are no meals
       const transactionCallback = prismaMock.$transaction.mock.calls[0][0];
@@ -494,8 +504,12 @@ describe('Diet Service', () => {
         }
       });
 
-      // Verify the result doesn't include patient data
-      const { patient, ...expectedResult } = mockDietPlan;
+      // Verify the result doesn't include patient data and has status instead of isActive
+      const { patient, isActive, ...planWithoutPatientAndIsActive } = mockDietPlan;
+      const expectedResult = {
+        ...planWithoutPatientAndIsActive,
+        status: 'ACTIVE' // isActive: true maps to status: 'ACTIVE'
+      };
       expect(result).toEqual(expectedResult);
     });
 
@@ -561,7 +575,11 @@ describe('Diet Service', () => {
 
       const result = await dietService.getDietPlanById(101, 1);
 
-      const { patient, ...expectedResult } = planWithoutMeals;
+      const { patient, isActive, ...planWithoutPatientAndIsActive } = planWithoutMeals;
+      const expectedResult = {
+        ...planWithoutPatientAndIsActive,
+        status: 'ACTIVE' // isActive: true maps to status: 'ACTIVE'
+      };
       expect(result).toEqual(expectedResult);
       expect(result?.meals).toEqual([]);
     });
@@ -607,7 +625,11 @@ describe('Diet Service', () => {
 
       const result = await dietService.getDietPlanById(101, 5);
 
-      const { patient, ...expectedResult } = planForDifferentProfessional;
+      const { patient, isActive, ...planWithoutPatientAndIsActive } = planForDifferentProfessional;
+      const expectedResult = {
+        ...planWithoutPatientAndIsActive,
+        status: 'ACTIVE' // isActive: true maps to status: 'ACTIVE'
+      };
       expect(result).toEqual(expectedResult);
     });
   });
