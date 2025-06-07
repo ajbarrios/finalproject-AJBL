@@ -37,7 +37,7 @@ describe('PatientBiometricHistoryPage', () => {
   beforeEach(() => {
     // Reset mocks before each test
     mockUseParams.mockReturnValue({ patientId });
-    mockApiGet.mockClear();
+    vi.clearAllMocks();
   });
 
   test('renders loading state initially', () => {

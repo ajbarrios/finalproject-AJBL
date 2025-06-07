@@ -26,7 +26,7 @@ export const createDietPlan = async (
  */
 export const getDietPlan = async (dietPlanId: string): Promise<DietPlan> => {
   try {
-    const response = await api.get(`/diets/plans/${dietPlanId}`);
+    const response = await api.get(`/diets/${dietPlanId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching diet plan:', error);
@@ -55,7 +55,7 @@ export const updateDietPlan = async (
   planData: Partial<DietPlanCreation>
 ): Promise<DietPlan> => {
   try {
-    const response = await api.put(`/diets/plans/${dietPlanId}`, planData);
+    const response = await api.put(`/diets/${dietPlanId}`, planData);
     return response.data;
   } catch (error) {
     console.error('Error updating diet plan:', error);
@@ -68,7 +68,7 @@ export const updateDietPlan = async (
  */
 export const deleteDietPlan = async (dietPlanId: string): Promise<void> => {
   try {
-    await api.delete(`/diets/plans/${dietPlanId}`);
+    await api.delete(`/diets/${dietPlanId}`);
   } catch (error) {
     console.error('Error deleting diet plan:', error);
     throw error;

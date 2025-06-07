@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach, type Mock, type Mocked } from 'vitest';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import type { DietPlan, DietPlanCreation } from '../types/dietPlan';
+import { PlanStatus, MealType, DayOfWeek } from '../types/dietPlan';
 
 // Mockear el apiClient
 vi.mock('./api', () => {
@@ -34,14 +36,14 @@ describe('dietPlanService', () => {
   let updateDietPlan: typeof import('./dietPlanService').updateDietPlan;
   let deleteDietPlan: typeof import('./dietPlanService').deleteDietPlan;
 
-  const mockDietPlan = {
+  const mockDietPlan: DietPlan = {
     id: 'plan1',
     title: 'Plan de Pérdida de Peso',
     description: 'Descripción del plan',
     startDate: '2025-06-01',
     endDate: '2025-06-30',
     objectives: 'Perder 5kg',
-    status: 'ACTIVE',
+    status: PlanStatus.ACTIVE,
     notes: 'Notas importantes',
     patientId: '19',
     professionalId: '1',
@@ -50,18 +52,18 @@ describe('dietPlanService', () => {
     meals: [
       {
         id: 'meal1',
-        mealType: 'BREAKFAST',
+        mealType: MealType.BREAKFAST,
         content: 'Avena con frutas',
-        dayOfWeek: 'MONDAY',
+        dayOfWeek: DayOfWeek.MONDAY,
         dietPlanId: 'plan1',
         createdAt: '2025-06-01T00:00:00.000Z',
         updatedAt: '2025-06-01T00:00:00.000Z',
       },
       {
         id: 'meal2',
-        mealType: 'LUNCH',
+        mealType: MealType.LUNCH,
         content: 'Ensalada con proteína',
-        dayOfWeek: 'MONDAY',
+        dayOfWeek: DayOfWeek.MONDAY,
         dietPlanId: 'plan1',
         createdAt: '2025-06-01T00:00:00.000Z',
         updatedAt: '2025-06-01T00:00:00.000Z',
@@ -69,24 +71,24 @@ describe('dietPlanService', () => {
     ]
   };
 
-  const mockDietPlanCreation = {
+  const mockDietPlanCreation: DietPlanCreation = {
     title: 'Plan de Pérdida de Peso',
     description: 'Descripción del plan',
     startDate: '2025-06-01',
     endDate: '2025-06-30',
     objectives: 'Perder 5kg',
-    status: 'ACTIVE',
+    status: PlanStatus.ACTIVE,
     notes: 'Notas importantes',
     meals: [
       {
-        mealType: 'BREAKFAST',
+        mealType: MealType.BREAKFAST,
         content: 'Avena con frutas',
-        dayOfWeek: 'MONDAY'
+        dayOfWeek: DayOfWeek.MONDAY
       },
       {
-        mealType: 'LUNCH',
+        mealType: MealType.LUNCH,
         content: 'Ensalada con proteína',
-        dayOfWeek: 'MONDAY'
+        dayOfWeek: DayOfWeek.MONDAY
       }
     ]
   };
@@ -115,7 +117,7 @@ describe('dietPlanService', () => {
     it('should create a diet plan successfully', async () => {
       vi.mocked(mockApiClient.post).mockResolvedValue({ data: mockDietPlan });
 
-      const result = await createDietPlan('19', mockDietPlanCreation as any);
+      const result = await createDietPlan('19', mockDietPlanCreation as DietPlanCreation);
 
       expect(mockApiClient.post).toHaveBeenCalledOnce();
       expect(mockApiClient.post).toHaveBeenCalledWith('/diets/patients/19/plans', mockDietPlanCreation);
@@ -161,7 +163,7 @@ describe('dietPlanService', () => {
       const result = await getDietPlan('plan1');
 
       expect(mockApiClient.get).toHaveBeenCalledOnce();
-      expect(mockApiClient.get).toHaveBeenCalledWith('/diets/plans/plan1');
+      expect(mockApiClient.get).toHaveBeenCalledWith('/diets/plan1');
       expect(result).toEqual(mockDietPlan);
     });
 
@@ -186,7 +188,7 @@ describe('dietPlanService', () => {
       vi.mocked(mockApiClient.get as Mock).mockRejectedValue(mockAxiosError);
 
       await expect(getDietPlan('plan1')).rejects.toThrow();
-      expect(mockApiClient.get).toHaveBeenCalledWith('/diets/plans/plan1');
+      expect(mockApiClient.get).toHaveBeenCalledWith('/diets/plan1');
     });
   });
 
@@ -254,7 +256,7 @@ describe('dietPlanService', () => {
       const result = await updateDietPlan('plan1', updateData);
 
       expect(mockApiClient.put).toHaveBeenCalledOnce();
-      expect(mockApiClient.put).toHaveBeenCalledWith('/diets/plans/plan1', updateData);
+      expect(mockApiClient.put).toHaveBeenCalledWith('/diets/plan1', updateData);
       expect(result).toEqual(updatedDietPlan);
     });
 
@@ -279,7 +281,7 @@ describe('dietPlanService', () => {
       vi.mocked(mockApiClient.put as Mock).mockRejectedValue(mockAxiosError);
 
       await expect(updateDietPlan('plan1', updateData)).rejects.toThrow();
-      expect(mockApiClient.put).toHaveBeenCalledWith('/diets/plans/plan1', updateData);
+      expect(mockApiClient.put).toHaveBeenCalledWith('/diets/plan1', updateData);
     });
   });
 
@@ -290,7 +292,7 @@ describe('dietPlanService', () => {
       await deleteDietPlan('plan1');
 
       expect(mockApiClient.delete).toHaveBeenCalledOnce();
-      expect(mockApiClient.delete).toHaveBeenCalledWith('/diets/plans/plan1');
+      expect(mockApiClient.delete).toHaveBeenCalledWith('/diets/plan1');
     });
 
     it('should handle API errors when deleting diet plan', async () => {
@@ -314,7 +316,7 @@ describe('dietPlanService', () => {
       vi.mocked(mockApiClient.delete as Mock).mockRejectedValue(mockAxiosError);
 
       await expect(deleteDietPlan('plan1')).rejects.toThrow();
-      expect(mockApiClient.delete).toHaveBeenCalledWith('/diets/plans/plan1');
+      expect(mockApiClient.delete).toHaveBeenCalledWith('/diets/plan1');
     });
 
     it('should handle network errors when deleting diet plan', async () => {

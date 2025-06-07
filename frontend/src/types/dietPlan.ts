@@ -69,6 +69,7 @@ export interface DietPlan extends Omit<DietPlanCreation, 'meals'> {
   id: string;
   patientId: string;
   professionalId: string;
+  status: PlanStatus; // Asegurar que use el enum correcto
   meals: DietMeal[];
   createdAt: string;
   updatedAt: string;
