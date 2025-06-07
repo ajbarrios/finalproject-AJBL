@@ -435,6 +435,21 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 101 (Relacionado con TB-013 - Verificación Final Tests):**
 "Ejecuta los tests para verificar que todas las correcciones de TypeScript se han aplicado correctamente y no hay errores de compilación en `dietPlanService.test.ts`."
 
+**Prompt 102 (Relacionado con TB-014 - Análisis del Proyecto y Plan de Acción):**
+"Escanea el proyecto NutriTrack Pro para entender el tech stack, enfocándote en backend, frontend y readme. Una vez que hayas analizado todo el proyecto, necesito que analices el ticket TB-014 de 'Modificación de un Plan de Dieta Existente' y me proporciones un plan de acción detallado para implementarlo."
+
+**Prompt 103 (Relacionado con TB-014 - Implementación Backend Completa):**
+"Quiero que empiecen el desarrollo hasta la parte de unit testing. Implementa todas las fases del plan de acción para TB-014: validaciones, servicio, controlador, rutas y la lógica compleja de sincronización de comidas. Asegúrate de que el código compile sin errores de TypeScript."
+
+**Prompt 104 (Relacionado con TB-014 - Implementación Tests Unitarios Completos):**
+"Implementa comprehensive test suites para TB-014: 1) Tests de validación para `updateDietPlanSchema` y `dietMealUpdateSchema` cubriendo actualizaciones completas, parciales, validación de campos y comidas, 2) Tests de servicio para `updateDietPlan` cubriendo autorización, actualizaciones, sincronización de comidas y manejo de errores, 3) Tests de controlador cubriendo autenticación, validación, respuestas de error y casos de éxito."
+
+**Prompt 105 (Relacionado con TB-014 - Corrección Tests Fallidos - Mocks y Formato Respuesta):**
+"Los tests están fallando. Te paso la salida de la terminal para que los corrijas. Los problemas incluyen: 1) Mocks de transacciones de Prisma mal configurados para simular las dos llamadas a `findUnique`, 2) Formato de respuesta inconsistente en el controlador (esperado: `{message, data}` vs actual), 3) Mensajes de error de autorización no coincidentes, 4) Manejo inconsistente de errores (algunos a `next()`, otros manejados directamente)."
+
+**Prompt 106 (Relacionado con TB-014 - Consolidación Tests Duplicados):**
+"Hay dos archivos de test duplicados en la carpeta @/services. Los test se están guardando en la carpeta @/tests. Puedes leer los que están duplicados, generar uno solo en la carpeta test de cada uno y comprobar que todo funciona? Específicamente: `diet.service.test.ts` (versión pequeña en `/services/` vs completa en `/tests/`) y `patient.service.test.ts` (solo en `/services/`, necesita moverse a `/tests/`)."
+
 ---
 
 ### 7. Pull Requests
