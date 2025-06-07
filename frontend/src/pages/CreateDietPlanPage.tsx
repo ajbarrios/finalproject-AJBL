@@ -139,10 +139,10 @@ const CreateDietPlanPage: React.FC = () => {
         notes: formData.notes || undefined
       };
 
-      await createDietPlan(patientId, planData);
+      const createdPlan = await createDietPlan(patientId, planData);
       
       toast.success('Plan de dieta creado exitosamente');
-      navigate(`/patients/${patientId}`);
+      navigate(`/patients/${patientId}/diet-plans/${createdPlan.id}`);
     } catch (error: unknown) {
       console.error('Error creating diet plan:', error);
       

@@ -129,13 +129,28 @@ const PatientProfilePage: React.FC = () => {
           <div className="bg-white p-6 rounded-lg shadow col-span-full">
              <h2 className="text-xl font-semibold mb-4">Planes de Dieta</h2>
              {patient.dietPlansSummary && patient.dietPlansSummary.length > 0 ? (
-               <ul>
+               <div className="space-y-3">
                  {patient.dietPlansSummary.map(plan => (
-                   <li key={plan.id}>- {plan.title} ({plan.status === 'Active' ? 'Activo' : 'Borrador'})</li>
+                   <div key={plan.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                     <div>
+                       <h3 className="font-medium text-gray-900">{plan.title}</h3>
+                       <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                         plan.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                       }`}>
+                         {plan.status === 'ACTIVE' ? 'Activo' : 'Borrador'}
+                       </span>
+                     </div>
+                     <button
+                       onClick={() => navigate(`/patients/${patientId}/diet-plans/${plan.id}`)}
+                       className="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm"
+                     >
+                       Ver Detalles
+                     </button>
+                   </div>
                  ))}
-               </ul>
+               </div>
              ) : (
-               <p>No hay planes de dieta asignados.</p>
+               <p className="text-gray-500">No hay planes de dieta asignados.</p>
              )}
            </div>
 
@@ -144,7 +159,7 @@ const PatientProfilePage: React.FC = () => {
              {patient.workoutPlansSummary && patient.workoutPlansSummary.length > 0 ? (
                <ul>
                  {patient.workoutPlansSummary.map(plan => (
-                   <li key={plan.id}>- {plan.title} ({plan.status === 'Active' ? 'Activo' : 'Borrador'})</li>
+                   <li key={plan.id}>- {plan.title} ({plan.status === 'ACTIVE' ? 'Activo' : 'Borrador'})</li>
                  ))}
                </ul>
              ) : (

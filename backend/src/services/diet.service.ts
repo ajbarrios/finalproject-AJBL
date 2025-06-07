@@ -48,9 +48,12 @@ const getDietPlanById = async (
     throw new Error('Acceso no autorizado: el plan no pertenece a este profesional.');
   }
 
-  // Retornar el plan sin la información del paciente (ya no es necesaria)
-  const { patient, ...planWithoutPatient } = dietPlan;
-  return planWithoutPatient;
+  // Retornar el plan sin la información del paciente y mapear isActive a status
+  const { patient, isActive, ...planWithoutPatient } = dietPlan;
+  return {
+    ...planWithoutPatient,
+    status: isActive ? 'ACTIVE' : 'DRAFT' // Mapear isActive boolean a status string
+  };
 };
 
 const createDietPlan = async (
@@ -110,7 +113,12 @@ const createDietPlan = async (
         throw new Error('Error interno al recuperar el plan creado.');
     }
 
-    return planWithMeals;
+    // Mapear isActive a status antes de retornar
+    const { isActive, ...planWithoutIsActive } = planWithMeals;
+    return {
+      ...planWithoutIsActive,
+      status: isActive ? 'ACTIVE' : 'DRAFT' // Mapear isActive boolean a status string
+    };
   }); // La transacción se confirma automáticamente si el callback no arroja error
 
   return newDietPlan; // Retornar el plan completo con comidas

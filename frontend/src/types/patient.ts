@@ -102,7 +102,7 @@ export type DietPlanSummary = {
   title: string;
   startDate: string | null; // ISO date string
   endDate: string | null; // ISO date string
-  status: 'Active' | 'Draft'; // Añadido para coincidir con PlanSummary
+  status: 'ACTIVE' | 'DRAFT'; // Corregido para coincidir con el backend
 };
 
 export type WorkoutPlanSummary = {
@@ -110,7 +110,7 @@ export type WorkoutPlanSummary = {
   title: string;
   startDate: string | null; // ISO date string
   endDate: string | null; // ISO date string
-  status: 'Active' | 'Draft'; // Añadido para coincidir con PlanSummary
+  status: 'ACTIVE' | 'DRAFT'; // Corregido para coincidir con el backend
 };
 
 // Define a type for the detailed patient response
@@ -141,5 +141,5 @@ export interface PlanSummary {
   title: string;
   startDate?: string | null; // O Date
   endDate?: string | null; // O Date
-  status: 'Active' | 'Draft'; // Ajusta si hay más estados
+  status: 'ACTIVE' | 'DRAFT'; // Corregido para coincidir con el backend
 } 

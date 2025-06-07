@@ -115,6 +115,7 @@ describe('Diet Service', () => {
       // Mockear el findUnique final para que devuelva el plan con las comidas creadas
       const mockCreatedPlanWithMeals = {
            ...mockNewDietPlan,
+           isActive: true, // Add isActive field for the mock
            meals: planData.meals.map((meal, index) => ({ id: index + 1, ...meal, dietPlanId: mockNewDietPlan.id }))
       }; // Simular el resultado con IDs generados
 
@@ -175,7 +176,14 @@ describe('Diet Service', () => {
         },
       });
 
-      expect(createdPlan).toEqual(mockCreatedPlanWithMeals); // Verificar que se devuelve el plan completo con comidas
+      // Expect the plan with status field instead of isActive
+      const { isActive, ...planWithoutIsActive } = mockCreatedPlanWithMeals;
+      const expectedResult = {
+        ...planWithoutIsActive,
+        status: 'ACTIVE' // isActive: true maps to status: 'ACTIVE'
+      };
+      
+      expect(createdPlan).toEqual(expectedResult); // Verificar que se devuelve el plan completo con comidas
     });
 
      it('should handle transaction errors and let them propagate', async () => {

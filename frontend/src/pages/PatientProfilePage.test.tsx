@@ -58,11 +58,11 @@ const mockPatientDetails: PatientDetails = {
     updatedAt: new Date().toISOString(),
   },
   dietPlansSummary: [
-    { id: 'diet1', title: 'Plan Inicial', status: 'Active', startDate: '2023-10-01T00:00:00.000Z', endDate: '2023-11-01T00:00:00.000Z' },
-    { id: 'diet2', title: 'Plan Mantenimiento', status: 'Draft', startDate: '2023-11-02T00:00:00.000Z', endDate: '2023-12-02T00:00:00.000Z' },
+    { id: 'diet1', title: 'Plan Inicial', status: 'ACTIVE', startDate: '2023-10-01T00:00:00.000Z', endDate: '2023-11-01T00:00:00.000Z' },
+    { id: 'diet2', title: 'Plan Mantenimiento', status: 'DRAFT', startDate: '2023-11-02T00:00:00.000Z', endDate: '2023-12-02T00:00:00.000Z' },
   ],
   workoutPlansSummary: [
-    { id: 'workout1', title: 'Rutina Fuerza', status: 'Active', startDate: '2023-10-01T00:00:00.000Z', endDate: '2023-11-01T00:00:00.000Z' },
+    { id: 'workout1', title: 'Rutina Fuerza', status: 'ACTIVE', startDate: '2023-10-01T00:00:00.000Z', endDate: '2023-11-01T00:00:00.000Z' },
   ],
 };
 
@@ -109,11 +109,13 @@ describe('PatientProfilePage', () => {
       expect(screen.getByText('Último Registro Biométrico')).toBeInTheDocument();
       expect(screen.getByText('Peso:')).toBeInTheDocument();
       expect(screen.getByText('Planes de Dieta')).toBeInTheDocument();
-      // Aserciones para los planes, verificando la presencia de algún texto del plan
-      expect(screen.getByText('- Plan Inicial (Activo)')).toBeInTheDocument();
-      expect(screen.getByText('- Plan Mantenimiento (Borrador)')).toBeInTheDocument();
+      // Aserciones para los planes, verificando la presencia de textos y badges
+      expect(screen.getByText('Plan Inicial')).toBeInTheDocument();
+      expect(screen.getByText('Activo')).toBeInTheDocument(); // El badge ACTIVE se muestra como "Activo"
+      expect(screen.getByText('Plan Mantenimiento')).toBeInTheDocument();
+      expect(screen.getByText('Borrador')).toBeInTheDocument(); // El badge DRAFT se muestra como "Borrador"
       expect(screen.getByText('Planes de Entrenamiento')).toBeInTheDocument();
-      expect(screen.getByText('- Rutina Fuerza (Activo)')).toBeInTheDocument();
+      expect(screen.getByText('- Rutina Fuerza (Activo)')).toBeInTheDocument(); // Los workout plans siguen con formato anterior
       // Verificar que el mensaje de carga desaparece
       expect(screen.queryByText('Cargando datos del paciente...')).not.toBeInTheDocument();
     });
