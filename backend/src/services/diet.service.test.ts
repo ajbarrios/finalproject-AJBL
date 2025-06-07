@@ -167,7 +167,10 @@ describe('Diet Service', () => {
         where: { id: mockNewDietPlan.id },
         include: {
            meals: {
-              orderBy: { dayOfWeek: 'asc', mealType: 'asc' }, // Aquí los strings literales están bien
+              orderBy: [
+                { dayOfWeek: 'asc' },
+                { mealType: 'asc' }
+              ],
            }
         },
       });

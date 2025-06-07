@@ -6,6 +6,8 @@ import cors from 'cors';
 import authRoutes from './api/routes/auth.routes';
 // Importar rutas de pacientes
 import patientRoutes from './api/routes/patient.routes';
+// Importar rutas de dietas
+import dietRoutes from './api/routes/diet.routes';
 
 // Cargar variables de entorno desde .env
 dotenv.config();
@@ -34,6 +36,7 @@ app.get('/', (req: Request, res: Response) => {
 // Configurar rutas de la API
 app.use('/api/auth', authRoutes); // Montar rutas de autenticación bajo /api/auth
 app.use('/api/patients', patientRoutes); // Montar rutas de pacientes bajo /api/patients
+app.use('/api/diets', dietRoutes); // Montar rutas de dietas bajo /api/diets
 
 // Iniciar el servidor
 app.listen(PORT, () => {

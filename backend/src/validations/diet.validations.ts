@@ -3,8 +3,11 @@ import { z } from 'zod';
 // Definir los tipos de días de la semana como un enum de Zod
 const DayOfWeekEnum = z.enum(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']);
 
+// Definir los tipos de comida como un enum de Zod
+const MealTypeEnum = z.enum(['BREAKFAST', 'MID_MORNING_SNACK', 'LUNCH', 'AFTERNOON_SNACK', 'DINNER']);
+
 const dietMealSchema = z.object({
-  mealType: z.string().min(1, 'El tipo de comida es obligatorio.'), // Podría ser un enum si los tipos son fijos
+  mealType: MealTypeEnum, // Usar enum en lugar de string
   content: z.string().min(1, 'El contenido de la comida es obligatorio.'),
   dayOfWeek: DayOfWeekEnum, // Ahora cada comida tiene un día de la semana
   // No hay created_at/updated_at/id en el input

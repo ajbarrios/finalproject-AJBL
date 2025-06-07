@@ -61,7 +61,10 @@ const createDietPlan = async (
         where: { id: createdPlan.id },
         include: {
             meals: {
-                orderBy: { dayOfWeek: 'asc', mealType: 'asc' }, // Ordenar comidas si es necesario
+                orderBy: [
+                    { dayOfWeek: 'asc' },
+                    { mealType: 'asc' }
+                ],
             }
         }
     });

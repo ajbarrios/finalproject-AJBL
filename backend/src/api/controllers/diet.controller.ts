@@ -10,22 +10,24 @@ export const createDietPlanForPatient = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const patientId = parseInt(req.params.patientId, 10);
-    const professionalId = req.professional?.id; // Obtener professionalId del usuario autenticado
+    const professionalId = req.professional?.professionalId; // Usar professionalId del token JWT
     const planData: CreateDietPlanInput = req.body; // Asumir que la validación ya ocurrió
 
     // Verificar si professionalId existe (aunque el middleware de auth debería asegurar esto)
     if (!professionalId) {
-      return res.status(401).json({ message: 'Profesional no autenticado o token inválido.' });
+      res.status(401).json({ message: 'Profesional no autenticado o token inválido.' });
+      return;
     }
 
     // Verificar si el paciente pertenece al profesional
     const patient = await dietService.findPatientByProfessional(patientId, professionalId);
 
     if (!patient) {
-      return res.status(404).json({ message: 'Paciente no encontrado o no pertenece a este profesional.' });
+      res.status(404).json({ message: 'Paciente no encontrado o no pertenece a este profesional.' });
+      return;
     }
 
     // Crear el plan de dieta
