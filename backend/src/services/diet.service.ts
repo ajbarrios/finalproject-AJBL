@@ -1,4 +1,4 @@
-import { CreateDietPlanInput } from '../validations/diet.validations';
+import { CreateDietPlanInput, UpdateDietPlanInput, DietMealUpdateInput } from '../validations/diet.validations';
 import prisma from '../config/db/prisma.client'; // Importar cliente Prisma
 import { MealType, DayOfWeek } from '../generated/prisma';
 
@@ -54,6 +54,138 @@ const getDietPlanById = async (
     ...planWithoutPatient,
     status: isActive ? 'ACTIVE' : 'DRAFT' // Mapear isActive boolean a status string
   };
+};
+
+// Nueva función para actualizar un plan de dieta existente
+const updateDietPlan = async (
+  dietPlanId: number,
+  professionalId: number,
+  updateData: UpdateDietPlanInput
+) => {
+  // Implementación transaccional para actualizar el plan y sincronizar sus comidas
+  const updatedDietPlan = await prisma.$transaction(async (tx) => {
+    // 1. Verificar que el plan existe y pertenece al profesional
+    const existingPlan = await tx.dietPlan.findUnique({
+      where: { id: dietPlanId },
+      include: {
+        patient: { select: { professionalId: true } },
+        meals: true
+      }
+    });
+
+    if (!existingPlan) {
+      throw new Error('Plan de dieta no encontrado.');
+    }
+
+    if (existingPlan.patient.professionalId !== professionalId) {
+      throw new Error('Acceso no autorizado: el plan no pertenece a este profesional.');
+    }
+
+    // 2. Actualizar información general del plan (si se proporcionó)
+    const planUpdateData: any = {};
+    if (updateData.title !== undefined) planUpdateData.title = updateData.title;
+    if (updateData.description !== undefined) planUpdateData.description = updateData.description;
+    if (updateData.startDate !== undefined) {
+      planUpdateData.startDate = updateData.startDate ? new Date(updateData.startDate) : null;
+    }
+    if (updateData.endDate !== undefined) {
+      planUpdateData.endDate = updateData.endDate ? new Date(updateData.endDate) : null;
+    }
+    if (updateData.objectives !== undefined) planUpdateData.objectives = updateData.objectives;
+    if (updateData.status !== undefined) {
+      planUpdateData.isActive = updateData.status === 'ACTIVE';
+    }
+    if (updateData.notes !== undefined) planUpdateData.notes = updateData.notes;
+
+    // Actualizar el plan solo si hay campos a actualizar
+    if (Object.keys(planUpdateData).length > 0) {
+      await tx.dietPlan.update({
+        where: { id: dietPlanId },
+        data: planUpdateData
+      });
+    }
+
+    // 3. Sincronizar comidas si se proporcionaron
+    if (updateData.meals !== undefined) {
+      const newMeals = updateData.meals;
+      const existingMeals = existingPlan.meals;
+
+      // Clasificar comidas según su operación
+      const existingMealIds = existingMeals.map(m => m.id);
+      const newMealIds = newMeals.filter(m => m.id).map(m => m.id!);
+
+      // Comidas a eliminar: existen en BD pero no en la nueva lista
+      const mealsToDelete = existingMealIds.filter(id => !newMealIds.includes(id));
+
+      // Comidas a crear: no tienen ID en la nueva lista
+      const mealsToCreate = newMeals.filter(m => !m.id);
+
+      // Comidas a actualizar: tienen ID y existen en BD
+      const mealsToUpdate = newMeals.filter(m => m.id && existingMealIds.includes(m.id!));
+
+      // Ejecutar eliminaciones
+      if (mealsToDelete.length > 0) {
+        await tx.dietMeal.deleteMany({
+          where: {
+            id: { in: mealsToDelete },
+            dietPlanId: dietPlanId // Seguridad adicional
+          }
+        });
+      }
+
+      // Ejecutar actualizaciones
+      for (const meal of mealsToUpdate) {
+        await tx.dietMeal.update({
+          where: { id: meal.id! },
+          data: {
+            mealType: meal.mealType as MealType,
+            content: meal.content,
+            dayOfWeek: meal.dayOfWeek as DayOfWeek
+          }
+        });
+      }
+
+      // Ejecutar creaciones
+      if (mealsToCreate.length > 0) {
+        const mealsData = mealsToCreate.map(meal => ({
+          mealType: meal.mealType as MealType,
+          content: meal.content,
+          dayOfWeek: meal.dayOfWeek as DayOfWeek,
+          dietPlanId: dietPlanId
+        }));
+
+        await tx.dietMeal.createMany({
+          data: mealsData
+        });
+      }
+    }
+
+    // 4. Recuperar el plan actualizado con todas las comidas
+    const updatedPlan = await tx.dietPlan.findUnique({
+      where: { id: dietPlanId },
+      include: {
+        meals: {
+          orderBy: [
+            { dayOfWeek: 'asc' },
+            { mealType: 'asc' }
+          ]
+        }
+      }
+    });
+
+    if (!updatedPlan) {
+      throw new Error('Error interno al recuperar el plan actualizado.');
+    }
+
+    // Mapear isActive a status antes de retornar
+    const { isActive, ...planWithoutIsActive } = updatedPlan;
+    return {
+      ...planWithoutIsActive,
+      status: isActive ? 'ACTIVE' : 'DRAFT'
+    };
+  });
+
+  return updatedDietPlan;
 };
 
 const createDietPlan = async (
@@ -124,4 +256,9 @@ const createDietPlan = async (
   return newDietPlan; // Retornar el plan completo con comidas
 };
 
-export default { findPatientByProfessional, createDietPlan, getDietPlanById }; 
+export default { 
+  findPatientByProfessional, 
+  createDietPlan, 
+  getDietPlanById,
+  updateDietPlan
+}; 

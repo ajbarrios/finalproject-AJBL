@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../../../../src/middleware/auth.middleware';
 import dietService from '../../../../src/services/diet.service';
 import { vi, describe, it, expect, beforeEach, Mocked } from 'vitest';
-import { createDietPlanForPatient, getDietPlanById } from '../../../../src/api/controllers/diet.controller';
-import { CreateDietPlanInput } from '../../../../src/validations/diet.validations';
+import { createDietPlanForPatient, getDietPlanById, updateDietPlan } from '../../../../src/api/controllers/diet.controller';
+import { CreateDietPlanInput, UpdateDietPlanInput } from '../../../../src/validations/diet.validations';
 
 // Mock the diet service module
 vi.mock('../../../../src/services/diet.service', () => ({
@@ -11,6 +11,7 @@ vi.mock('../../../../src/services/diet.service', () => ({
     findPatientByProfessional: vi.fn(),
     createDietPlan: vi.fn(),
     getDietPlanById: vi.fn(),
+    updateDietPlan: vi.fn(),
   },
 }));
 
@@ -370,6 +371,396 @@ describe('Diet Controller', () => {
       expect(dietServiceMock.getDietPlanById).toHaveBeenCalledWith(999, 1);
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(mockDietPlan);
+    });
+  });
+
+  // Tests para updateDietPlan (TB-014)
+  describe('updateDietPlan', () => {
+    const mockUpdateData: UpdateDietPlanInput = {
+      title: 'Plan Actualizado',
+      description: 'Nueva descripción',
+      startDate: '2025-07-01',
+      endDate: '2025-07-31',
+      objectives: 'Nuevos objetivos',
+      status: 'DRAFT',
+      notes: 'Nuevas notas',
+      meals: [
+        {
+          id: 1,
+          mealType: 'BREAKFAST',
+          content: 'Desayuno actualizado',
+          dayOfWeek: 'TUESDAY'
+        },
+        {
+          mealType: 'DINNER',
+          content: 'Nueva cena',
+          dayOfWeek: 'TUESDAY'
+        }
+      ]
+    };
+
+    const mockUpdatedPlan = {
+      id: 101,
+      title: 'Plan Actualizado',
+      description: 'Nueva descripción',
+      startDate: new Date('2025-07-01'),
+      endDate: new Date('2025-07-31'),
+      objectives: 'Nuevos objetivos',
+      status: 'DRAFT',
+      notes: 'Nuevas notas',
+      patientId: 19,
+      professionalId: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      meals: [
+        {
+          id: 1,
+          mealType: 'BREAKFAST',
+          content: 'Desayuno actualizado',
+          dayOfWeek: 'TUESDAY',
+          dietPlanId: 101,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 3,
+          mealType: 'DINNER',
+          content: 'Nueva cena',
+          dayOfWeek: 'TUESDAY',
+          dietPlanId: 101,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      ]
+    };
+
+    beforeEach(() => {
+      mockRequest = {
+        params: { dietPlanId: '101' },
+        professional: { professionalId: 1 },
+        body: mockUpdateData,
+      };
+    });
+
+    it('should update diet plan successfully with 200 status', async () => {
+      dietServiceMock.updateDietPlan.mockResolvedValue(mockUpdatedPlan as any);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, mockUpdateData);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Plan de dieta actualizado exitosamente.',
+        data: mockUpdatedPlan,
+      });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 401 when professional is not authenticated', async () => {
+      mockRequest.professional = undefined;
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Profesional no autenticado o token inválido.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 401 when professionalId is missing from token', async () => {
+      mockRequest.professional = { email: 'test@test.com' };
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Profesional no autenticado o token inválido.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 for invalid dietPlanId parameter', async () => {
+      mockRequest.params = { dietPlanId: 'invalid' };
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'ID del plan de dieta inválido.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 for negative dietPlanId', async () => {
+      mockRequest.params = { dietPlanId: '-5' };
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'ID del plan de dieta inválido.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 for zero dietPlanId', async () => {
+      mockRequest.params = { dietPlanId: '0' };
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'ID del plan de dieta inválido.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should handle partial updates with only title', async () => {
+      const partialUpdate = { title: 'Solo título actualizado' };
+      mockRequest.body = partialUpdate;
+
+      const partialResult = { ...mockUpdatedPlan, title: 'Solo título actualizado' };
+      dietServiceMock.updateDietPlan.mockResolvedValue(partialResult as any);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, partialUpdate);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Plan de dieta actualizado exitosamente.',
+        data: partialResult,
+      });
+    });
+
+    it('should handle updates with only meals', async () => {
+      const mealsOnlyUpdate = {
+        meals: [
+          {
+            id: 1,
+            mealType: 'BREAKFAST',
+            content: 'Desayuno modificado',
+            dayOfWeek: 'WEDNESDAY'
+          }
+        ]
+      };
+      mockRequest.body = mealsOnlyUpdate;
+
+      const mealsOnlyResult = {
+        ...mockUpdatedPlan,
+        meals: [
+          {
+            id: 1,
+            mealType: 'BREAKFAST',
+            content: 'Desayuno modificado',
+            dayOfWeek: 'WEDNESDAY',
+            dietPlanId: 101,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+        ]
+      };
+      dietServiceMock.updateDietPlan.mockResolvedValue(mealsOnlyResult as any);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, mealsOnlyUpdate);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Plan de dieta actualizado exitosamente.',
+        data: mealsOnlyResult,
+      });
+    });
+
+    it('should handle clearing optional fields', async () => {
+      const clearingUpdate = {
+        description: '',
+        objectives: '',
+        notes: ''
+      };
+      mockRequest.body = clearingUpdate;
+
+      const clearedResult = {
+        ...mockUpdatedPlan,
+        description: '',
+        objectives: '',
+        notes: ''
+      };
+      dietServiceMock.updateDietPlan.mockResolvedValue(clearedResult as any);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, clearingUpdate);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Plan de dieta actualizado exitosamente.',
+        data: clearedResult,
+      });
+    });
+
+    it('should handle status changes', async () => {
+      const statusUpdate = { status: 'ACTIVE' as const };
+      mockRequest.body = statusUpdate;
+
+      const activeResult = { ...mockUpdatedPlan, status: 'ACTIVE' };
+      dietServiceMock.updateDietPlan.mockResolvedValue(activeResult as any);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, statusUpdate);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Plan de dieta actualizado exitosamente.',
+        data: activeResult,
+      });
+    });
+
+    it('should handle date range updates', async () => {
+      const dateUpdate = {
+        startDate: '2025-08-01',
+        endDate: '2025-08-31'
+      };
+      mockRequest.body = dateUpdate;
+
+      const dateResult = {
+        ...mockUpdatedPlan,
+        startDate: new Date('2025-08-01'),
+        endDate: new Date('2025-08-31')
+      };
+      dietServiceMock.updateDietPlan.mockResolvedValue(dateResult as any);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, dateUpdate);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Plan de dieta actualizado exitosamente.',
+        data: dateResult,
+      });
+    });
+
+    it('should return 404 when plan not found', async () => {
+      const notFoundError = new Error('Plan de dieta no encontrado.');
+      dietServiceMock.updateDietPlan.mockRejectedValue(notFoundError);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, mockUpdateData);
+      expect(mockResponse.status).toHaveBeenCalledWith(404);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Plan de dieta no encontrado.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 403 when access is unauthorized', async () => {
+      const authError = new Error('Acceso no autorizado: el plan no pertenece a este profesional.');
+      dietServiceMock.updateDietPlan.mockRejectedValue(authError);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, mockUpdateData);
+      expect(mockResponse.status).toHaveBeenCalledWith(403);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'No tienes permisos para actualizar este plan de dieta.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should handle internal service errors', async () => {
+      const internalError = new Error('Error interno al recuperar el plan actualizado.');
+      dietServiceMock.updateDietPlan.mockRejectedValue(internalError);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, mockUpdateData);
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Error interno del servidor.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should handle database errors gracefully', async () => {
+      const dbError = new Error('Database connection failed');
+      dietServiceMock.updateDietPlan.mockRejectedValue(dbError);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, mockUpdateData);
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Error interno del servidor.' });
+      expect(nextFunction).not.toHaveBeenCalled();
+    });
+
+    it('should work with different valid dietPlanId values', async () => {
+      mockRequest.params = { dietPlanId: '999' };
+      dietServiceMock.updateDietPlan.mockResolvedValue({ ...mockUpdatedPlan, id: 999 } as any);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(999, 1, mockUpdateData);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should handle complex meal updates (existing + new)', async () => {
+      const complexMealUpdate = {
+        title: 'Plan Complejo',
+        meals: [
+          {
+            id: 1, // Existente
+            mealType: 'BREAKFAST',
+            content: 'Desayuno actualizado',
+            dayOfWeek: 'FRIDAY'
+          },
+          {
+            // Nueva comida
+            mealType: 'MID_MORNING_SNACK',
+            content: 'Nuevo snack',
+            dayOfWeek: 'FRIDAY'
+          },
+          {
+            id: 5, // Otra existente
+            mealType: 'DINNER',
+            content: 'Cena actualizada',
+            dayOfWeek: 'FRIDAY'
+          }
+        ]
+      };
+      mockRequest.body = complexMealUpdate;
+
+      const complexResult = {
+        ...mockUpdatedPlan,
+        title: 'Plan Complejo',
+        meals: [
+          {
+            id: 1,
+            mealType: 'BREAKFAST',
+            content: 'Desayuno actualizado',
+            dayOfWeek: 'FRIDAY',
+            dietPlanId: 101,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            id: 6, // Nueva comida generada
+            mealType: 'MID_MORNING_SNACK',
+            content: 'Nuevo snack',
+            dayOfWeek: 'FRIDAY',
+            dietPlanId: 101,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            id: 5,
+            mealType: 'DINNER',
+            content: 'Cena actualizada',
+            dayOfWeek: 'FRIDAY',
+            dietPlanId: 101,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+        ]
+      };
+      dietServiceMock.updateDietPlan.mockResolvedValue(complexResult as any);
+
+      await updateDietPlan(mockRequest as AuthenticatedRequest, mockResponse as Response, nextFunction);
+
+      expect(dietServiceMock.updateDietPlan).toHaveBeenCalledWith(101, 1, complexMealUpdate);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Plan de dieta actualizado exitosamente.',
+        data: complexResult,
+      });
     });
   });
 }); 

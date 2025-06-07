@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 // Importa el cliente Prisma TAL COMO LO HACE EL SERVICIO. 
 // Vitest debería reemplazar esto con el contenido de __mocks__/prisma.client.ts
-import prismaFromServicePerspective from '../config/db/prisma.client'; 
-import { getPatientsForProfessional, createPatientForProfessional, updatePatientForProfessional } from './patient.service';
-import { type Patient } from '../generated/prisma';
+import prismaFromServicePerspective from '../../../src/config/db/prisma.client'; 
+import { getPatientsForProfessional, createPatientForProfessional, updatePatientForProfessional } from '../../../src/services/patient.service';
+import { type Patient } from '../../../src/generated/prisma';
 import { type DeepMockProxy } from 'vitest-mock-extended'; // Solo necesitamos el tipo aquí
-import { type PrismaClient } from '../generated/prisma'; // Solo el tipo
+import { type PrismaClient } from '../../../src/generated/prisma'; // Solo el tipo
 
 // Esta será nuestra referencia al mock, que debería ser la misma instancia que prismaFromServicePerspective
 const prismaClientMock = prismaFromServicePerspective as DeepMockProxy<PrismaClient>; 
