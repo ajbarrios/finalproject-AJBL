@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { listPatients, getPatientById, createPatient, updatePatient, createBiometricRecord, getBiometricRecords } from '../controllers/patient.controller'; // Importar la nueva función controladora
+import { sendPlansEmail } from '../controllers/emailPlan.controller'; // Importar controlador de email
 
 // Importaremos el middleware de autenticación aquí cuando esté listo
 // import { authenticateToken } from '../../middleware/auth.middleware'; // La ruta anterior era placeholder
@@ -48,6 +49,13 @@ router.get(
   '/:patientId/biometric-records',
   authenticateToken,
   getBiometricRecords
+);
+
+// Ruta para enviar planes por email (POST /api/patients/:patientId/send-plans-email)
+router.post(
+  '/:patientId/send-plans-email',
+  authenticateToken, // Proteger esta ruta
+  sendPlansEmail // TB-019: Controlador para envío de emails
 );
 
 // Aquí se añadirán otras rutas de pacientes (DELETE)
