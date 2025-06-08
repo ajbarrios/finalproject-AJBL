@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchPatientById } from '../services/patientService';
 import type { Patient } from '../types/patient';
+import SendEmailModal from '../components/common/SendEmailModal';
+import { useAuth } from '../hooks/useAuth';
 
 const PatientProfilePage: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState<boolean>(false);
 
   useEffect(() => {
     const getPatientDetails = async () => {
@@ -199,8 +203,45 @@ const PatientProfilePage: React.FC = () => {
               >
               Crear Plan Entrenamiento
             </button>
+            
+            {/* Botón Enviar Planes por Email - Solo se muestra si hay planes */}
+            {patient.dietPlansSummary && patient.dietPlansSummary.length > 0 && (
+              <button 
+                onClick={() => setShowEmailModal(true)}
+                className={`px-4 py-2 rounded transition-colors duration-200 flex items-center ${
+                  patient.email 
+                    ? 'bg-orange-500 text-white hover:bg-orange-600' 
+                    : 'bg-yellow-500 text-white hover:bg-yellow-600'
+                }`}
+                title={!patient.email ? 'El paciente no tiene email registrado. Deberás introducir el email manualmente.' : 'Enviar planes al email del paciente'}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                {patient.email ? 'Enviar Planes por Email' : 'Enviar Planes (Sin Email)'}
+              </button>
+            )}
            </div>
         </div>
+      )}
+
+      {/* Modal de Envío de Email */}
+      {patient && showEmailModal && (
+        <SendEmailModal
+          isOpen={showEmailModal}
+          onClose={() => setShowEmailModal(false)}
+          onSendSuccess={() => {
+            setShowEmailModal(false);
+          }}
+          patientId={patientId!}
+          patientName={`${patient.firstName} ${patient.lastName}`}
+          patientEmail={patient.email || undefined}
+          professionalName={user?.fullName}
+          availablePlans={{
+            dietPlans: patient.dietPlansSummary || [],
+            workoutPlans: patient.workoutPlansSummary || [],
+          }}
+        />
       )}
     </div>
   );
