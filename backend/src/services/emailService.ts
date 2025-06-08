@@ -105,18 +105,18 @@ class EmailService {
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
           
           <!-- Header -->
-          <header style="text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <header style="text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%); padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             <h1 style="color: white; margin: 0; font-size: 32px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
               NutriTrack Pro
             </h1>
-            <p style="color: #d1fae5; margin: 8px 0 0 0; font-size: 16px; font-weight: 300;">
+            <p style="color: #E0E7FF; margin: 8px 0 0 0; font-size: 16px; font-weight: 300;">
               Tu salud, nuestro compromiso
             </p>
           </header>
           
           <!-- Main Content -->
           <main style="background-color: white; padding: 40px 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px;">
-            <h2 style="color: #059669; margin-top: 0; font-size: 24px; font-weight: 600;">
+            <h2 style="color: #4F46E5; margin-top: 0; font-size: 24px; font-weight: 600;">
               📋 Tu Plan Personalizado
             </h2>
             
@@ -129,8 +129,8 @@ class EmailService {
             </p>
             
             <!-- Info Box -->
-            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); padding: 20px; border-left: 4px solid #10b981; margin: 25px 0; border-radius: 8px;">
-              <p style="margin: 0; font-style: italic; color: #065f46; font-size: 15px;">
+            <div style="background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%); padding: 20px; border-left: 4px solid #8B5CF6; margin: 25px 0; border-radius: 8px;">
+              <p style="margin: 0; font-style: italic; color: #4F46E5; font-size: 15px;">
                 <strong>💡 Información importante:</strong><br>
                 Este plan ha sido creado específicamente para ti basándose en tus objetivos y necesidades individuales.
               </p>
@@ -139,7 +139,7 @@ class EmailService {
             <!-- Attachment Info -->
             <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 25px 0;">
               <p style="margin: 0; color: #475569; font-size: 15px;">
-                📎 <strong style="color: #059669;">Adjunto:</strong> Encontrarás tu plan completo en formato PDF listo para descargar e imprimir.
+                📎 <strong style="color: #4F46E5;">Adjunto:</strong> Encontrarás tu plan completo en formato PDF listo para descargar e imprimir.
               </p>
             </div>
             
@@ -155,7 +155,7 @@ class EmailService {
           <footer style="text-align: center; color: #6b7280; font-size: 14px; padding: 20px;">
             <p style="margin: 0 0 10px 0; font-size: 16px;">
               Saludos cordiales,<br>
-              <strong style="color: #059669; font-size: 18px;">El equipo de NutriTrack Pro</strong>
+              <strong style="color: #4F46E5; font-size: 18px;">El equipo de NutriTrack Pro</strong>
             </p>
             
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px auto; width: 80%;">

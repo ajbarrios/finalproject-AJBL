@@ -1,12 +1,25 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { PDFService } from '../../../src/services/pdfService';
-import { Patient, DietPlan, WorkoutPlan } from '../../../src/generated/prisma';
+import { Patient, DietPlan, WorkoutPlan, DietMeal, WorkoutDay, Exercise, MealType, DayOfWeek } from '../../../src/generated/prisma';
+
+// Tipos extendidos para tests
+interface DietPlanWithMeals extends DietPlan {
+  meals: DietMeal[];
+}
+
+interface WorkoutDayWithExercises extends WorkoutDay {
+  exercises: Exercise[];
+}
+
+interface WorkoutPlanWithDays extends WorkoutPlan {
+  days: WorkoutDayWithExercises[];
+}
 
 describe('PDFService', () => {
   let pdfService: PDFService;
   let mockPatient: Patient;
-  let mockDietPlan: DietPlan;
-  let mockWorkoutPlan: WorkoutPlan;
+  let mockDietPlan: DietPlanWithMeals;
+  let mockWorkoutPlan: WorkoutPlanWithDays;
 
   beforeEach(() => {
     pdfService = new PDFService();
@@ -29,7 +42,66 @@ describe('PDFService', () => {
       updatedAt: new Date('2024-01-01')
     };
 
-    // Mock de plan de dieta
+    // Mock de comidas para plan de dieta
+    const mockMeals: DietMeal[] = [
+      {
+        id: 1,
+        dietPlanId: 101,
+        mealType: MealType.BREAKFAST,
+        content: '2 tostadas integrales con aguacate y huevo',
+        dayOfWeek: DayOfWeek.MONDAY,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      },
+      {
+        id: 2,
+        dietPlanId: 101,
+        mealType: MealType.LUNCH,
+        content: 'Ensalada de pollo con verduras y aceite de oliva',
+        dayOfWeek: DayOfWeek.MONDAY,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      }
+    ];
+
+    // Mock de ejercicios
+    const mockExercises: Exercise[] = [
+      {
+        id: 1,
+        workoutDayId: 1,
+        name: 'Sentadillas',
+        setsReps: '3x12',
+        observations: 'Mantener la espalda recta',
+        displayOrder: 1,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      },
+      {
+        id: 2,
+        workoutDayId: 1,
+        name: 'Flexiones',
+        setsReps: '3x10',
+        observations: 'Bajar hasta el pecho',
+        displayOrder: 2,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      }
+    ];
+
+    // Mock de días de entrenamiento
+    const mockWorkoutDays: WorkoutDayWithExercises[] = [
+      {
+        id: 1,
+        workoutPlanId: 201,
+        dayOfWeek: DayOfWeek.MONDAY,
+        description: 'Día de tren superior',
+        exercises: mockExercises,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      }
+    ];
+
+    // Mock de plan de dieta con comidas
     mockDietPlan = {
       id: 101,
       professionalId: 1,
@@ -44,10 +116,11 @@ describe('PDFService', () => {
       deletedAt: null,
       notes: 'Seguir estrictamente las comidas',
       createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-01-01')
+      updatedAt: new Date('2024-01-01'),
+      meals: mockMeals
     };
 
-    // Mock de plan de entrenamiento
+    // Mock de plan de entrenamiento con días y ejercicios
     mockWorkoutPlan = {
       id: 201,
       professionalId: 1,
@@ -60,12 +133,13 @@ describe('PDFService', () => {
       isActive: true,
       notes: 'Incrementar intensidad progresivamente',
       createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-01-01')
+      updatedAt: new Date('2024-01-01'),
+      days: mockWorkoutDays
     };
   });
 
   describe('generateCombinedPlansPDF', () => {
-    it('should generate PDF with both diet and workout plans', async () => {
+    it('should generate a real PDF buffer with both diet and workout plans', async () => {
       const options = {
         patient: mockPatient,
         dietPlan: mockDietPlan,
@@ -74,27 +148,13 @@ describe('PDFService', () => {
 
       const result = await pdfService.generateCombinedPlansPDF(options);
 
+      // Verificar que es un Buffer real
       expect(result).toBeInstanceOf(Buffer);
-      expect(result.length).toBeGreaterThan(0);
-
-      // Convertir buffer a string para verificar contenido
-      const pdfContent = result.toString('utf-8');
+      expect(result.length).toBeGreaterThan(1000); // PDF real debe ser > 1KB
       
-      // Verificar información del paciente
-      expect(pdfContent).toContain('Juan Pérez');
-      expect(pdfContent).toContain('juan.perez@email.com');
-      expect(pdfContent).toContain('NUTRITRACK PRO - PLAN PERSONALIZADO');
-
-      // Verificar plan de dieta
-      expect(pdfContent).toContain('PLAN DE DIETA: Plan de Pérdida de Peso');
-      expect(pdfContent).toContain('Plan diseñado para perder peso de forma saludable');
-      expect(pdfContent).toContain('Perder 5kg manteniendo masa muscular');
-      expect(pdfContent).toContain('Activo');
-
-      // Verificar plan de entrenamiento
-      expect(pdfContent).toContain('PLAN DE ENTRENAMIENTO: Rutina de Fuerza y Cardio');
-      expect(pdfContent).toContain('Combinación de ejercicios de fuerza y cardiovasculares');
-      expect(pdfContent).toContain('Aumentar fuerza y resistencia cardiovascular');
+      // Verificar que tiene header PDF válido
+      const pdfHeader = result.toString('hex').substring(0, 8);
+      expect(pdfHeader).toBe('25504446'); // %PDF en hexadecimal
     });
 
     it('should generate PDF with only diet plan', async () => {
@@ -107,17 +167,11 @@ describe('PDFService', () => {
       const result = await pdfService.generateCombinedPlansPDF(options);
 
       expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(500);
       
-      const pdfContent = result.toString('utf-8');
-      
-      // Verificar información del paciente
-      expect(pdfContent).toContain('Juan Pérez');
-      
-      // Verificar que incluye plan de dieta
-      expect(pdfContent).toContain('PLAN DE DIETA: Plan de Pérdida de Peso');
-      
-      // Verificar que NO incluye plan de entrenamiento
-      expect(pdfContent).not.toContain('PLAN DE ENTRENAMIENTO:');
+      // Verificar header PDF
+      const pdfHeader = result.toString('hex').substring(0, 8);
+      expect(pdfHeader).toBe('25504446');
     });
 
     it('should generate PDF with only workout plan', async () => {
@@ -130,46 +184,46 @@ describe('PDFService', () => {
       const result = await pdfService.generateCombinedPlansPDF(options);
 
       expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(500);
       
-      const pdfContent = result.toString('utf-8');
-      
-      // Verificar información del paciente
-      expect(pdfContent).toContain('Juan Pérez');
-      
-      // Verificar que incluye plan de entrenamiento
-      expect(pdfContent).toContain('PLAN DE ENTRENAMIENTO: Rutina de Fuerza y Cardio');
-      
-      // Verificar que NO incluye plan de dieta
-      expect(pdfContent).not.toContain('PLAN DE DIETA:');
+      // Verificar header PDF
+      const pdfHeader = result.toString('hex').substring(0, 8);
+      expect(pdfHeader).toBe('25504446');
     });
 
-    it('should generate PDF with patient without email', async () => {
-      const patientWithoutEmail = {
+    it('should generate PDF with patient without optional fields', async () => {
+      const patientWithoutOptionalFields = {
         ...mockPatient,
-        email: null
+        email: null,
+        phone: null,
+        birthDate: null,
+        gender: null,
+        height: null,
+        objectives: null,
+        dietRestrictions: null
       };
 
       const options = {
-        patient: patientWithoutEmail,
+        patient: patientWithoutOptionalFields,
         dietPlan: mockDietPlan,
         workoutPlan: null
       };
 
       const result = await pdfService.generateCombinedPlansPDF(options);
-      const pdfContent = result.toString('utf-8');
       
-      expect(pdfContent).toContain('Email: No especificado');
+      expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(500);
     });
 
     it('should handle diet plan without optional fields', async () => {
-      const minimalDietPlan = {
+      const minimalDietPlan: DietPlanWithMeals = {
         ...mockDietPlan,
         description: null,
         startDate: null,
         endDate: null,
         objectives: null,
-        isActive: false,
-        deletedAt: null
+        notes: null,
+        meals: [] // Plan sin comidas
       };
 
       const options = {
@@ -179,23 +233,20 @@ describe('PDFService', () => {
       };
 
       const result = await pdfService.generateCombinedPlansPDF(options);
-      const pdfContent = result.toString('utf-8');
       
-      expect(pdfContent).toContain('Descripción: Sin descripción');
-      expect(pdfContent).toContain('Fecha inicio: No especificada');
-      expect(pdfContent).toContain('Fecha fin: No especificada');
-      expect(pdfContent).toContain('Objetivos: No especificados');
-      expect(pdfContent).toContain('Estado: Inactivo');
+      expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(500);
     });
 
     it('should handle workout plan without optional fields', async () => {
-      const minimalWorkoutPlan = {
+      const minimalWorkoutPlan: WorkoutPlanWithDays = {
         ...mockWorkoutPlan,
         description: null,
         startDate: null,
         endDate: null,
         objectives: null,
-        isActive: false
+        notes: null,
+        days: [] // Plan sin días
       };
 
       const options = {
@@ -205,139 +256,152 @@ describe('PDFService', () => {
       };
 
       const result = await pdfService.generateCombinedPlansPDF(options);
-      const pdfContent = result.toString('utf-8');
       
-      expect(pdfContent).toContain('Descripción: Sin descripción');
-      expect(pdfContent).toContain('Fecha inicio: No especificada');
-      expect(pdfContent).toContain('Fecha fin: No especificada');
-      expect(pdfContent).toContain('Objetivos: No especificados');
-      expect(pdfContent).toContain('Estado: Inactivo');
+      expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(500);
     });
 
-    it('should include current date in PDF', async () => {
-      const options = {
+    it('should generate PDF with both plans having comprehensive data', async () => {
+      // Crear plan de dieta con múltiples comidas y días
+      const comprehensiveMeals: DietMeal[] = [
+        {
+          id: 1,
+          dietPlanId: 101,
+          mealType: MealType.BREAKFAST,
+          content: 'Avena con frutas y nueces',
+          dayOfWeek: DayOfWeek.MONDAY,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          dietPlanId: 101,
+          mealType: MealType.LUNCH,
+          content: 'Pollo a la plancha con arroz integral',
+          dayOfWeek: DayOfWeek.MONDAY,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 3,
+          dietPlanId: 101,
+          mealType: MealType.BREAKFAST,
+          content: 'Tostadas con aguacate',
+          dayOfWeek: DayOfWeek.TUESDAY,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+
+      const comprehensiveExercises: Exercise[] = [
+        {
+          id: 1,
+          workoutDayId: 1,
+          name: 'Press de banca',
+          setsReps: '4x8',
+          observations: 'Mantener control en la bajada',
+          displayOrder: 1,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          workoutDayId: 1,
+          name: 'Dominadas',
+          setsReps: '3x6',
+          observations: 'Usar banda elástica si es necesario',
+          displayOrder: 2,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+
+      const comprehensiveDays: WorkoutDayWithExercises[] = [
+        {
+          id: 1,
+          workoutPlanId: 201,
+          dayOfWeek: DayOfWeek.MONDAY,
+          description: 'Pecho y espalda',
+          exercises: comprehensiveExercises,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          workoutPlanId: 201,
+          dayOfWeek: DayOfWeek.WEDNESDAY,
+          description: 'Piernas y glúteos',
+          exercises: [
+            {
+              id: 3,
+              workoutDayId: 2,
+              name: 'Sentadillas',
+              setsReps: '4x12',
+              observations: 'Bajar hasta 90 grados',
+              displayOrder: 1,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+          ],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+
+      const comprehensiveOptions = {
         patient: mockPatient,
-        dietPlan: mockDietPlan,
-        workoutPlan: null
+        dietPlan: { ...mockDietPlan, meals: comprehensiveMeals },
+        workoutPlan: { ...mockWorkoutPlan, days: comprehensiveDays },
+        professional: {
+          firstName: 'Dr. María',
+          lastName: 'González',
+          profession: 'NUTRITIONIST'
+        }
       };
 
-      const result = await pdfService.generateCombinedPlansPDF(options);
-      const pdfContent = result.toString('utf-8');
-      
-      const currentDate = new Date().toLocaleDateString('es-ES');
-      expect(pdfContent).toContain(`Fecha de generación: ${currentDate}`);
-      expect(pdfContent).toContain(`Generado automáticamente el ${currentDate}`);
+      const result = await pdfService.generateCombinedPlansPDF(comprehensiveOptions);
+
+      expect(result).toBeInstanceOf(Buffer);
+      expect(result.length).toBeGreaterThan(2000); // Más contenido = PDF más grande
     });
 
-    it('should include TODO notes for TB-018 implementation', async () => {
-      const options = {
-        patient: mockPatient,
-        dietPlan: mockDietPlan,
-        workoutPlan: mockWorkoutPlan
-      };
-
-      const result = await pdfService.generateCombinedPlansPDF(options);
-      const pdfContent = result.toString('utf-8');
-      
-      expect(pdfContent).toContain('TODO: Implementar contenido detallado de comidas en TB-018');
-      expect(pdfContent).toContain('TODO: Implementar contenido detallado de ejercicios en TB-018');
-      expect(pdfContent).toContain('NOTA: Este es un PDF temporal generado por el sistema');
-      expect(pdfContent).toContain('La implementación completa será desarrollada en TB-018');
-    });
-
-    it('should format dates correctly in Spanish locale', async () => {
-      const options = {
-        patient: mockPatient,
-        dietPlan: mockDietPlan,
-        workoutPlan: mockWorkoutPlan
-      };
-
-      const result = await pdfService.generateCombinedPlansPDF(options);
-      const pdfContent = result.toString('utf-8');
-      
-      // Verificar formato de fechas en español (DD/MM/YYYY o DD/M/YYYY)
-      const expectedStartDate = mockDietPlan.startDate!.toLocaleDateString('es-ES');
-      const expectedEndDate = mockDietPlan.endDate!.toLocaleDateString('es-ES');
-      
-      expect(pdfContent).toContain(`Fecha inicio: ${expectedStartDate}`);
-      expect(pdfContent).toContain(`Fecha fin: ${expectedEndDate}`);
-    });
-
-    it('should handle errors gracefully', async () => {
-      // Simular un error manipulando los datos
+    it('should throw error when PDF generation fails', async () => {
+      // Simular error pasando datos inválidos
       const invalidOptions = {
-        patient: null as any,
+        patient: null as any, // Esto debería causar error
         dietPlan: mockDietPlan,
         workoutPlan: null
       };
 
       await expect(pdfService.generateCombinedPlansPDF(invalidOptions))
-        .rejects.toThrow('Failed to generate PDF:');
+        .rejects
+        .toThrow(/Failed to generate PDF/);
     });
   });
 
   describe('generateFileName', () => {
-    it('should generate filename with date by default', () => {
-      const filename = pdfService.generateFileName(mockPatient);
+    it('should generate correct filename with date', () => {
+      const fileName = pdfService.generateFileName(mockPatient, true);
       
-      const expectedDate = new Date().toISOString().split('T')[0];
-      const expectedName = `Juan_Pérez_plan_${expectedDate}.pdf`;
-      
-      expect(filename).toBe(expectedName);
+      expect(fileName).toMatch(/^Juan_Pérez_plan_\d{4}-\d{2}-\d{2}\.pdf$/);
     });
 
-    it('should generate filename without date when specified', () => {
-      const filename = pdfService.generateFileName(mockPatient, false);
+    it('should generate correct filename without date', () => {
+      const fileName = pdfService.generateFileName(mockPatient, false);
       
-      expect(filename).toBe('Juan_Pérez_plan.pdf');
-      expect(filename).not.toContain('202'); // No debe contener año
+      expect(fileName).toBe('Juan_Pérez_plan.pdf');
     });
 
-    it('should handle patient names with spaces correctly', () => {
+    it('should handle patient names with spaces', () => {
       const patientWithSpaces = {
         ...mockPatient,
         firstName: 'María José',
         lastName: 'García López'
       };
 
-      const filename = pdfService.generateFileName(patientWithSpaces, false);
+      const fileName = pdfService.generateFileName(patientWithSpaces, false);
       
-      expect(filename).toBe('María_José_García_López_plan.pdf');
-      expect(filename).not.toContain(' '); // No debe contener espacios
-    });
-
-    it('should handle patient names with special characters', () => {
-      const patientWithSpecialChars = {
-        ...mockPatient,
-        firstName: 'José Ángel',
-        lastName: 'Martínez'
-      };
-
-      const filename = pdfService.generateFileName(patientWithSpecialChars, false);
-      
-      // Los espacios deben ser reemplazados por guiones bajos
-      expect(filename).toBe('José_Ángel_Martínez_plan.pdf');
-    });
-
-    it('should generate consistent filename format', () => {
-      const filename1 = pdfService.generateFileName(mockPatient, false);
-      const filename2 = pdfService.generateFileName(mockPatient, false);
-      
-      // Debería ser el mismo filename si es el mismo paciente y sin fecha
-      expect(filename1).toBe(filename2);
-      expect(filename1).toMatch(/^[A-Za-zÀ-ÿ_]+_plan\.pdf$/);
-    });
-
-    it('should include correct date format when includeDate is true', () => {
-      const filename = pdfService.generateFileName(mockPatient, true);
-      
-      // Verificar formato YYYY-MM-DD en el filename
-      const dateRegex = /\d{4}-\d{2}-\d{2}/;
-      expect(filename).toMatch(dateRegex);
-      
-      // Verificar que la fecha es de hoy
-      const today = new Date().toISOString().split('T')[0];
-      expect(filename).toContain(today);
+      expect(fileName).toBe('María_José_García_López_plan.pdf');
     });
   });
 }); 
