@@ -459,6 +459,24 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 109 (Relacionado con TF-014 - Corrección Tests Existentes No Relacionados):**
 "Todavía hay un test que está fallando. La salida de la consola es @node" (Corrección de tests existentes en PatientBiometricHistoryPage.test.tsx que estaban fallando por problemas de mocking de API y importaciones incorrectas, no relacionados con TF-014 pero necesarios para mantener la suite de tests limpia)
 
+**Prompt 110 (Relacionado con TF-014A - Análisis Inicial del Proyecto):**
+"Escanea el proyecto NutriTrack Pro para entender la estructura, enfocándote en /frontend, /backend y documentación en /docs. Comienza por el readme.md para obtener contexto de la arquitectura y tecnologías utilizadas."
+
+**Prompt 111 (Relacionado con TF-014A - Planificación Ticket Eliminación Planes Dieta):**
+"Analiza el ticket TF-014A de eliminación de planes de dieta. Revisa qué API existe en el backend y proporciona un plan de acción detallado para implementar la funcionalidad de eliminación con modal de confirmación en el frontend."
+
+**Prompt 112 (Relacionado con TF-014A - Inicio Implementación Frontend):**
+"Quiero que comencemos la implementación hasta llegar a unit testing. Implementa el modal de confirmación reutilizable y la funcionalidad de eliminación en DietPlanDetailsPage siguiendo los patrones y estilos del proyecto."
+
+**Prompt 113 (Relacionado con TF-014A - Corrección Bug Soft Delete):**
+"Tengo un problema: los planes de dieta que elimino siguen apareciendo en el perfil del paciente. El backend usa soft delete (isDeleted: true) pero parece que no se está filtrando correctamente. ¿Puedes revisar el servicio de pacientes y corregir el problema?"
+
+**Prompt 114 (Relacionado con TF-014A - Implementación Unit Testing Completos):**
+"Procede con unit testing siguiendo los patrones existentes en el proyecto. Implementa tests completos para DeleteConfirmationModal y para la funcionalidad de eliminación en DietPlanDetailsPage, cubriendo todos los casos de uso, errores, y interacciones."
+
+**Prompt 115 (Relacionado con TF-014A - Corrección Tests Fallidos):**
+"Los tests están fallando. Te paso la salida de la terminal para que los corrijas. Los problemas incluyen: 1) Discrepancias entre texto esperado vs real en estados de carga, 2) Mensajes de error genéricos vs específicos, 3) Texto del modal que incluye título del plan, 4) Manejo de errores estandarizados según implementación real."
+
 ---
 
 ### 7. Pull Requests

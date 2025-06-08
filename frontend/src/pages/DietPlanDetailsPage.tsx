@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { getDietPlan } from '../services/dietPlanService';
+import { getDietPlan, deleteDietPlan } from '../services/dietPlanService';
 import type { DietPlan } from '../types/dietPlan';
 import { MEAL_TYPE_LABELS, DAY_OF_WEEK_LABELS } from '../types/dietPlan';
+import DeleteConfirmationModal from '../components/common/DeleteConfirmationModal';
 
 const DietPlanDetailsPage: React.FC = () => {
   const { patientId, dietPlanId } = useParams<{ patientId: string; dietPlanId: string }>();
+  const navigate = useNavigate();
   
   const [dietPlan, setDietPlan] = useState<DietPlan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estados para el modal de eliminación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchDietPlanDetails = async () => {
@@ -49,6 +55,46 @@ const DietPlanDetailsPage: React.FC = () => {
 
     fetchDietPlanDetails();
   }, [dietPlanId]);
+
+  // Función para manejar la eliminación del plan de dieta
+  const handleDeletePlan = async () => {
+    if (!dietPlanId) {
+      toast.error('ID del plan de dieta no válido');
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteDietPlan(dietPlanId);
+      
+      toast.success('Plan de dieta eliminado exitosamente');
+      
+      // Redirigir al perfil del paciente
+      if (patientId) {
+        navigate(`/patients/${patientId}`);
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Error deleting diet plan:', err);
+      
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { status?: number } };
+        if (axiosErr.response?.status === 403) {
+          toast.error('No tienes permisos para eliminar este plan de dieta');
+        } else if (axiosErr.response?.status === 404) {
+          toast.error('Plan de dieta no encontrado');
+        } else {
+          toast.error('Error al eliminar el plan de dieta');
+        }
+      } else {
+        toast.error('Error al eliminar el plan de dieta');
+      }
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'No especificada';
@@ -124,7 +170,7 @@ const DietPlanDetailsPage: React.FC = () => {
             Editar Plan
           </Link>
           <button
-            onClick={() => {/* TODO: Implementar eliminación */}}
+            onClick={() => setShowDeleteModal(true)}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Eliminar
@@ -225,6 +271,18 @@ const DietPlanDetailsPage: React.FC = () => {
           <p>Última actualización: {formatDate(dietPlan.updatedAt)}</p>
         )}
       </div>
+
+      {/* Modal de confirmación para eliminación */}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeletePlan}
+        title="Eliminar Plan de Dieta"
+        message={`¿Estás seguro de que quieres eliminar el plan "${dietPlan?.title}"? Esta acción no se puede deshacer.`}
+        isLoading={isDeleting}
+        confirmButtonText="Sí, Eliminar"
+        cancelButtonText="Cancelar"
+      />
     </div>
   );
 };
