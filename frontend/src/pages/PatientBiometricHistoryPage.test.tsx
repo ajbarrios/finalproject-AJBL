@@ -1,10 +1,18 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
 import PatientBiometricHistoryPage from './PatientBiometricHistoryPage';
 import api from '../services/api';
 
 // Mock the api service
-vi.mock('../../services/api');
+vi.mock('../services/api', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
 
 // Mock react-router-dom's useParams and Link (although Link is implicitly tested by MemoryRouter)
 vi.mock('react-router-dom', async (importOriginal) => {
