@@ -958,19 +958,116 @@ Permitir que un profesional autenticado cree un nuevo plan de entrenamiento para
 
 ## Ticket: TB-019
 **Historia de Usuario Asociada:** HU-019: Envío de Planes (PDF) por Correo Electrónico al Paciente
-**Título del Ticket:** API para Enviar PDF de Planes por Email
-**Descripción:** Implementar el endpoint API que genere el PDF de planes (reutilizando lógica de HU-018) y lo envíe por correo electrónico al destinatario especificado.
-**Criterios de Aceptación:**
-    *   Endpoint `POST /api/patients/{patientId}/send-plans-email` (protegido).
-    *   Aceptar: `recipientEmail`, `subject`, `bodyMessage` (opcional), `dietPlanId` (opcional), `workoutPlanId` (opcional). Al menos un ID de plan.
-    *   Validar entradas (email, asunto, IDs de plan).
-    *   Verificar autorización del profesional (paciente, planes).
-    *   Reutilizar lógica de HU-018 para generar PDF en memoria.
-    *   Usar servicio de email (ej. SendGrid) para enviar correo con PDF adjunto, asunto y cuerpo personalizados.
-    *   Manejar errores de generación de PDF y envío de email.
-    *   Respuesta API: 200 OK con confirmación, o errores (400, 401, 403, 404, 500).
+**Título del Ticket:** API para Enviar PDF de Planes por Email usando Nodemailer
+**Descripción:** Implementar el endpoint API que genere el PDF de planes (reutilizando lógica de TB-018) y lo envíe por correo electrónico utilizando Nodemailer con Gmail al destinatario especificado.
+
+**Dependencias:**
+*   TB-018 (Generación de PDF) debe estar completado
+*   Cuenta Gmail configurada con App Password
+*   Variables de entorno de email configuradas
+
+**Tareas Específicas (Backend):**
+1.  **Configuración de Nodemailer:**
+    *   Instalar dependencias: `nodemailer` y `@types/nodemailer`
+    *   Configurar transporter de Gmail con autenticación por App Password
+    *   Implementar verificación de conexión SMTP
+    *   Configurar variables de entorno: `EMAIL_USER`, `EMAIL_PASS`, `FROM_NAME`
+
+2.  **Crear Servicio de Email:**
+    *   Implementar clase `EmailService` con método `sendPlanEmail()`
+    *   Generar template HTML responsive para emails con marca NutriTrack Pro
+    *   Manejar adjuntos PDF con `content-type: application/pdf`
+    *   Implementar logging de emails enviados y manejo de errores
+
+3.  **Crear Endpoint de Envío:**
+    *   Endpoint `POST /api/patients/{patientId}/send-plans-email` (protegido)
+    *   Middleware de autenticación `authenticateToken` aplicado
+
+4.  **Validación de Datos de Entrada con Zod:**
+    *   `recipientEmail`: string.email() obligatorio
+    *   `subject`: string.min(1).max(200) obligatorio  
+    *   `bodyMessage`: string.max(1000) opcional
+    *   `dietPlanId`: string.uuid() opcional
+    *   `workoutPlanId`: string.uuid() opcional
+    *   Validar que al menos un ID de plan se proporcione
+
+5.  **Lógica de Autorización:**
+    *   Verificar que el `patientId` pertenece al profesional autenticado
+    *   Validar que los planes especificados (`dietPlanId`, `workoutPlanId`) existen
+    *   Verificar que los planes pertenecen al paciente especificado
+    *   Verificar que el profesional tiene permisos sobre los planes
+
+6.  **Proceso de Generación y Envío:**
+    *   Recuperar datos completos del paciente de la BD
+    *   Obtener datos de los planes especificados (dieta y/o entrenamiento)
+    *   Reutilizar servicio de TB-018 para generar PDF en memoria (`Buffer`)
+    *   Generar nombre de archivo descriptivo: `{nombrePaciente}_{apellido}_plan_{fecha}.pdf`
+    *   Enviar email usando Nodemailer con PDF adjunto
+
+7.  **Respuestas del API:**
+    *   **200 OK:** Email enviado exitosamente
+        ```json
+        {
+          "message": "Email sent successfully",
+          "recipient": "paciente@email.com",
+          "messageId": "nodemailer-message-id",
+          "timestamp": "2024-01-01T10:00:00Z"
+        }
+        ```
+    *   **400 Bad Request:** Errores de validación
+        ```json
+        {
+          "message": "Validation failed",
+          "errors": {
+            "recipientEmail": ["Email inválido"],
+            "subject": ["Asunto requerido"]
+          }
+        }
+        ```
+    *   **401 Unauthorized:** Token JWT inválido o expirado
+    *   **403 Forbidden:** Profesional no autorizado para el paciente/planes
+    *   **404 Not Found:** Paciente o planes no encontrados
+    *   **500 Internal Server Error:** Errores de generación PDF o envío email
+
+8.  **Manejo de Errores Específicos:**
+    *   Errores de conectividad SMTP de Gmail
+    *   Errores de autenticación de email (App Password inválida)
+    *   Límites de Gmail (500 emails/día, 25MB adjuntos)
+    *   Timeouts de envío de email
+    *   Errores de generación de PDF (dependencia TB-018)
+
+**Criterios de Aceptación (Backend):**
+*   ✅ Nodemailer configurado correctamente con Gmail y App Password
+*   ✅ Variables de entorno `EMAIL_USER`, `EMAIL_PASS`, `FROM_NAME` configuradas
+*   ✅ Endpoint `POST /api/patients/{patientId}/send-plans-email` funcional y protegido
+*   ✅ Validación con Zod de todos los campos de entrada
+*   ✅ Verificación completa de autorización (profesional → paciente → planes)
+*   ✅ Reutilización exitosa de lógica de generación PDF de TB-018
+*   ✅ Email HTML template responsive implementado con marca NutriTrack Pro
+*   ✅ PDF adjunto correctamente al email con nombre descriptivo
+*   ✅ Manejo robusto de errores SMTP y de aplicación
+*   ✅ Logging de emails enviados con messageId para tracking
+*   ✅ Respuestas API bien estructuradas para todos los casos (200, 400, 401, 403, 404, 500)
+*   ✅ Tests unitarios para el servicio de email y el controlador
+*   ✅ Tests de integración del endpoint completo
+
+**Configuración Requerida (.env):**
+```env
+# Email Configuration - Nodemailer + Gmail
+EMAIL_USER=nutritrack.pro.2024@gmail.com
+EMAIL_PASS=abcd-efgh-ijkl-mnop  # App Password de 16 dígitos
+FROM_NAME="NutriTrack Pro"
+```
+
+**Limitaciones Gmail:**
+*   500 emails por día máximo
+*   25MB tamaño máximo de adjunto
+*   Requiere verificación en 2 pasos + App Password
+
 **Prioridad:** Media
 **Estado:** Pendiente
+**Estimación:** 8-10 horas
+**Etiquetas:** `backend`, `email`, `nodemailer`, `gmail`, `pdf`, `envío`, `HU-019`
 ---
 
 ## Ticket: TB-020
