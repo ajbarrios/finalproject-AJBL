@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { PDFService } from '../../../src/services/pdfService';
+import { pdfService } from '../../../src/services/pdfService';
 import { Patient, DietPlan, WorkoutPlan, DietMeal, WorkoutDay, Exercise, MealType, DayOfWeek } from '../../../src/generated/prisma';
 
 // Tipos extendidos para tests
@@ -16,13 +16,12 @@ interface WorkoutPlanWithDays extends WorkoutPlan {
 }
 
 describe('PDFService', () => {
-  let pdfService: PDFService;
   let mockPatient: Patient;
   let mockDietPlan: DietPlanWithMeals;
   let mockWorkoutPlan: WorkoutPlanWithDays;
 
   beforeEach(() => {
-    pdfService = new PDFService();
+    // pdfService is already imported as a singleton instance
 
     // Mock de datos del paciente
     mockPatient = {
