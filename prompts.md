@@ -477,6 +477,27 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 115 (Relacionado con TF-014A - Corrección Tests Fallidos):**
 "Los tests están fallando. Te paso la salida de la terminal para que los corrijas. Los problemas incluyen: 1) Discrepancias entre texto esperado vs real en estados de carga, 2) Mensajes de error genéricos vs específicos, 3) Texto del modal que incluye título del plan, 4) Manejo de errores estandarizados según implementación real."
 
+**Prompt 116 (Relacionado con TB-019 - Diagnóstico Inicial Tests Fallidos):**
+"Ayudame a configurar una cuenta de Gmail de servicio para NutriTrack Pro en la parte de seguridad de Google para que pueda conectarse con nodemailer. Actualmente tengo el usuario y password en el archivo .env pero tengo el siguiente error de conexión en la terminal @node"
+
+**Prompt 117 (Relacionado con TB-019 - Corrección Mock Nodemailer Hoisting):**
+"Los tests de EmailService fallan con error de hoisting: 'Cannot access 'mockCreateTransport' before initialization'. Necesito corregir la configuración del mock de nodemailer para evitar problemas de instanciación automática del singleton."
+
+**Prompt 118 (Relacionado con TB-019 - Corrección Validaciones UUID vs ID Numéricos):**
+"Los tests esperan IDs numéricos pero las validaciones están configuradas para UUIDs. El esquema de validación debe cambiar de UUID a regex numérico para `patientId`, `dietPlanId`, `workoutPlanId` usando `.regex(/^\\d+$/, 'El ID debe ser un número válido')`."
+
+**Prompt 119 (Relacionado con TB-019 - Actualización Tests con IDs Numéricos):**
+"Actualiza todos los tests de validación y controlador para usar IDs numéricos en lugar de UUIDs. Cambia datos de prueba de UUIDs como `'550e8400-e29b-41d4-a716-446655440000'` por IDs numéricos como `'123'`."
+
+**Prompt 120 (Relacionado con TB-019 - Generación cURL Testing):**
+"Genera comandos curl completos para probar el endpoint POST /api/patients/{id}/send-plans-email incluyendo: comando básico, variaciones (solo dieta, solo entrenamiento), script automatizado con login, y documentación de respuestas esperadas (éxito, errores 401/400/404/500)."
+
+**Prompt 121 (Relacionado con TB-019 - Diagnóstico Error Gmail Autenticación):**
+"Al levantar el servidor obtengo error '535-5.7.8 Username and Password not accepted'. Gmail requiere App Password para aplicaciones de terceros. Proporciona solución completa: habilitar 2FA, generar App Password, configurar variables de entorno EMAIL_USER y EMAIL_PASS."
+
+**Prompt 122 (Relacionado con TB-019 - Múltiples Soluciones Configuración Gmail):**
+"No encuentro 'Contraseñas de aplicaciones' en configuración Gmail. Proporciona múltiples alternativas: URL directa (myaccount.google.com/apppasswords), verificación 2FA obligatoria, búsqueda en página con Ctrl+F, alternativas temporales, cuenta nueva para desarrollo, diagnóstico de tipo de cuenta."
+
 ---
 
 ### 7. Pull Requests
