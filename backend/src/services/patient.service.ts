@@ -86,11 +86,11 @@ export const getPatientDetailsForProfessional = async (
       take: 1,
     });
 
-    // 3. Obtener resúmenes de planes de dieta
+    // 3. Obtener resúmenes de planes de dieta (excluyendo los eliminados)
     const dietPlansSummary = await prisma.dietPlan.findMany({
       where: {
         patientId: patientId,
-        // Considerar añadir filtro de soft delete si aplica
+        isDeleted: false, // Filtrar planes eliminados (soft delete)
       },
       select: {
         id: true,
@@ -104,11 +104,11 @@ export const getPatientDetailsForProfessional = async (
       },
     });
 
-    // 4. Obtener resúmenes de planes de entrenamiento
+    // 4. Obtener resúmenes de planes de entrenamiento (excluyendo los eliminados)
     const workoutPlansSummary = await prisma.workoutPlan.findMany({
       where: {
         patientId: patientId,
-        // Considerar añadir filtro de soft delete si aplica
+        // Nota: Los planes de entrenamiento no tienen soft delete implementado aún
       },
       select: {
         id: true,
