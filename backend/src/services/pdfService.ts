@@ -74,7 +74,7 @@ class PDFService {
       right: 50
     }
   };
-
+  
   /**
    * Genera un PDF combinado de planes de dieta y entrenamiento
    */
@@ -775,4 +775,4 @@ class PDFService {
 export const pdfService = new PDFService();
 
 // Exportar también la clase para testing
-export { PDFService };
+export { PDFService }; 
