@@ -149,4 +149,51 @@ export const updateDietPlan = async (
     res.status(500).json({ message: 'Error interno del servidor.' });
     return;
   }
+};
+
+// Nueva función para eliminar un plan de dieta (soft delete)
+export const deleteDietPlan = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const dietPlanId = parseInt(req.params.dietPlanId, 10);
+    const professionalId = req.professional?.professionalId;
+
+    // Verificar si professionalId existe
+    if (!professionalId) {
+      res.status(401).json({ message: 'Profesional no autenticado o token inválido.' });
+      return;
+    }
+
+    // Validar que dietPlanId sea un número válido
+    if (isNaN(dietPlanId) || dietPlanId <= 0) {
+      res.status(400).json({ message: 'ID del plan de dieta inválido.' });
+      return;
+    }
+
+    // Eliminar el plan de dieta (soft delete)
+    await dietService.deleteDietPlan(dietPlanId, professionalId);
+
+    // Responder con éxito (204 No Content es apropiado para eliminaciones exitosas)
+    res.status(204).send();
+  } catch (error) {
+    // Manejar errores específicos
+    if (error instanceof Error) {
+      if (error.message.includes('Plan de dieta no encontrado')) {
+        res.status(404).json({ message: 'Plan de dieta no encontrado.' });
+        return;
+      }
+      
+      if (error.message.includes('Acceso no autorizado')) {
+        res.status(403).json({ message: 'No tienes permisos para eliminar este plan de dieta.' });
+        return;
+      }
+    }
+
+    console.error('Error eliminando plan de dieta:', error);
+    res.status(500).json({ message: 'Error interno del servidor.' });
+    return;
+  }
 }; 

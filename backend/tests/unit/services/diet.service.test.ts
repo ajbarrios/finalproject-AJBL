@@ -483,7 +483,10 @@ describe('Diet Service', () => {
       const result = await dietService.getDietPlanById(101, 1);
 
       expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
-        where: { id: 101 },
+        where: { 
+          id: 101,
+          isDeleted: false
+        },
         include: {
           meals: {
             orderBy: [
@@ -512,7 +515,10 @@ describe('Diet Service', () => {
       const result = await dietService.getDietPlanById(999, 1);
 
       expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
-        where: { id: 999 },
+        where: { 
+          id: 999,
+          isDeleted: false
+        },
         include: {
           meals: {
             orderBy: [
@@ -543,7 +549,10 @@ describe('Diet Service', () => {
         .rejects.toThrow('Acceso no autorizado: el plan no pertenece a este profesional.');
 
       expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
-        where: { id: 101 },
+        where: { 
+          id: 101,
+          isDeleted: false
+        },
         include: {
           meals: {
             orderBy: [
@@ -591,7 +600,10 @@ describe('Diet Service', () => {
       await dietService.getDietPlanById(101, 1);
 
       expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
-        where: { id: 101 },
+        where: { 
+          id: 101,
+          isDeleted: false
+        },
         include: {
           meals: {
             orderBy: [
@@ -1149,6 +1161,154 @@ describe('Diet Service', () => {
       const result = await dietService.updateDietPlan(101, 1, updateData);
 
       expect(result.status).toBe('ACTIVE');
+    });
+  });
+
+  describe('deleteDietPlan', () => {
+    const mockDietPlan = {
+      id: 101,
+      title: 'Plan a eliminar',
+      description: 'Descripción del plan',
+      startDate: new Date('2025-06-01'),
+      endDate: new Date('2025-06-30'),
+      objectives: 'Objetivos del plan',
+      isActive: true,
+      isDeleted: false,
+      deletedAt: null,
+      notes: 'Notas del plan',
+      patientId: 19,
+      professionalId: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      patient: {
+        professionalId: 1
+      }
+    };
+
+    it('should delete diet plan successfully (soft delete)', async () => {
+      prismaMock.dietPlan.findUnique.mockResolvedValue(mockDietPlan);
+      prismaMock.dietPlan.update.mockResolvedValue({
+        ...mockDietPlan,
+        isDeleted: true,
+        deletedAt: new Date()
+      });
+
+      await dietService.deleteDietPlan(101, 1);
+
+      expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
+        where: {
+          id: 101,
+          isDeleted: false
+        },
+        include: {
+          patient: {
+            select: { professionalId: true }
+          }
+        }
+      });
+
+      expect(prismaMock.dietPlan.update).toHaveBeenCalledWith({
+        where: { id: 101 },
+        data: {
+          isDeleted: true,
+          deletedAt: expect.any(Date)
+        }
+      });
+    });
+
+    it('should throw error if diet plan not found', async () => {
+      prismaMock.dietPlan.findUnique.mockResolvedValue(null);
+
+      await expect(dietService.deleteDietPlan(999, 1))
+        .rejects.toThrow('Plan de dieta no encontrado.');
+
+      expect(prismaMock.dietPlan.findUnique).toHaveBeenCalledWith({
+        where: {
+          id: 999,
+          isDeleted: false
+        },
+        include: {
+          patient: {
+            select: { professionalId: true }
+          }
+        }
+      });
+
+      expect(prismaMock.dietPlan.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw error if diet plan already deleted', async () => {
+      prismaMock.dietPlan.findUnique.mockResolvedValue(null); // Plan eliminado no se encuentra
+
+      await expect(dietService.deleteDietPlan(101, 1))
+        .rejects.toThrow('Plan de dieta no encontrado.');
+
+      expect(prismaMock.dietPlan.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw error if professional is not authorized', async () => {
+      const unauthorizedPlan = {
+        ...mockDietPlan,
+        patient: {
+          professionalId: 2 // Diferente profesional
+        }
+      };
+
+      prismaMock.dietPlan.findUnique.mockResolvedValue(unauthorizedPlan);
+
+      await expect(dietService.deleteDietPlan(101, 1))
+        .rejects.toThrow('Acceso no autorizado: el plan no pertenece a este profesional.');
+
+      expect(prismaMock.dietPlan.update).not.toHaveBeenCalled();
+    });
+
+    it('should handle database errors during deletion', async () => {
+      prismaMock.dietPlan.findUnique.mockResolvedValue(mockDietPlan);
+      prismaMock.dietPlan.update.mockRejectedValue(new Error('Database update failed'));
+
+      await expect(dietService.deleteDietPlan(101, 1))
+        .rejects.toThrow('Database update failed');
+
+      expect(prismaMock.dietPlan.findUnique).toHaveBeenCalled();
+      expect(prismaMock.dietPlan.update).toHaveBeenCalled();
+    });
+
+    it('should handle database errors during plan lookup', async () => {
+      prismaMock.dietPlan.findUnique.mockRejectedValue(new Error('Database connection failed'));
+
+      await expect(dietService.deleteDietPlan(101, 1))
+        .rejects.toThrow('Database connection failed');
+
+      expect(prismaMock.dietPlan.update).not.toHaveBeenCalled();
+    });
+
+    it('should verify correct date is set for deletedAt', async () => {
+      const beforeDelete = new Date();
+      
+      prismaMock.dietPlan.findUnique.mockResolvedValue(mockDietPlan);
+      prismaMock.dietPlan.update.mockResolvedValue({
+        ...mockDietPlan,
+        isDeleted: true,
+        deletedAt: new Date()
+      });
+
+      await dietService.deleteDietPlan(101, 1);
+
+      const afterDelete = new Date();
+
+      expect(prismaMock.dietPlan.update).toHaveBeenCalledWith({
+        where: { id: 101 },
+        data: {
+          isDeleted: true,
+          deletedAt: expect.any(Date)
+        }
+      });
+
+      // Verificar que la fecha está en el rango esperado
+      const updateCall = prismaMock.dietPlan.update.mock.calls[0];
+      const deletedAtValue = updateCall[0].data.deletedAt;
+      expect(deletedAtValue.getTime()).toBeGreaterThanOrEqual(beforeDelete.getTime());
+      expect(deletedAtValue.getTime()).toBeLessThanOrEqual(afterDelete.getTime());
     });
   });
 }); 

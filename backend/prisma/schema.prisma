@@ -118,6 +118,8 @@ model DietPlan {
   objectives     String?   @db.Text
   isActive       Boolean   @default(true)
   notes          String?   @db.Text
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -128,8 +130,10 @@ model DietPlan {
   @@index([professionalId])
   @@index([patientId])
   @@index([isActive])
+  @@index([isDeleted])
   @@index([startDate, endDate])
   @@index([patientId, isActive])
+  @@index([patientId, isDeleted])
 }
 
 model DietMeal {
