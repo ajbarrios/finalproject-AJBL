@@ -24,7 +24,10 @@ const getDietPlanById = async (
 ) => {
   // Buscar el plan de dieta e incluir las comidas y información del paciente para autorización
   const dietPlan = await prisma.dietPlan.findUnique({
-    where: { id: dietPlanId },
+    where: { 
+      id: dietPlanId,
+      isDeleted: false // Solo buscar planes no eliminados
+    },
     include: {
       meals: {
         orderBy: [
@@ -66,7 +69,10 @@ const updateDietPlan = async (
   const updatedDietPlan = await prisma.$transaction(async (tx) => {
     // 1. Verificar que el plan existe y pertenece al profesional
     const existingPlan = await tx.dietPlan.findUnique({
-      where: { id: dietPlanId },
+      where: { 
+        id: dietPlanId,
+        isDeleted: false // Solo buscar planes no eliminados
+      },
       include: {
         patient: { select: { professionalId: true } },
         meals: true
@@ -256,9 +262,50 @@ const createDietPlan = async (
   return newDietPlan; // Retornar el plan completo con comidas
 };
 
+// Nueva función para eliminar (soft delete) un plan de dieta
+const deleteDietPlan = async (
+  dietPlanId: number,
+  professionalId: number
+): Promise<void> => {
+  // Buscar el plan de dieta e incluir información del paciente para autorización
+  const dietPlan = await prisma.dietPlan.findUnique({
+    where: { 
+      id: dietPlanId,
+      isDeleted: false // Solo buscar planes no eliminados
+    },
+    include: {
+      patient: {
+        select: { professionalId: true }
+      }
+    }
+  });
+
+  // Si no se encuentra el plan o ya está eliminado, lanzar error
+  if (!dietPlan) {
+    throw new Error('Plan de dieta no encontrado.');
+  }
+
+  // Verificar autorización: el plan debe pertenecer a un paciente del profesional autenticado
+  if (dietPlan.patient.professionalId !== professionalId) {
+    throw new Error('Acceso no autorizado: el plan no pertenece a este profesional.');
+  }
+
+  // Realizar soft delete: marcar como eliminado
+  await prisma.dietPlan.update({
+    where: { id: dietPlanId },
+    data: {
+      isDeleted: true,
+      deletedAt: new Date()
+    }
+  });
+
+  // No retornamos nada, la función es void
+};
+
 export default { 
   findPatientByProfessional, 
   createDietPlan, 
   getDietPlanById,
-  updateDietPlan
+  updateDietPlan,
+  deleteDietPlan
 }; 
