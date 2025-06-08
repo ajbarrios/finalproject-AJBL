@@ -4,6 +4,8 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import PatientProfilePage from './PatientProfilePage';
 import * as patientService from '../services/patientService'; // Importar el servicio mockeable
 import type { PatientDetails } from '../types/patient'; // Importar el tipo necesario
+import { AuthContext } from '../contexts/AuthContextValue';
+import type { AuthContextType } from '../contexts/AuthContextValue';
 
 // Mockear react-router-dom para controlar useNavigate
 const mockNavigate = vi.fn();
@@ -66,6 +68,28 @@ const mockPatientDetails: PatientDetails = {
   ],
 };
 
+// Mock AuthProvider para testing
+const mockAuthContextValue: AuthContextType = {
+  user: {
+    id: '1',
+    fullName: 'Dr. Juan Pérez',
+    email: 'dr.juan@example.com',
+    profession: 'Nutricionista',
+  },
+  token: 'mock-token',
+  isAuthenticated: true,
+  isLoading: false,
+  login: vi.fn(),
+  logout: vi.fn(),
+};
+
+// Wrapper component para proporcionar contexto de auth
+const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <AuthContext.Provider value={mockAuthContextValue}>
+    {children}
+  </AuthContext.Provider>
+);
+
 describe('PatientProfilePage', () => {
   beforeEach(() => {
     // Limpiar el mock antes de cada prueba
@@ -79,11 +103,13 @@ describe('PatientProfilePage', () => {
     vi.mocked(patientService.fetchPatientById).mockReturnValue(new Promise(() => {}));
 
     render(
-      <MemoryRouter initialEntries={['/pacientes/patient1']}>
-        <Routes>
-          <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
-        </Routes>
-      </MemoryRouter>
+      <TestWrapper>
+        <MemoryRouter initialEntries={['/pacientes/patient1']}>
+          <Routes>
+            <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
+          </Routes>
+        </MemoryRouter>
+      </TestWrapper>
     );
 
     expect(screen.getByText('Cargando datos del paciente...')).toBeInTheDocument();
@@ -94,11 +120,13 @@ describe('PatientProfilePage', () => {
     vi.mocked(patientService.fetchPatientById).mockResolvedValue(mockPatientDetails);
 
     render(
-      <MemoryRouter initialEntries={['/pacientes/patient1']}>
-        <Routes>
-          <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
-        </Routes>
-      </MemoryRouter>
+      <TestWrapper>
+        <MemoryRouter initialEntries={['/pacientes/patient1']}>
+          <Routes>
+            <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
+          </Routes>
+        </MemoryRouter>
+      </TestWrapper>
     );
 
     // Esperar a que la carga termine y se muestren los datos
@@ -130,11 +158,13 @@ describe('PatientProfilePage', () => {
     vi.mocked(patientService.fetchPatientById).mockResolvedValue(mockPatientDetails);
 
     render(
-      <MemoryRouter initialEntries={['/pacientes/patient1']}>
-        <Routes>
-          <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
-        </Routes>
-      </MemoryRouter>
+      <TestWrapper>
+        <MemoryRouter initialEntries={['/pacientes/patient1']}>
+          <Routes>
+            <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
+          </Routes>
+        </MemoryRouter>
+      </TestWrapper>
     );
 
     // Esperar a que el componente termine de cargar y muestre los datos
@@ -157,11 +187,13 @@ describe('PatientProfilePage', () => {
     vi.mocked(patientService.fetchPatientById).mockRejectedValue(new Error(errorMessage));
 
     render(
-      <MemoryRouter initialEntries={['/pacientes/patient1']}>
-        <Routes>
-          <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
-        </Routes>
-      </MemoryRouter>
+      <TestWrapper>
+        <MemoryRouter initialEntries={['/pacientes/patient1']}>
+          <Routes>
+            <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
+          </Routes>
+        </MemoryRouter>
+      </TestWrapper>
     );
 
     // Esperar a que el error se muestre
@@ -184,11 +216,13 @@ describe('PatientProfilePage', () => {
     vi.mocked(patientService.fetchPatientById).mockResolvedValue(patientWithoutDetails);
 
     render(
-      <MemoryRouter initialEntries={['/pacientes/patient2']}>
-        <Routes>
-          <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
-        </Routes>
-      </MemoryRouter>
+      <TestWrapper>
+        <MemoryRouter initialEntries={['/pacientes/patient2']}>
+          <Routes>
+            <Route path="/pacientes/:patientId" element={<PatientProfilePage />} />
+          </Routes>
+        </MemoryRouter>
+      </TestWrapper>
     );
 
     await waitFor(() => {

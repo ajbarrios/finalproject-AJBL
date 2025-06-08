@@ -498,6 +498,36 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 122 (Relacionado con TB-019 - Múltiples Soluciones Configuración Gmail):**
 "No encuentro 'Contraseñas de aplicaciones' en configuración Gmail. Proporciona múltiples alternativas: URL directa (myaccount.google.com/apppasswords), verificación 2FA obligatoria, búsqueda en página con Ctrl+F, alternativas temporales, cuenta nueva para desarrollo, diagnóstico de tipo de cuenta."
 
+**Prompt 123 (Relacionado con TF-019 - Refactorización SendEmailModal - Identificación del Problema):**
+"El componente SendEmailModal.tsx es muy extenso (436 líneas) y necesita refactorización. ¿Puedes sugerir cómo modularizarlo para mejorar la mantenibilidad? Propón una estrategia de refactorización que incluya extracción de componentes, hooks personalizados, y organización de archivos."
+
+**Prompt 124 (Relacionado con TF-019 - Refactorización SendEmailModal - Creación de Tipos e Interfaces):**
+"Comencemos extrayendo los tipos e interfaces del componente SendEmailModal para crear un archivo separado de tipos. Necesito que extraigas todas las interfaces y tipos TypeScript utilizados en el componente para organizarlos en un archivo emailTypes.ts dedicado."
+
+**Prompt 125 (Relacionado con TF-019 - Refactorización SendEmailModal - Extracción PlanSelector):**
+"Ahora extraigamos el componente PlanSelector del SendEmailModal. Este componente debe manejar la selección de planes de dieta y entrenamiento, mostrando badges de estado (ACTIVE/DRAFT) y permitiendo selección/deselección de planes. Créalo como un componente reutilizable independiente."
+
+**Prompt 126 (Relacionado con TF-019 - Refactorización SendEmailModal - Extracción Componentes Adicionales):**
+"Continuemos extrayendo más componentes del SendEmailModal. Necesito extraer AlertMessage (para el mensaje de advertencia sobre el email del paciente) y crear un hook personalizado usePlanSelection para manejar la lógica de selección de planes. Esto reducirá significativamente el tamaño del componente principal."
+
+**Prompt 127 (Relacionado con TF-019 - Refactorización SendEmailModal - Extracción Componentes Finales):**
+"Completemos la refactorización extrayendo los últimos componentes: EmailFormFields (para los campos de email, subject y message) y ActionButtons (para los botones Cancel y Send Email). Esto debería reducir el componente principal a aproximadamente la mitad de su tamaño original."
+
+**Prompt 128 (Relacionado con TF-019 - Refactorización SendEmailModal - Corrección Errores de Linting):**
+"Los componentes extraídos tienen errores de linting relacionados con imports no utilizados y estructura de formularios. Necesito corregir estos errores: remover imports no utilizados de react-hook-form, cambiar la estructura de form por div para envío manual, y ajustar las importaciones de tipos."
+
+**Prompt 129 (Relacionado con TF-019 - Refactorización SendEmailModal - Solución Infinite Loops):**
+"Tengo errores de 'Maximum update depth exceeded' causados por funciones que se recrean en cada render. Necesito usar useCallback para memoizar todas las funciones en el hook usePlanSelection y utilizar setState funcional para evitar dependencias problemáticas en useEffect."
+
+**Prompt 130 (Relacionado con TF-019 - Refactorización SendEmailModal - Creación Tests Unitarios Completos):**
+"Necesito crear una suite completa de tests unitarios para todos los componentes extraídos: AlertMessage (5 tests), ActionButtons (8 tests), PlanSelector (12 tests), EmailFormFields (15 tests), y usePlanSelection hook (11 tests). Los tests deben cubrir renderizado, interacciones, estados, y casos edge."
+
+**Prompt 131 (Relacionado con TF-019 - Refactorización SendEmailModal - Corrección Tests Fallidos):**
+"Algunos tests están fallando debido a problemas con selectors de SVG y clases CSS. Necesito cambiar `screen.getByRole('img')` por `container.querySelector('svg')` para los iconos SVG y usar selectores CSS directos para las aserciones de estilos en lugar de getByRole."
+
+**Prompt 132 (Relacionado con TF-019 - Refactorización SendEmailModal - Corrección Tests PatientProfilePage):**
+"Los tests de PatientProfilePage están fallando con error 'useAuth must be used within an AuthProvider'. Necesito crear un mock del AuthProvider y un TestWrapper component para proporcionar el contexto de autenticación necesario en todos los tests que usan el hook useAuth."
+
 ---
 
 ### 7. Pull Requests
