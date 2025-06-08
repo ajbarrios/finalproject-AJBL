@@ -450,6 +450,15 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 106 (Relacionado con TB-014 - Consolidación Tests Duplicados):**
 "Hay dos archivos de test duplicados en la carpeta @/services. Los test se están guardando en la carpeta @/tests. Puedes leer los que están duplicados, generar uno solo en la carpeta test de cada uno y comprobar que todo funciona? Específicamente: `diet.service.test.ts` (versión pequeña en `/services/` vs completa en `/tests/`) y `patient.service.test.ts` (solo en `/services/`, necesita moverse a `/tests/`)."
 
+**Prompt 107 (Relacionado con TF-014 - Plan de Acción y Creación Tests Frontend):**
+"Funciona correctamente ahora! Procedamos con los unit test relacionados con los cambios. Presta atención al estilo de testing en la carpeta @/frontend"
+
+**Prompt 108 (Relacionado con TF-014 - Implementación Tests EditDietPlanPage):**
+"Crear tests unitarios para EditDietPlanPage siguiendo el estilo y patrones del proyecto" (Implementación de 18 tests cubriendo renderizado, validación, CRUD de comidas, manejo de errores, navegación, y casos edge)
+
+**Prompt 109 (Relacionado con TF-014 - Corrección Tests Existentes No Relacionados):**
+"Todavía hay un test que está fallando. La salida de la consola es @node" (Corrección de tests existentes en PatientBiometricHistoryPage.test.tsx que estaban fallando por problemas de mocking de API y importaciones incorrectas, no relacionados con TF-014 pero necesarios para mantener la suite de tests limpia)
+
 ---
 
 ### 7. Pull Requests
