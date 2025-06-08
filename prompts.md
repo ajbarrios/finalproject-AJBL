@@ -528,6 +528,12 @@ Necesito refinar y simplificar ciertos puntos del MVP para lograr tener algo fun
 **Prompt 132 (Relacionado con TF-019 - Refactorización SendEmailModal - Corrección Tests PatientProfilePage):**
 "Los tests de PatientProfilePage están fallando con error 'useAuth must be used within an AuthProvider'. Necesito crear un mock del AuthProvider y un TestWrapper component para proporcionar el contexto de autenticación necesario en todos los tests que usan el hook useAuth."
 
+**Prompt 133 (Relacionado con TB-018 - Corrección Tests Controlador PDF Incompletos):**
+"El test del pdf controller no esta completo. Sigue los ejemplos de las suites de test existentes en la parte de @backend y ten en cuenta los errores del linter."
+
+**Prompt 134 (Relacionado con TB-018 - Corrección Tests Controlador PDF Incompletos):**
+"Hay un test que esta fallando. Te adjunto la salida de la @node" (Corrección de múltiples tests fallidos incluyendo: validaciones PDF que rechazaban null values, mocks del controlador con IDs string vs number, mensajes de error inconsistentes entre implementación y tests, y timeout en test de PDFs grandes)
+
 ---
 
 ### 7. Pull Requests
