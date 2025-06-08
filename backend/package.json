@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "dist/app.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/app.js",
+    "build": "npm run db:generate && tsc && cp -r src/generated dist/src/",
+    "start": "node dist/src/app.js",
     "dev": "nodemon src/app.ts",
     "test": "vitest",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "db:generate": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
