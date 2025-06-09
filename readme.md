@@ -23,9 +23,7 @@ NutriTrack Pro
 NutriTrack Pro es una aplicación web para profesionales de la nutrición y entrenadores deportivos que quieran llevar a todas partes la progresión de sus clientes.
 
 ### **0.4. URL del proyecto:**
-
-Aún no esta desplegado publicamente pero se puede ejecutar en local siguiendo las instrucciones o ver la demo del apartado 0.6. [Demo del Proyecto](#06-demo-del-proyecto) 
-> Puede ser pública o privada, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/).
+[Web Nutritrack Pro](https://nutritrack-pro.netlify.app/)
 
 ### 0.5. URL o archivo comprimido del repositorio
 [Github NutriTrack Pro](https://github.com/ajbarrios/finalproject-AJBL)
