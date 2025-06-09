@@ -16,13 +16,13 @@ async function main() {
   await prisma.professional.deleteMany({});
   console.log('Tabla Professional limpiada.');
 
-  // --- 1. Crear/Asegurar el Profesional "Antonio Jose Barrios Leon" ---
-  const antonioProfessionalData = {
+  // --- 1. Crear/Asegurar el Profesional "ai4devs test" ---
+  const professionalData = {
     id: 1, // ID especificado
-    email: 'antonio@email.com',
+    email: 'ai4devstest@email.com',
     passwordHash: '$2b$10$4CQ.1AOYRpE5M4IXFaW00.denRK1rym7gqPnpf/5WWpEbiha.ttXm',
-    firstName: 'Antonio Jose', // Nombre interpretado
-    lastName: 'Barrios Leon',  // Apellido interpretado
+    firstName: 'ai4devs', // Nombre interpretado
+    lastName: 'test',  // Apellido interpretado
     profession: ProfessionType.NUTRITIONIST,
   };
 
@@ -31,35 +31,35 @@ async function main() {
   try {
     // Paso previo: Verificar si el email 'antonio@email.com' está en uso por OTRO profesional
     const conflictingProfessional = await prisma.professional.findUnique({
-      where: { email: antonioProfessionalData.email },
+      where: { email: professionalData.email },
     });
 
-    if (conflictingProfessional && conflictingProfessional.id !== antonioProfessionalData.id) {
+    if (conflictingProfessional && conflictingProfessional.id !== professionalData.id) {
       // El email está en uso por otro profesional. Actualizar el email de ese otro profesional.
       const newEmailForConflict = `old_${Date.now()}_${conflictingProfessional.email}`;
       await prisma.professional.update({
         where: { id: conflictingProfessional.id },
         data: { email: newEmailForConflict },
       });
-      console.log(`Email '${antonioProfessionalData.email}' estaba en uso por ID ${conflictingProfessional.id}. Se actualizó a '${newEmailForConflict}'.`);
+      console.log(`Email '${professionalData.email}' estaba en uso por ID ${conflictingProfessional.id}. Se actualizó a '${newEmailForConflict}'.`);
     }
 
     // Ahora proceder con el upsert para el profesional Antonio
     const professional = await prisma.professional.upsert({
-      where: { id: antonioProfessionalData.id },
+      where: { id: professionalData.id },
       update: { // Campos a actualizar si el profesional con ID 1 ya existe
-        email: antonioProfessionalData.email,
-        passwordHash: antonioProfessionalData.passwordHash,
-        firstName: antonioProfessionalData.firstName,
-        lastName: antonioProfessionalData.lastName,
-        profession: antonioProfessionalData.profession,
+        email: professionalData.email,
+        passwordHash: professionalData.passwordHash,
+        firstName: professionalData.firstName,
+        lastName: professionalData.lastName,
+        profession: professionalData.profession,
       },
-      create: antonioProfessionalData, // Datos para crear, incluyendo el ID 1
+      create: professionalData, // Datos para crear, incluyendo el ID 1
     });
     console.log(`Profesional '${professional.firstName} ${professional.lastName}' (ID: ${professional.id}) procesado (creado/actualizado).`);
     professionalIdToUse = professional.id;
   } catch (error) {
-    console.error(`Error al procesar el profesional con ID ${antonioProfessionalData.id}:`, error);
+    console.error(`Error al procesar el profesional con ID ${professionalData.id}:`, error);
     console.error('No se pudo crear/actualizar el profesional especificado. Saliendo del seed script.');
     process.exit(1); // 'process' está disponible gracias a la directiva triple-slash
   }
