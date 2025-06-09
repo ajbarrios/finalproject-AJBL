@@ -31,6 +31,26 @@ NutriTrack Pro es una aplicación web para profesionales de la nutrición y entr
 
 > Puedes tenerlo alojado en público o en privado, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/). También puedes compartir por correo un archivo zip con el contenido
 
+#### **🧪 Instrucciones para Probar la Aplicación**
+
+Para evaluar todas las funcionalidades de NutriTrack Pro:
+
+1. **Accede a la aplicación web:** [nutritrack-pro.netlify.app](https://nutritrack-pro.netlify.app/)
+
+2. **Regístrate como nutricionista:**
+   - Haz clic en "Registrarse" 
+   - Crea una cuenta con tipo de usuario "Nutricionista"
+   - Verifica que el login funciona correctamente
+
+3. **Prueba las funcionalidades principales:**
+   - ✅ **Gestión de pacientes:** Añade varios pacientes de prueba con datos completos
+   - ✅ **Registros biométricos:** Agrega medidas corporales y visualiza gráficos de evolución
+   - ✅ **Planes de dieta:** Crea planes personalizados organizados por días y comidas
+   - ✅ **Generación PDF:** Genera y descarga planes en formato PDF profesional
+   - ✅ **Envío por email:** Prueba el envío de planes por correo electrónico. Crea un paciente con un email al que tengas acceso para ver el resultado del plan de dieta generado.
+   - ✅ **Búsqueda y filtros:** Usa la funcionalidad de búsqueda en el dashboard
+
+
 #### **Frontend (React con Vite y Tailwind CSS)**
 
 1.  **Navega al directorio `frontend`:**
