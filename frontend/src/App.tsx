@@ -37,13 +37,7 @@ import CreateDietPlanPage from './pages/CreateDietPlanPage';
 import DietPlanDetailsPage from './pages/DietPlanDetailsPage';
 import EditDietPlanPage from './pages/EditDietPlanPage';
 
-// Componente para la página de inicio temporal (si no hay otra)
-const HomePage = () => (
-  <div className="container mx-auto mt-10 p-4 text-center">
-    <h1 className="text-3xl font-bold mb-4">Bienvenido a NutriTrack Pro</h1>
-    <p className="mb-6">Gestiona tus pacientes y sus planes de forma eficiente.</p>
-  </div>
-);
+import HomePage from './pages/HomePage';
 
 function App() {
   const auth = useAuth(); // Para la redirección principal
