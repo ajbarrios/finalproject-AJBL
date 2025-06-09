@@ -171,56 +171,52 @@ const PatientProfilePage: React.FC = () => {
              )}
            </div>
 
-           <div className="bg-white p-6 rounded-lg shadow col-span-full flex flex-wrap gap-3">
-              <button 
-                onClick={() => navigate(`/patients/${patientId}/edit`)}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
-              >
-                Editar Paciente
-              </button>
-              <button 
-                onClick={() => navigate(`/patients/${patientId}/biometric-records/new`)}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors duration-200"
-              >
-                Añadir Registro Biométrico
-              </button>
-              <button 
-                onClick={() => navigate(`/patients/${patientId}/biometric-records`)}
-                className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors duration-200"
-              >
-                Ver Historial Biométrico
-              </button>
-              <button 
-                onClick={() => navigate(`/patients/${patientId}/diet-plans/new`)}
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors duration-200"
-              >
-                Crear Plan Dieta
-              </button>
-              <button 
-              disabled 
-              title="próximamente" 
-              className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-              Crear Plan Entrenamiento
-            </button>
-            
-            {/* Botón Enviar Planes por Email - Solo se muestra si hay planes */}
-            {patient.dietPlansSummary && patient.dietPlansSummary.length > 0 && (
-              <button 
-                onClick={() => setShowEmailModal(true)}
-                className={`px-4 py-2 rounded transition-colors duration-200 flex items-center ${
-                  patient.email 
-                    ? 'bg-orange-500 text-white hover:bg-orange-600' 
-                    : 'bg-yellow-500 text-white hover:bg-yellow-600'
-                }`}
-                title={!patient.email ? 'El paciente no tiene email registrado. Deberás introducir el email manualmente.' : 'Enviar planes al email del paciente'}
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                {patient.email ? 'Enviar Planes por Email' : 'Enviar Planes (Sin Email)'}
-              </button>
-            )}
+           <div className="bg-white p-6 rounded-lg shadow col-span-full">
+             <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Acciones del Paciente</h3>
+             <div className="flex flex-wrap justify-center gap-4">
+               <button 
+                 onClick={() => navigate(`/patients/${patientId}/edit`)}
+                 className="bg-gray-600 text-white px-6 py-2.5 rounded-lg hover:bg-gray-700 transition-colors duration-200 shadow-sm"
+               >
+                 Editar Paciente
+               </button>
+               <button 
+                 onClick={() => navigate(`/patients/${patientId}/biometric-records/new`)}
+                 className="bg-slate-600 text-white px-6 py-2.5 rounded-lg hover:bg-slate-700 transition-colors duration-200 shadow-sm"
+               >
+                 Añadir Registro Biométrico
+               </button>
+               <button 
+                 onClick={() => navigate(`/patients/${patientId}/biometric-records`)}
+                 className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+               >
+                 Ver Historial Biométrico
+               </button>
+               <button 
+                 onClick={() => navigate(`/patients/${patientId}/diet-plans/new`)}
+                 className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-sm"
+               >
+                 Crear Plan Dieta
+               </button>
+               
+               {/* Botón Enviar Planes por Email - Solo se muestra si hay planes */}
+               {patient.dietPlansSummary && patient.dietPlansSummary.length > 0 && (
+                 <button 
+                   onClick={() => setShowEmailModal(true)}
+                   className={`px-6 py-2.5 rounded-lg transition-colors duration-200 flex items-center shadow-sm ${
+                     patient.email 
+                       ? 'bg-emerald-600 text-white hover:bg-emerald-700' 
+                       : 'bg-amber-600 text-white hover:bg-amber-700'
+                   }`}
+                   title={!patient.email ? 'El paciente no tiene email registrado. Deberás introducir el email manualmente.' : 'Enviar planes al email del paciente'}
+                 >
+                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                   </svg>
+                   {patient.email ? 'Enviar Planes por Email' : 'Enviar Planes (Sin Email)'}
+                 </button>
+               )}
+             </div>
            </div>
         </div>
       )}
