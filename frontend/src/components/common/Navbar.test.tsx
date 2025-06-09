@@ -40,6 +40,7 @@ describe('Navbar', () => {
       logout: vi.fn(),
       isLoading: false,
       token: null,
+      handleTokenExpired: vi.fn(),
     });
     renderNavbarWithRouter();
     const titleLink = screen.getByRole('link', { name: /NutriTrack Pro/i });
@@ -56,6 +57,7 @@ describe('Navbar', () => {
         logout: vi.fn(),
         isLoading: false,
         token: null,
+        handleTokenExpired: vi.fn(),
       });
     });
 
@@ -89,6 +91,7 @@ describe('Navbar', () => {
         logout: mockLogout,
         isLoading: false,
         token: 'fake-token',
+        handleTokenExpired: vi.fn(),
       });
     });
 

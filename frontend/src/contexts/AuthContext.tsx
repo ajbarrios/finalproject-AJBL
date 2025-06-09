@@ -93,8 +93,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  const handleTokenExpired = () => {
+    // Solo hacer logout automático, el toast ya se muestra en el interceptor
+    logout();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, login, logout, handleTokenExpired }}>
       {children}
     </AuthContext.Provider>
   );

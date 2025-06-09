@@ -81,6 +81,7 @@ const mockAuthContextValue: AuthContextType = {
   isLoading: false,
   login: vi.fn(),
   logout: vi.fn(),
+  handleTokenExpired: vi.fn(),
 };
 
 // Wrapper component para proporcionar contexto de auth
