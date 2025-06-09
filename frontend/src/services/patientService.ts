@@ -1,7 +1,7 @@
 import type { Patient, NewPatientData, UpdatePatientData } from '../types/patient';
 import api from './api';
 
-const PATIENTS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/patients';
+const PATIENTS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL + '/patients' || 'http://localhost:3000/api/patients';
 
 /**
  * Obtiene la lista de pacientes para el profesional autenticado.
