@@ -72,18 +72,24 @@ He añadido una demo del proyecto corriendo en entorno local en @demo. ¿Puedes 
 ### **2.4. Infraestructura y despliegue**
 
 **Prompt 1:**
+"Actúa como un DevOps expert especializado en despliegues de aplicaciones fullstack. Tengo un proyecto NutriTrack Pro con frontend React+Vite+TypeScript+Tailwind y backend Node.js+Express+TypeScript+Prisma+PostgreSQL. Necesito desplegarlo en producción usando Netlify para frontend y Render para backend+BD. Proporciona un plan detallado paso a paso que incluya: preparación del código para producción, configuración de variables de entorno, scripts de build, configuración de dominios, y configuración de la base de datos PostgreSQL. El frontend debe comunicarse correctamente con el backend desplegado."
 
 **Prompt 2:**
+"Estoy configurando el despliegue de mi aplicación NutriTrack Pro en Render y Netlify pero tengo varios problemas. En Render: mi API Node.js no inicia correctamente (error con Prisma migrations), las variables de entorno de JWT_SECRET y DATABASE_URL no se reconocen, y el health check falla. En Netlify: el frontend se construye pero no puede conectar con la API (CORS errors), las rutas SPA devuelven 404, y las variables VITE_API_BASE_URL no se aplican. Proporciona una solución completa para resolver estos problemas de configuración incluyendo comandos específicos, archivos de configuración necesarios (_redirects, render.yaml, etc.) y debugging steps."
 
 **Prompt 3:**
+"Mi aplicación NutriTrack Pro está desplegada en Render (backend) y Netlify (frontend) pero tengo Los PDFs generados con PDFKit consumen mucha memoria en Render. Proporciona optimizaciones específicas para este caso de uso."
 
 ### **2.5. Seguridad**
 
 **Prompt 1:**
+"Actúa como un experto en seguridad web para principiantes. Tengo una aplicación NutriTrack Pro con backend Node.js+Express+JWT+Prisma+PostgreSQL y frontend React que maneja datos sensibles de pacientes (información personal, métricas biométricas). Como desarrollador junior, necesito implementar las medidas de seguridad básicas pero esenciales. Proporciona una guía paso a paso para: 1) Autenticación segura con JWT (tiempo de expiración, secretos fuertes), 2) Validación y sanitización de inputs con Zod, 3) Configuración HTTPS, 4) Protección contra inyecciones SQL, 5) Hash seguro de contraseñas con bcrypt. Incluye ejemplos de código prácticos y explica por qué cada medida es importante."
 
 **Prompt 2:**
+"Soy un desarrollador junior trabajando en NutriTrack Pro y necesito asegurar el frontend React. La aplicación maneja tokens JWT, formularios de pacientes, y comunicación con APIs. ¿Puedes explicarme de forma sencilla cómo implementar: 1) Protección contra XSS (Cross-Site Scripting), 2) Manejo seguro de tokens JWT en localStorage vs sessionStorage, 3) Validación de formularios en cliente antes de enviar al backend, 4) Configuración segura de CORS, 5) Protección de rutas privadas? Proporciona ejemplos prácticos con React y explica qué vulnerabilidades estoy evitando con cada implementación."
 
 **Prompt 3:**
+"Como desarrollador de NutriTrack Pro que maneja datos médicos sensibles, necesito una checklist de seguridad final antes de ir a producción. ¿Puedes proporcionarme una guía de auditoría de seguridad básica que incluya: 1) Variables de entorno y secretos (qué nunca exponer en el código), 2) Configuración de rate limiting para APIs, 3) Logs de seguridad (qué registrar sin exponer datos sensibles), 4) Backup seguro de base de datos, 5) Headers de seguridad HTTP, 6) Verificación de dependencias vulnerables (npm audit)? Explica cada punto de forma simple y proporciona comandos o código específico para implementar cada medida en mi stack tecnológico."
 
 ### **2.6. Tests**
 
