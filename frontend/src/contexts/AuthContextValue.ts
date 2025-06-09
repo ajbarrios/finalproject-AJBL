@@ -20,6 +20,7 @@ export interface AuthContextType {
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
+  handleTokenExpired: () => void;
 }
 
 // Se exporta AuthContext para que el hook y el provider puedan consumirlo
