@@ -49,6 +49,12 @@ He añadido una demo del proyecto corriendo en entorno local en @demo. ¿Puedes 
 - Explica si sigue algún patrón predefinido, justifica por qué se ha elegido esta arquitectura, y destaca los beneficios principales que aportan al proyecto y justifican su uso, así como sacrificios o déficits que implica."
 
 **Prompt 3:**
+"Necesito crear un archivo en formato markdown dentro de la carpeta @/docs denominado infraestructura en el que se explique está desplegado el proyecto. Ten en cuenta lo siguiente:
+- El frontend esta desplegado en Netlify, lincado a github y se despliega automaticamente con cada commit a master.
+- La api del proyecto, es decir el backend, esta desplegado en la plataforma Render como servicio web y se despliega con cada commit a master.
+- La base de datos Postgres esta desplegada tambien en Render.
+
+Explica todo esto de forma clara y concisa, con un tono didáctico."
 
 ### **2.2. Descripción de componentes principales:**
 
