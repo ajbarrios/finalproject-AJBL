@@ -232,6 +232,28 @@ const NewPatientPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Botón Volver al Dashboard - con estilos consistentes */}
+      <div className="mb-4">
+        <button 
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center text-indigo-600 hover:text-indigo-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-1"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Volver al Dashboard
+        </button>
+      </div>
+
       <h1 className="text-2xl font-bold mb-6">Registrar Nuevo Paciente</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6">
