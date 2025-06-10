@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 const HomePage: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
       {/* Patrón de fondo sutil */}
@@ -46,19 +49,39 @@ const HomePage: React.FC = () => {
           
           {/* Botones de acción */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              to="/login"
-              className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105 shadow-lg"
-            >
-              <span className="relative">Iniciar Sesión</span>
-            </Link>
-            
-            <Link
-              to="/registro"
-              className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg text-indigo-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105 shadow-lg border border-indigo-200"
-            >
-              <span className="relative">Registrarse</span>
-            </Link>
+            {!isLoading && (
+              <>
+                {isAuthenticated ? (
+                  // Botón para ir al dashboard cuando está logado
+                  <Link
+                    to="/dashboard"
+                    className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                  >
+                    <span className="relative">Ir al Dashboard</span>
+                  </Link>
+                ) : (
+                  // Botones de login y registro cuando no está logado
+                  <>
+                    <Link
+                      to="/login"
+                      className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    >
+                      <span className="relative">Iniciar Sesión</span>
+                    </Link>
+                    
+                    <Link
+                      to="/registro"
+                      className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg text-indigo-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105 shadow-lg border border-indigo-200"
+                    >
+                      <span className="relative">Registrarse</span>
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
+            {isLoading && (
+              <div className="text-gray-600">Cargando...</div>
+            )}
           </div>
           
           {/* Información adicional */}
