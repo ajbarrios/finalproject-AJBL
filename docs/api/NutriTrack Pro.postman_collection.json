@@ -2,6 +2,7 @@
 	"info": {
 		"_postman_id": "cd5c5993-5abc-48c3-a929-2d19a14482c9",
 		"name": "NutriTrack Pro",
+		"description": "Colección completa de endpoints para la API de NutriTrack Pro. Incluye autenticación, gestión de pacientes, planes de dieta, registros biométricos y funcionalidades de email.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "19730999"
 	},
@@ -9,6 +10,56 @@
 		{
 			"name": "Auth",
 			"item": [
+				{
+					"name": "Registrar Profesional",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has user data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('firstName');",
+									"    pm.expect(jsonData).to.have.property('lastName');",
+									"    pm.expect(jsonData).to.have.property('email');",
+									"    pm.expect(jsonData).to.have.property('profession');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Dr. Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"phone\": \"+34123456789\",\n  \"profession\": \"NUTRITIONIST\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registra un nuevo profesional en el sistema. Los campos firstName, lastName, email, password y profession son obligatorios."
+					},
+					"response": []
+				},
 				{
 					"name": "Login Profesional",
 					"event": [
@@ -44,7 +95,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"tu_email_de_profesional@example.com\",\n  \"password\": \"tu_contraseña_de_profesional\"\n}"
+							"raw": "{\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/login",
@@ -61,11 +112,53 @@
 					"response": []
 				}
 			],
-			"description": "Endpoints relacionados con la autenticación"
+			"description": "Endpoints relacionados con la autenticación de profesionales"
 		},
 		{
 			"name": "Patients",
 			"item": [
+				{
+					"name": "Crear Nuevo Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\",\n  \"email\": \"juan.perez@example.com\",\n  \"phone\": \"+34123456789\",\n  \"birthDate\": \"1990-01-15\", \n  \"gender\": \"Masculino\",\n  \"height\": 175.5,\n  \"medicalNotes\": \"Historial de alergias leves.\",\n  \"dietRestrictions\": \"Intolerancia a la lactosa\",\n  \"objectives\": \"Mejorar composición corporal y perder 5kg\",\n  \"initialBiometrics\": {\n    \"recordDate\": \"2023-11-20\",\n    \"weight\": 80.5,\n    \"bodyFatPercentage\": 22.1,\n    \"musclePercentage\": 38.5,\n    \"waterPercentage\": 55.3,\n    \"waistDiameter\": 88.0,\n    \"notes\": \"Medición inicial post-ayuno.\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients"
+							]
+						},
+						"description": "Crea un nuevo paciente para el profesional autenticado. Incluye datos opcionales y biometría inicial."
+					},
+					"response": []
+				},
 				{
 					"name": "Listar Pacientes (sin búsqueda)",
 					"request": {
@@ -80,13 +173,7 @@
 							]
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"disabled": true
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/patients",
 							"host": [
@@ -96,7 +183,7 @@
 								"patients"
 							]
 						},
-						"description": "Lista todos los pacientes del profesional autenticado. Asegúrate de haber iniciado sesión y que la variable `authToken` esté seteada."
+						"description": "Lista todos los pacientes del profesional autenticado."
 					},
 					"response": []
 				},
@@ -116,7 +203,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/patients?search=termino_a_buscar",
+							"raw": "{{baseUrl}}/patients?search=Juan&page=1&limit=10&sortBy=firstName&order=asc",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -126,12 +213,32 @@
 							"query": [
 								{
 									"key": "search",
-									"value": "termino_a_buscar",
+									"value": "Juan",
 									"description": "Término para buscar en nombre, apellido o email del paciente."
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número de página para paginación."
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Número de resultados por página."
+								},
+								{
+									"key": "sortBy",
+									"value": "firstName",
+									"description": "Campo por el cual ordenar."
+								},
+								{
+									"key": "order",
+									"value": "asc",
+									"description": "Orden de clasificación (asc/desc)."
 								}
 							]
 						},
-						"description": "Lista los pacientes del profesional autenticado que coincidan con el término de búsqueda. Modifica el valor del parámetro `search`."
+						"description": "Lista los pacientes del profesional autenticado que coincidan con el término de búsqueda, con opciones de paginación y ordenamiento."
 					},
 					"response": []
 				},
@@ -172,48 +279,6 @@
 					"response": []
 				},
 				{
-					"name": "Crear Nuevo Paciente",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authToken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"Nuevo\",\n  \"lastName\": \"Paciente\",\n  \"email\": \"nuevo.paciente@example.com\",\n  \"phone\": \"+34123456789\",\n  \"birthDate\": \"1990-01-15\", \n  \"gender\": \"Prefiero no especificar\",\n  \"height\": 170.5,\n  \"medicalNotes\": \"Historial de alergias leves.\",\n  \"dietRestrictions\": \"Ninguna\",\n  \"objectives\": \"Mejorar composición corporal\",\n  \"initialBiometrics\": {\n    \"recordDate\": \"2023-11-20\",\n    \"weight\": 75.2,\n    \"bodyFatPercentage\": 20.1,\n    \"musclePercentage\": 35.5,\n    \"waterPercentage\": 50.3,\n    \"waistDiameter\": 85.0,\n    \"notes\": \"Medición inicial.\"\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/patients",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"patients"
-							]
-						},
-						"description": "Crea un nuevo paciente para el profesional autenticado. Incluye campos opcionales y datos biométricos iniciales. Asegúrate de haber iniciado sesión y que la variable `authToken` esté seteada."
-					},
-					"response": []
-				},
-				{
 					"name": "Actualizar Paciente - Datos Básicos",
 					"request": {
 						"auth": {
@@ -235,7 +300,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"Nombre Actualizado\",\n  \"lastName\": \"Apellido Actualizado\",\n  \"email\": \"actualizado@example.com\",\n  \"phone\": \"+34678912345\"\n}",
+							"raw": "{\n  \"firstName\": \"Juan Carlos\",\n  \"lastName\": \"Pérez García\",\n  \"email\": \"juancarlos.perez@example.com\",\n  \"phone\": \"+34678912345\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -285,7 +350,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"medicalNotes\": \"Paciente con alergia a frutos secos documentada.\",\n  \"dietRestrictions\": \"Evitar frutos secos, lácteos limitados.\",\n  \"objectives\": \"Mantenimiento de peso y mejora de rendimiento deportivo.\"\n}",
+							"raw": "{\n  \"medicalNotes\": \"Paciente con alergia a frutos secos documentada. Hipertensión controlada.\",\n  \"dietRestrictions\": \"Evitar frutos secos, lácteos limitados, bajo en sodio.\",\n  \"objectives\": \"Mantenimiento de peso y mejora de resistencia cardiovascular. Meta: correr 5km sin parar.\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -335,7 +400,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"height\": 178.5,\n  \"gender\": \"No binario\",\n  \"birthDate\": \"1992-03-15\"\n}",
+							"raw": "{\n  \"height\": 178.5,\n  \"gender\": \"Masculino\",\n  \"birthDate\": \"1992-03-15\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -365,6 +430,451 @@
 				}
 			],
 			"description": "Endpoints relacionados con la gestión de pacientes"
+		},
+		{
+			"name": "Biometric Records",
+			"item": [
+				{
+					"name": "Crear Registro Biométrico",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"recordDate\": \"2023-11-25\",\n  \"weight\": 78.5,\n  \"bodyFatPercentage\": 20.5,\n  \"musclePercentage\": 40.2,\n  \"waterPercentage\": 58.1,\n  \"backChestDiameter\": 102.0,\n  \"waistDiameter\": 85.5,\n  \"armsDiameter\": 36.2,\n  \"legsDiameter\": 56.8,\n  \"calvesDiameter\": 39.1,\n  \"notes\": \"Medición después de 2 semanas de entrenamiento. Se observa reducción en cintura.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId/biometric-records",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId",
+								"biometric-records"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Registra nuevas medidas biométricas para un paciente específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Registros Biométricos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId/biometric-records?startDate=2023-01-01&endDate=2023-12-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId",
+								"biometric-records"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2023-01-01",
+									"description": "Fecha de inicio para filtrar registros (opcional)"
+								},
+								{
+									"key": "endDate",
+									"value": "2023-12-31",
+									"description": "Fecha de fin para filtrar registros (opcional)"
+								}
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Obtiene todos los registros biométricos de un paciente, con filtros opcionales por fecha."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gestión de registros biométricos de pacientes"
+		},
+		{
+			"name": "Diet Plans",
+			"item": [
+				{
+					"name": "Crear Plan de Dieta",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Plan de Dieta para Pérdida de Grasa - Semana 1\",\n  \"description\": \"Plan nutricional diseñado para crear un déficit calórico controlado, manteniendo los nutrientes esenciales.\",\n  \"startDate\": \"2023-12-01\",\n  \"endDate\": \"2023-12-07\",\n  \"objectives\": \"Reducir 0.5kg de grasa corporal manteniendo masa muscular.\",\n  \"isActive\": true,\n  \"notes\": \"Beber 2-3L de agua al día. Realizar las comidas cada 3-4 horas.\",\n  \"meals\": [\n    {\n      \"mealType\": \"BREAKFAST\",\n      \"content\": \"Avena (50g) con leche descremada (200ml), arándanos (100g) y almendras (15g)\",\n      \"dayOfWeek\": \"MONDAY\"\n    },\n    {\n      \"mealType\": \"MID_MORNING_SNACK\",\n      \"content\": \"Yogur griego natural (150g) con nueces (10g)\",\n      \"dayOfWeek\": \"MONDAY\"\n    },\n    {\n      \"mealType\": \"LUNCH\",\n      \"content\": \"Pechuga de pollo a la plancha (150g), arroz integral (80g cocido), ensalada mixta con aceite de oliva (1 cdta)\",\n      \"dayOfWeek\": \"MONDAY\"\n    },\n    {\n      \"mealType\": \"AFTERNOON_SNACK\",\n      \"content\": \"Manzana (1 mediana) con mantequilla de almendra (1 cda)\",\n      \"dayOfWeek\": \"MONDAY\"\n    },\n    {\n      \"mealType\": \"DINNER\",\n      \"content\": \"Salmón a la plancha (120g), verduras al vapor (200g), quinoa (60g cocida)\",\n      \"dayOfWeek\": \"MONDAY\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/diets/patients/:patientId/plans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"diets",
+								"patients",
+								":patientId",
+								"plans"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Crea un nuevo plan de dieta para un paciente específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Plan de Dieta por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/diets/:dietPlanId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"diets",
+								":dietPlanId"
+							],
+							"variable": [
+								{
+									"key": "dietPlanId",
+									"value": "1",
+									"description": "ID del plan de dieta"
+								}
+							]
+						},
+						"description": "Obtiene los detalles completos de un plan de dieta específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Plan de Dieta",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Plan de Dieta Actualizado - Pérdida de Grasa Semana 1\",\n  \"description\": \"Plan nutricional actualizado con ajustes según progreso del paciente.\",\n  \"objectives\": \"Reducir 0.5kg de grasa corporal manteniendo masa muscular. Ajuste por buen progreso inicial.\",\n  \"isActive\": true,\n  \"notes\": \"Aumentar ingesta de agua a 3L/día. Paciente tolera bien el plan actual.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/diets/:dietPlanId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"diets",
+								":dietPlanId"
+							],
+							"variable": [
+								{
+									"key": "dietPlanId",
+									"value": "1",
+									"description": "ID del plan de dieta a actualizar"
+								}
+							]
+						},
+						"description": "Actualiza un plan de dieta existente."
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Plan de Dieta (Soft Delete)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/diets/:dietPlanId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"diets",
+								":dietPlanId"
+							],
+							"variable": [
+								{
+									"key": "dietPlanId",
+									"value": "1",
+									"description": "ID del plan de dieta a eliminar"
+								}
+							]
+						},
+						"description": "Realiza un soft delete de un plan de dieta (marca como eliminado sin borrar físicamente)."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gestión de planes de dieta"
+		},
+		{
+			"name": "Email",
+			"item": [
+				{
+					"name": "Enviar Planes por Email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dietPlanId\": \"1\",\n  \"workoutPlanId\": null,\n  \"recipientEmail\": \"juan.perez@example.com\",\n  \"subject\": \"Tus planes nutricionales de NutriTrack Pro\",\n  \"bodyMessage\": \"Hola Juan,\\n\\nAdjunto encontrarás tu plan nutricional personalizado. Por favor, revísalo y no dudes en contactarme si tienes alguna pregunta.\\n\\nSaludos,\\nDr. Jane Smith\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId/send-plans-email",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId",
+								"send-plans-email"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Envía los planes de dieta y/o entrenamiento de un paciente por correo electrónico."
+					},
+					"response": []
+				},
+				{
+					"name": "Enviar Solo Plan de Dieta por Email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dietPlanId\": \"1\",\n  \"recipientEmail\": \"juan.perez@example.com\",\n  \"subject\": \"Tu plan nutricional actualizado\",\n  \"bodyMessage\": \"Hola Juan,\\n\\nHe actualizado tu plan nutricional basándome en tu progreso. Revisa los cambios y sigue las indicaciones.\\n\\n¡Sigue así!\\nDr. Jane Smith\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId/send-plans-email",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId",
+								"send-plans-email"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Envía únicamente el plan de dieta por correo electrónico."
+					},
+					"response": []
+				},
+				{
+					"name": "Enviar Solo Plan de Entrenamiento por Email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"workoutPlanId\": \"1\",\n  \"recipientEmail\": \"juan.perez@example.com\",\n  \"subject\": \"Tu rutina de entrenamiento personalizada\",\n  \"bodyMessage\": \"Hola Juan,\\n\\nAquí tienes tu nueva rutina de entrenamiento. Recuerda realizar un calentamiento adecuado antes de cada sesión.\\n\\n¡A entrenar!\\nEntrenador Smith\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId/send-plans-email",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId",
+								"send-plans-email"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Envía únicamente el plan de entrenamiento por correo electrónico."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para envío de planes por correo electrónico"
 		}
 	],
 	"event": [
@@ -391,12 +901,14 @@
 		{
 			"key": "baseUrl",
 			"value": "http://localhost:3000/api",
-			"type": "string"
+			"type": "string",
+			"description": "URL base de la API de NutriTrack Pro"
 		},
 		{
 			"key": "authToken",
-			"value": "TU_TOKEN_JWT_VALIDO_AQUI_O_DEJAR_VACIO_SI_LOGIN_LO_SETTEA",
-			"type": "string"
+			"value": "",
+			"type": "string",
+			"description": "Token JWT para autenticación. Se establece automáticamente al hacer login."
 		}
 	]
 }

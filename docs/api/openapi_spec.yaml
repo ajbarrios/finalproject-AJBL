@@ -28,14 +28,18 @@ components:
     ProfessionalRegistration:
       type: object
       required:
-        - fullName
+        - firstName
+        - lastName
         - email
         - password
         - profession
       properties:
-        fullName:
+        firstName:
           type: string
-          example: "Dr. Jane Doe"
+          example: "Jane"
+        lastName:
+          type: string
+          example: "Doe"
         email:
           type: string
           format: email
@@ -44,10 +48,13 @@ components:
           type: string
           format: password
           example: "S3cur3P@ss!"
+        phone:
+          type: string
+          example: "+1234567890"
         profession:
           type: string
-          enum: ["nutricionista", "entrenador"]
-          example: "nutricionista"
+          enum: ["NUTRITIONIST", "TRAINER"]
+          example: "NUTRITIONIST"
     ProfessionalLogin:
       type: object
       required:
@@ -62,28 +69,6 @@ components:
           type: string
           format: password
           example: "S3cur3P@ss!"
-    ForgotPassword:
-      type: object
-      required:
-        - email
-      properties:
-        email:
-          type: string
-          format: email
-          example: "jane.doe@example.com"
-    ResetPassword:
-      type: object
-      required:
-        - token
-        - newPassword
-      properties:
-        token:
-          type: string
-          example: "reset-token-uuid"
-        newPassword:
-          type: string
-          format: password
-          example: "NewS3cur3P@ss!"
     AuthResponse:
       type: object
       properties:
@@ -94,18 +79,21 @@ components:
           type: object
           properties:
             id:
-              type: string # o integer
-              example: "user-uuid"
-            fullName:
+              type: integer
+              example: 1
+            firstName:
               type: string
-              example: "Dr. Jane Doe"
+              example: "Jane"
+            lastName:
+              type: string
+              example: "Doe"
             email:
               type: string
               format: email
               example: "jane.doe@example.com"
             profession:
               type: string
-              example: "nutricionista"
+              example: "NUTRITIONIST"
 
     # Patient Schemas
     PatientCreation:
@@ -133,19 +121,58 @@ components:
           example: "1990-01-15"
         gender:
           type: string
-          enum: ["Masculino", "Femenino", "Otro", "Prefiero no decirlo"]
           example: "Masculino"
         height:
           type: number
           format: float
           description: "Altura en cm"
           example: 175.5
-        initialBiometrics: # Opcional, para el primer registro
+        initialBiometrics:
           type: object
           properties:
-            weight: { type: number, format: float, example: 70.2 }
-            bodyFatPercentage: { type: number, format: float, example: 15.5 }
-            # ... otros campos biométricos iniciales
+            recordDate:
+              type: string
+              format: date
+              example: "2023-11-20"
+            weight: 
+              type: number
+              format: float
+              example: 70.2
+            bodyFatPercentage: 
+              type: number
+              format: float
+              example: 15.5
+            musclePercentage:
+              type: number
+              format: float
+              example: 40.0
+            waterPercentage:
+              type: number
+              format: float
+              example: 60.0
+            backChestDiameter:
+              type: number
+              format: float
+              example: 100.0
+            waistDiameter:
+              type: number
+              format: float
+              example: 80.0
+            armsDiameter:
+              type: number
+              format: float
+              example: 35.0
+            legsDiameter:
+              type: number
+              format: float
+              example: 55.0
+            calvesDiameter:
+              type: number
+              format: float
+              example: 38.0
+            notes:
+              type: string
+              example: "Medición inicial."
         medicalNotes:
           type: string
           example: "Alergia a la penicilina."
@@ -155,17 +182,17 @@ components:
         objectives:
           type: string
           example: "Perder 5kg y mejorar resistencia."
-    PatientResponse: # Similar a PatientCreation pero con ID y timestamps
+    PatientResponse:
       allOf:
         - $ref: '#/components/schemas/PatientCreation'
         - type: object
           properties:
             id:
-              type: string # o integer
-              example: "patient-uuid"
+              type: integer
+              example: 1
             professionalId:
-              type: string # o integer
-              example: "prof-uuid"
+              type: integer
+              example: 1
             createdAt:
               type: string
               format: date-time
@@ -178,7 +205,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/PatientResponse' # o una versión simplificada
+            $ref: '#/components/schemas/PatientResponse'
         pagination:
           type: object
           properties:
@@ -192,7 +219,6 @@ components:
       type: object
       required:
         - recordDate
-        # Al menos una medida
       properties:
         recordDate:
           type: string
@@ -213,8 +239,8 @@ components:
         - $ref: '#/components/schemas/BiometricRecordCreation'
         - type: object
           properties:
-            id: { type: string, example: "biometric-uuid" }
-            patientId: { type: string, example: "patient-uuid" }
+            id: { type: integer, example: 1 }
+            patientId: { type: integer, example: 1 }
             createdAt: { type: string, format: date-time }
 
     # Diet Plan Schemas
@@ -223,9 +249,19 @@ components:
       required:
         - mealType
         - content
+        - dayOfWeek
       properties:
-        mealType: { type: string, example: "Desayuno" }
-        content: { type: string, example: "Avena con frutas y nueces." }
+        mealType: 
+          type: string
+          enum: ["BREAKFAST", "MID_MORNING_SNACK", "LUNCH", "AFTERNOON_SNACK", "DINNER", "LATE_NIGHT_SNACK"]
+          example: "BREAKFAST"
+        content: 
+          type: string
+          example: "Avena con frutas y nueces."
+        dayOfWeek:
+          type: string
+          enum: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
+          example: "MONDAY"
     DietPlanCreation:
       type: object
       required:
@@ -236,127 +272,72 @@ components:
         startDate: { type: string, format: date, example: "2023-11-01" }
         endDate: { type: string, format: date, example: "2023-11-07" }
         objectives: { type: string, example: "Reducir 1kg de grasa." }
-        status: { type: string, enum: ["Activo", "Borrador"], example: "Activo"}
+        isActive: { type: boolean, example: true }
         notes: { type: string, example: "Beber 2L de agua al día." }
         meals:
           type: array
           items:
             $ref: '#/components/schemas/DietMealCreation'
-    DietPlanResponse: # Similar a DietPlanCreation pero con IDs y meals completos
+    DietPlanResponse:
       allOf:
-        - $ref: '#/components/schemas/DietPlanCreation' # Excluyendo 'meals' si se devuelven con IDs
+        - $ref: '#/components/schemas/DietPlanCreation'
         - type: object
           properties:
-            id: { type: string, example: "dietplan-uuid" }
-            patientId: { type: string, example: "patient-uuid" }
-            professionalId: { type: string, example: "prof-uuid" }
-            meals: # meals con sus IDs
+            id: { type: integer, example: 1 }
+            patientId: { type: integer, example: 1 }
+            professionalId: { type: integer, example: 1 }
+            isDeleted: { type: boolean, example: false }
+            deletedAt: { type: string, format: date-time, nullable: true }
+            meals:
               type: array
               items:
                 allOf:
                   - $ref: '#/components/schemas/DietMealCreation'
                   - type: object
                     properties:
-                      id: { type: string, example: "dietmeal-uuid" }
+                      id: { type: integer, example: 1 }
             createdAt: { type: string, format: date-time }
             updatedAt: { type: string, format: date-time }
 
-    # Workout Plan Schemas
-    ExerciseCreation:
-      type: object
-      required:
-        - name
-        - setsReps
-      properties:
-        name: { type: string, example: "Press de Banca" }
-        setsReps: { type: string, example: "4x10" }
-        observations: { type: string, example: "Controlar la bajada." }
-    WorkoutDayCreation:
-      type: object
-      required:
-        - dayOfWeek # o name
-        - exercises
-      properties:
-        dayOfWeek: { type: string, example: "Lunes" } # o "Día 1"
-        description: { type: string, example: "Entrenamiento de Pecho y Tríceps" }
-        exercises:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExerciseCreation'
-    WorkoutPlanCreation:
-      type: object
-      required:
-        - title
-      properties:
-        title: { type: string, example: "Plan Fuerza Hipertrofia Mes 1" }
-        description: { type: string, example: "Rutina de 3 días enfocada en básicos." }
-        startDate: { type: string, format: date, example: "2023-11-01" }
-        endDate: { type: string, format: date, example: "2023-11-30" }
-        objectives: { type: string, example: "Aumentar fuerza en básicos." }
-        status: { type: string, enum: ["Activo", "Borrador"], example: "Activo"}
-        notes: { type: string, example: "Calentar 10 min antes." }
-        days:
-          type: array
-          items:
-            $ref: '#/components/schemas/WorkoutDayCreation'
-    WorkoutPlanResponse: # Similar a WorkoutPlanCreation pero con IDs
-      allOf:
-        - $ref: '#/components/schemas/WorkoutPlanCreation' # Excluyendo 'days'
-        - type: object
-          properties:
-            id: { type: string, example: "workoutplan-uuid" }
-            patientId: { type: string, example: "patient-uuid" }
-            professionalId: { type: string, example: "prof-uuid" }
-            days: # days con sus IDs y exercises con sus IDs
-              type: array
-              items:
-                allOf:
-                  - $ref: '#/components/schemas/WorkoutDayCreation' # Excluyendo 'exercises'
-                  - type: object
-                    properties:
-                      id: { type: string, example: "workoutday-uuid" }
-                      exercises:
-                        type: array
-                        items:
-                          allOf:
-                            - $ref: '#/components/schemas/ExerciseCreation'
-                            - type: object
-                              properties:
-                                id: { type: string, example: "exercise-uuid" }
-            createdAt: { type: string, format: date-time }
-            updatedAt: { type: string, format: date-time }
-
-    # PDF & Email Schemas
-    CombinedPdfRequest:
+    # PDF Schemas
+    PdfGenerationRequest:
       type: object
       properties:
         dietPlanId:
           type: string
           nullable: true
-          example: "dietplan-uuid"
+          example: "1"
         workoutPlanId:
           type: string
           nullable: true
-          example: "workoutplan-uuid"
+          example: "1"
+
+    # Email Schemas
     SendEmailRequest:
-      allOf:
-        - $ref: '#/components/schemas/CombinedPdfRequest' # Reutiliza la selección de planes
-        - type: object
-          required:
-            - recipientEmail
-            - subject
-          properties:
-            recipientEmail:
-              type: string
-              format: email
-              example: "patient.email@example.com"
-            subject:
-              type: string
-              example: "Tus planes de NutriTrack Pro"
-            bodyMessage:
-              type: string
-              nullable: true
-              example: "Hola John, aquí tienes tus planes actualizados."
+      type: object
+      required:
+        - recipientEmail
+        - subject
+      properties:
+        dietPlanId:
+          type: string
+          nullable: true
+          example: "1"
+        workoutPlanId:
+          type: string
+          nullable: true
+          example: "1"
+        recipientEmail:
+          type: string
+          format: email
+          example: "patient.email@example.com"
+        subject:
+          type: string
+          example: "Tus planes de NutriTrack Pro"
+        bodyMessage:
+          type: string
+          nullable: true
+          example: "Hola John, aquí tienes tus planes actualizados."
 
     # General Error Schema
     ErrorResponse:
@@ -365,7 +346,7 @@ components:
         message:
           type: string
           example: "Error de validación"
-        errors: # Opcional, para errores de validación detallados
+        errors:
           type: array
           items:
             type: object
@@ -374,14 +355,15 @@ components:
               message: { type: string, example: "El email ya está registrado." }
 
 security:
-  - bearerAuth: [] # Aplica JWT a todos los endpoints por defecto
+  - bearerAuth: []
 
 paths:
   # --- Auth Endpoints ---
   /auth/register:
     post:
-      summary: HU-001 Registro de Nuevo Profesional
+      summary: Registro de Nuevo Profesional
       tags: [Auth]
+      security: [] # Sin autenticación requerida
       requestBody:
         required: true
         content:
@@ -393,27 +375,29 @@ paths:
           description: Profesional registrado exitosamente.
           content:
             application/json:
-              schema: # Podría ser un subconjunto de AuthResponse sin el token
+              schema:
                 type: object
                 properties:
-                  id: { type: string }
-                  fullName: { type: string }
+                  id: { type: integer }
+                  firstName: { type: string }
+                  lastName: { type: string }
                   email: { type: string }
                   profession: { type: string }
         '400':
-          description: Error de validación (ej. email inválido, campos faltantes).
+          description: Error de validación
           content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         '409':
-          description: Conflicto, el email ya está registrado.
+          description: Email ya registrado
           content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         '500':
-          description: Error interno del servidor.
+          description: Error interno del servidor
           content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /auth/login:
     post:
-      summary: HU-002 Inicio de Sesión del Profesional
+      summary: Inicio de Sesión del Profesional
       tags: [Auth]
+      security: [] # Sin autenticación requerida
       requestBody:
         required: true
         content:
@@ -422,81 +406,25 @@ paths:
               $ref: '#/components/schemas/ProfessionalLogin'
       responses:
         '200':
-          description: Inicio de sesión exitoso.
+          description: Inicio de sesión exitoso
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '400':
-          description: Error de validación (ej. campos vacíos).
+          description: Error de validación
           content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         '401':
-          description: Credenciales inválidas (email no encontrado o contraseña incorrecta).
+          description: Credenciales inválidas
           content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         '500':
-          description: Error interno del servidor.
-          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
-
-  /auth/forgot-password:
-    post:
-      summary: HU-003 Solicitud de Recuperación de Contraseña
-      tags: [Auth]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ForgotPassword'
-      responses:
-        '200':
-          description: Solicitud procesada. Si el email existe, se enviará un enlace.
-        '400':
-          description: Error de validación (ej. email inválido).
-          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
-        '500':
-          description: Error interno del servidor.
-          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
-
-  /auth/reset-password:
-    post:
-      summary: HU-003 Restablecimiento de Contraseña
-      tags: [Auth]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResetPassword'
-      responses:
-        '200':
-          description: Contraseña restablecida exitosamente.
-        '400':
-          description: Token inválido/expirado o contraseña no cumple criterios.
-          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
-        '500':
-          description: Error interno del servidor.
-          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
-
-  /auth/logout:
-    post:
-      summary: HU-004 Cerrar Sesión del Profesional (Opcional, si se usa blacklisting de tokens)
-      tags: [Auth]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Sesión cerrada exitosamente.
-        '401':
-          description: No autorizado (token no válido o no proporcionado).
-          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
-        '500':
-          description: Error interno del servidor.
+          description: Error interno del servidor
           content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   # --- Patient Endpoints ---
   /patients:
     post:
-      summary: HU-005 Registro de Nuevo Paciente
+      summary: Registro de Nuevo Paciente
       tags: [Patients]
       security:
         - bearerAuth: []
@@ -508,49 +436,49 @@ paths:
               $ref: '#/components/schemas/PatientCreation'
       responses:
         '201':
-          description: Paciente creado exitosamente.
+          description: Paciente creado exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PatientResponse'
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '400': { description: "Error de validación", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
     get:
-      summary: HU-008 Visualización del Dashboard Principal (Listar/Buscar Pacientes)
+      summary: Listar/Buscar Pacientes
       tags: [Patients]
       security:
         - bearerAuth: []
       parameters:
         - name: search
           in: query
-          description: Término de búsqueda para nombre, apellido o email.
+          description: Término de búsqueda para nombre, apellido o email
           required: false
           schema:
             type: string
         - name: page
           in: query
-          description: Número de página para paginación.
+          description: Número de página para paginación
           required: false
           schema:
             type: integer
             default: 1
         - name: limit
           in: query
-          description: Número de resultados por página.
+          description: Número de resultados por página
           required: false
           schema:
             type: integer
             default: 10
         - name: sortBy
           in: query
-          description: Campo por el cual ordenar (ej. name, createdAt).
+          description: Campo por el cual ordenar
           required: false
           schema:
             type: string
         - name: order
           in: query
-          description: Orden (asc, desc).
+          description: Orden (asc, desc)
           required: false
           schema:
             type: string
@@ -558,17 +486,17 @@ paths:
             default: asc
       responses:
         '200':
-          description: Lista de pacientes obtenida.
+          description: Lista de pacientes obtenida
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PatientListResponse'
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
   /patients/{patientId}:
     get:
-      summary: HU-009 Visualización del Perfil Detallado del Paciente
+      summary: Obtener Detalles del Paciente
       tags: [Patients]
       security:
         - bearerAuth: []
@@ -576,28 +504,46 @@ paths:
         - name: patientId
           in: path
           required: true
-          description: ID del paciente.
+          description: ID del paciente
           schema:
-            type: string # o integer
+            type: integer
       responses:
         '200':
-          description: Detalles del paciente obtenidos.
+          description: Detalles del paciente obtenidos
           content:
-            application/json: # Devolvería el PatientResponse y listas de resúmenes de planes/biométricas
+            application/json:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/PatientResponse'
                   - type: object
                     properties:
-                      lastBiometricRecord: { $ref: '#/components/schemas/BiometricRecordResponse', nullable: true }
-                      dietPlansSummary: { type: array, items: { type: object, properties: { id: {type: string}, title: {type: string}, isActive: {type: boolean} } } }
-                      workoutPlansSummary: { type: array, items: { type: object, properties: { id: {type: string}, title: {type: string}, isActive: {type: boolean} } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido (no es su paciente).", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+                      lastBiometricRecord: 
+                        allOf:
+                          - $ref: '#/components/schemas/BiometricRecordResponse'
+                          - type: object
+                            nullable: true
+                      dietPlansSummary: 
+                        type: array
+                        items: 
+                          type: object
+                          properties: 
+                            id: {type: integer}
+                            title: {type: string}
+                            isActive: {type: boolean}
+                      workoutPlansSummary: 
+                        type: array
+                        items: 
+                          type: object
+                          properties: 
+                            id: {type: integer}
+                            title: {type: string}
+                            isActive: {type: boolean}
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Paciente no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
     put:
-      summary: HU-006 Actualización de Información del Paciente
+      summary: Actualizar Información del Paciente
       tags: [Patients]
       security:
         - bearerAuth: []
@@ -605,37 +551,43 @@ paths:
         - name: patientId
           in: path
           required: true
-          description: ID del paciente a actualizar.
+          description: ID del paciente a actualizar
           schema:
-            type: string # o integer
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
-            schema: # Similar a PatientCreation, pero todos los campos son opcionales para PUT
+            schema:
               type: object
               properties:
                 firstName: { type: string }
                 lastName: { type: string }
                 email: { type: string, format: email }
-                # ... otros campos actualizables
+                phone: { type: string }
+                birthDate: { type: string, format: date }
+                gender: { type: string }
+                height: { type: number, format: float }
+                medicalNotes: { type: string }
+                dietRestrictions: { type: string }
+                objectives: { type: string }
       responses:
         '200':
-          description: Paciente actualizado exitosamente.
+          description: Paciente actualizado exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PatientResponse'
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '400': { description: "Error de validación", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Paciente no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
   # --- Biometric Record Endpoints ---
   /patients/{patientId}/biometric-records:
     post:
-      summary: HU-010 Registro de Nuevas Medidas Biométricas
+      summary: Registro de Nuevas Medidas Biométricas
       tags: [BiometricRecords]
       security:
         - bearerAuth: []
@@ -643,9 +595,9 @@ paths:
         - name: patientId
           in: path
           required: true
-          description: ID del paciente.
+          description: ID del paciente
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -654,15 +606,15 @@ paths:
               $ref: '#/components/schemas/BiometricRecordCreation'
       responses:
         '201':
-          description: Registro biométrico creado.
+          description: Registro biométrico creado
           content: { application/json: { schema: { $ref: '#/components/schemas/BiometricRecordResponse' } } }
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '400': { description: "Error de validación", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Paciente no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
     get:
-      summary: HU-011 Visualización de la Evolución de Métricas (Listar todos los registros)
+      summary: Obtener Registros Biométricos del Paciente
       tags: [BiometricRecords]
       security:
         - bearerAuth: []
@@ -670,42 +622,42 @@ paths:
         - name: patientId
           in: path
           required: true
-          description: ID del paciente.
+          description: ID del paciente
           schema:
-            type: string
+            type: integer
         - name: startDate
           in: query
-          description: Fecha de inicio para filtrar registros.
+          description: Fecha de inicio para filtrar registros
           required: false
           schema:
             type: string
             format: date
         - name: endDate
           in: query
-          description: Fecha de fin para filtrar registros.
+          description: Fecha de fin para filtrar registros
           required: false
           schema:
             type: string
             format: date
       responses:
         '200':
-          description: Lista de registros biométricos.
+          description: Lista de registros biométricos
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/BiometricRecordResponse'
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '400': { description: "Error de validación", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Paciente no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
   # --- Diet Plan Endpoints ---
-  /patients/{patientId}/diet-plans: # Asumiendo anidado para creación
+  /diets/patients/{patientId}/plans:
     post:
-      summary: HU-012 Creación Básica de Plan de Dieta
+      summary: Crear Plan de Dieta para Paciente
       tags: [DietPlans]
       security:
         - bearerAuth: []
@@ -713,9 +665,9 @@ paths:
         - name: patientId
           in: path
           required: true
-          description: ID del paciente para el cual se crea el plan.
+          description: ID del paciente para el cual se crea el plan
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -724,17 +676,17 @@ paths:
               $ref: '#/components/schemas/DietPlanCreation'
       responses:
         '201':
-          description: Plan de dieta creado.
+          description: Plan de dieta creado
           content: { application/json: { schema: { $ref: '#/components/schemas/DietPlanResponse' } } }
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '400': { description: "Error de validación", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Paciente no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
-  /diet-plans/{dietPlanId}: # No anidado para GET/PUT/DELETE, asume dietPlanId es único o la autorización maneja el contexto
+  /diets/{dietPlanId}:
     get:
-      summary: HU-013 Visualización de Detalles de un Plan de Dieta
+      summary: Obtener Detalles de un Plan de Dieta
       tags: [DietPlans]
       security:
         - bearerAuth: []
@@ -742,19 +694,19 @@ paths:
         - name: dietPlanId
           in: path
           required: true
-          description: ID del plan de dieta.
+          description: ID del plan de dieta
           schema:
-            type: string
+            type: integer
       responses:
         '200':
-          description: Detalles del plan de dieta.
+          description: Detalles del plan de dieta
           content: { application/json: { schema: { $ref: '#/components/schemas/DietPlanResponse' } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Plan de dieta no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Plan de dieta no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
     put:
-      summary: HU-014 Actualización de Información del Plan de Dieta
+      summary: Actualizar Plan de Dieta
       tags: [DietPlans]
       security:
         - bearerAuth: []
@@ -762,14 +714,14 @@ paths:
         - name: dietPlanId
           in: path
           required: true
-          description: ID del plan de dieta a actualizar.
+          description: ID del plan de dieta a actualizar
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
-            schema: # Similar a DietPlanCreation, pero todos los campos son opcionales para PUT
+            schema:
               type: object
               properties:
                 title: { type: string }
@@ -777,7 +729,7 @@ paths:
                 startDate: { type: string, format: date }
                 endDate: { type: string, format: date }
                 objectives: { type: string }
-                status: { type: string, enum: ["Activo", "Borrador"] }
+                isActive: { type: boolean }
                 notes: { type: string }
                 meals:
                   type: array
@@ -785,18 +737,18 @@ paths:
                     $ref: '#/components/schemas/DietMealCreation'
       responses:
         '200':
-          description: Plan de dieta actualizado exitosamente.
+          description: Plan de dieta actualizado exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DietPlanResponse'
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Plan de dieta no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '400': { description: "Error de validación", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Plan de dieta no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
     delete:
-      summary: HU-015 Eliminación de un Plan de Dieta
+      summary: Eliminar Plan de Dieta (Soft Delete)
       tags: [DietPlans]
       security:
         - bearerAuth: []
@@ -804,134 +756,21 @@ paths:
         - name: dietPlanId
           in: path
           required: true
-          description: ID del plan de dieta a eliminar.
+          description: ID del plan de dieta a eliminar
           schema:
-            type: string
+            type: integer
       responses:
         '200':
-          description: Plan de dieta eliminado exitosamente.
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Plan de dieta no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+          description: Plan de dieta eliminado exitosamente
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Plan de dieta no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
-  # --- Workout Plan Endpoints ---
-  /patients/{patientId}/workout-plans: # Asumiendo anidado para creación
+  # --- PDF Endpoints ---
+  /patients/{patientId}/combined-pdf:
     post:
-      summary: HU-016 Creación Básica de Plan de Entrenamiento
-      tags: [WorkoutPlans]
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: patientId
-          in: path
-          required: true
-          description: ID del paciente para el cual se crea el plan.
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WorkoutPlanCreation'
-      responses:
-        '201':
-          description: Plan de entrenamiento creado.
-          content: { application/json: { schema: { $ref: '#/components/schemas/WorkoutPlanResponse' } } }
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-
-  /workout-plans/{workoutPlanId}: # No anidado para GET/PUT/DELETE, asume workoutPlanId es único o la autorización maneja el contexto
-    get:
-      summary: HU-017 Visualización de Detalles de un Plan de Entrenamiento
-      tags: [WorkoutPlans]
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: workoutPlanId
-          in: path
-          required: true
-          description: ID del plan de entrenamiento.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Detalles del plan de entrenamiento.
-          content: { application/json: { schema: { $ref: '#/components/schemas/WorkoutPlanResponse' } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Plan de entrenamiento no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-    put:
-      summary: HU-018 Actualización de Información del Plan de Entrenamiento
-      tags: [WorkoutPlans]
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: workoutPlanId
-          in: path
-          required: true
-          description: ID del plan de entrenamiento a actualizar.
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: # Similar a WorkoutPlanCreation, pero todos los campos son opcionales para PUT
-              type: object
-              properties:
-                title: { type: string }
-                description: { type: string }
-                startDate: { type: string, format: date }
-                endDate: { type: string, format: date }
-                objectives: { type: string }
-                status: { type: string, enum: ["Activo", "Borrador"] }
-                notes: { type: string }
-                days:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/WorkoutDayCreation'
-      responses:
-        '200':
-          description: Plan de entrenamiento actualizado exitosamente.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WorkoutPlanResponse'
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Plan de entrenamiento no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-    delete:
-      summary: HU-019 Eliminación de un Plan de Entrenamiento
-      tags: [WorkoutPlans]
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: workoutPlanId
-          in: path
-          required: true
-          description: ID del plan de entrenamiento a eliminar.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Plan de entrenamiento eliminado exitosamente.
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Plan de entrenamiento no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-
-  # --- PDF & Email Endpoints ---
-  /patients/{patientId}/pdf:
-    post:
-      summary: HU-020 Generación de PDF de Planes
+      summary: Generar PDF Combinado de Planes
       tags: [PDF]
       security:
         - bearerAuth: []
@@ -939,32 +778,33 @@ paths:
         - name: patientId
           in: path
           required: true
-          description: ID del paciente.
+          description: ID del paciente
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CombinedPdfRequest'
+              $ref: '#/components/schemas/PdfGenerationRequest'
       responses:
         '200':
-          description: PDF generado exitosamente.
+          description: PDF generado exitosamente
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '400': { description: "Error de validación", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Paciente no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
-  /patients/{patientId}/email:
+  # --- Email Endpoints ---
+  /patients/{patientId}/send-plans-email:
     post:
-      summary: HU-021 Envío de Correo Electrónico con Planes
+      summary: Envío de Correo Electrónico con Planes
       tags: [Email]
       security:
         - bearerAuth: []
@@ -972,9 +812,9 @@ paths:
         - name: patientId
           in: path
           required: true
-          description: ID del paciente.
+          description: ID del paciente
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -983,28 +823,9 @@ paths:
               $ref: '#/components/schemas/SendEmailRequest'
       responses:
         '200':
-          description: Correo electrónico enviado exitosamente.
-        '400': { description: "Error de validación.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '401': { description: "No Autorizado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '403': { description: "Prohibido.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '404': { description: "Paciente no encontrado.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        '500': { description: "Error interno del servidor.", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-
-  # --- General Error Schema ---
-  /error:
-    get:
-      summary: HU-022 Visualización de Información de Error
-      tags: [Error]
-      responses:
-        '200':
-          description: Información de error obtenida exitosamente.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Error interno del servidor.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse' 
+          description: Correo electrónico enviado exitosamente
+        '400': { description: "Error de validación", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401': { description: "No Autorizado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '403': { description: "Prohibido", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: "Paciente no encontrado", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '500': { description: "Error interno del servidor", content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } } 

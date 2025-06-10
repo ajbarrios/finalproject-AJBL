@@ -72,6 +72,7 @@ Explica todo esto de forma clara y concisa, con un tono didáctico."
 "Ahora propon una estructura de ficheros. Mi idea es tener una carpeta denominada 'frontend' y 'backend'. Dentro de estas propon una estructura de ficheros que se rija por buenas practicas y patrones estandard en ambos stacks."
 
 **Prompt 2:**
+Escanea la parte @/backend del proyecto y presta atencion a la api disponible. Tras esto, actualiza la especificacion de la api en @openapi_spec.yaml y la colección de postman @NutriTrack Pro.postman_collection.json. Presta atención a la estructura del proyecto actual.
 
 **Prompt 3:**
 
