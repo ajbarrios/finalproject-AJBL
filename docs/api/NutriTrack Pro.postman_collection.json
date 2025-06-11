@@ -875,6 +875,165 @@
 				}
 			],
 			"description": "Endpoints para envío de planes por correo electrónico"
+		},
+		{
+			"name": "PDF",
+			"item": [
+				{
+					"name": "Generar PDF Combinado de Planes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dietPlanId\": \"1\",\n  \"workoutPlanId\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId/combined-pdf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId",
+								"combined-pdf"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Genera un PDF combinado que incluye los planes de dieta y/o entrenamiento especificados para un paciente."
+					},
+					"response": []
+				},
+				{
+					"name": "Generar PDF Solo Plan de Dieta",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dietPlanId\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId/combined-pdf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId",
+								"combined-pdf"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Genera un PDF que incluye únicamente el plan de dieta especificado."
+					},
+					"response": []
+				},
+				{
+					"name": "Generar PDF Solo Plan de Entrenamiento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"workoutPlanId\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients/:patientId/combined-pdf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":patientId",
+								"combined-pdf"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "1",
+									"description": "ID del paciente"
+								}
+							]
+						},
+						"description": "Genera un PDF que incluye únicamente el plan de entrenamiento especificado."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para generación de PDFs de planes"
 		}
 	],
 	"event": [
