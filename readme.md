@@ -23,15 +23,23 @@ NutriTrack Pro
 ### **0.3. Descripción breve del proyecto:**
 NutriTrack Pro es una aplicación web para profesionales de la nutrición y entrenadores deportivos que quieran llevar a todas partes la progresión de sus clientes.
 
-### **0.4. URL del proyecto:**
+### **0.4. URL del proyecto**
 [Web Nutritrack Pro](https://nutritrack-pro.netlify.app/)
 
-### 0.5. URL o archivo comprimido del repositorio
+### **0.5. URL o archivo comprimido del repositorio**
 [Github NutriTrack Pro](https://github.com/ajbarrios/finalproject-AJBL)
 
 > Puedes tenerlo alojado en público o en privado, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/). También puedes compartir por correo un archivo zip con el contenido
 
-#### **🧪 Instrucciones para Probar la Aplicación**
+### **0.6. Video del Proyecto:**
+
+Aquí puedes encontrar la versión 1.0 del proyecto NutriTrack Pro en entorno de producción: **Netlify** + **Render**:
+
+ 👉 [Youtube](https://youtu.be/wHk-Hecftak)
+
+---
+
+### **0.7. Instrucciones para Probar la Aplicación**
 
 Para evaluar todas las funcionalidades de NutriTrack Pro:
 
@@ -75,14 +83,6 @@ Para evaluar todas las funcionalidades de NutriTrack Pro:
     npm run dev
     ```
     La aplicación frontend debería abrirse en tu navegador (por defecto en `http://localhost:5173`).
-
----
-
-## 0.6. Demo del Proyecto
-
-Aquí puedes encontrar una demo del proyecto NutriTrack Pro corriendo en entorno local:
-
-[Ver Demo del Proyecto](./docs/demo/NutriTrack-Pro-entrega2-demo.webm)
 
 ---
 
