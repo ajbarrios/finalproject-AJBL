@@ -8,6 +8,7 @@ import { useAuth } from './hooks/useAuth'
 import { AuthProvider } from './contexts/AuthContext'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import PasswordRecoveryPage from './pages/PasswordRecoveryPage'
 
 // Componentes de Ruta
 interface RouteProps {
@@ -60,7 +61,7 @@ function App() {
             {/* Rutas públicas */}
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/registro" element={<GuestRoute><RegisterPage /></GuestRoute>} />
-            {/* <Route path="/recuperar-password" element={<GuestRoute><ForgotPasswordInfoPage /></GuestRoute>} /> */}
+            <Route path="/password-recovery" element={<GuestRoute><PasswordRecoveryPage /></GuestRoute>} />
 
             {/* Rutas protegidas */}
             <Route path="/dashboard" element={<ProtectedRoute><PatientDashboardPage /></ProtectedRoute>} />

@@ -95,7 +95,7 @@ const LoginPage: React.FC = () => {
 
           <div className="flex items-center justify-end">
             <div className="text-sm">
-              <Link to="/recuperar-password" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link to="/password-recovery" className="font-medium text-indigo-600 hover:text-indigo-500">
                 ¿Olvidaste tu contraseña?
               </Link>
             </div>
