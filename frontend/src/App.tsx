@@ -39,6 +39,7 @@ import DietPlanDetailsPage from './pages/DietPlanDetailsPage';
 import EditDietPlanPage from './pages/EditDietPlanPage';
 
 import HomePage from './pages/HomePage';
+import AboutUsPage from './pages/AboutUsPage';
 
 function App() {
   const auth = useAuth(); // Para la redirección principal
@@ -62,6 +63,7 @@ function App() {
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/registro" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="/password-recovery" element={<GuestRoute><PasswordRecoveryPage /></GuestRoute>} />
+            <Route path="/about-us" element={<AboutUsPage />} />
 
             {/* Rutas protegidas */}
             <Route path="/dashboard" element={<ProtectedRoute><PatientDashboardPage /></ProtectedRoute>} />

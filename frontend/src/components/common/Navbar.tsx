@@ -39,6 +39,7 @@ const Navbar: React.FC = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
+              <Link to="/about-us" className="hover:text-indigo-200">Acerca de</Link>
               <Link to="/login" className="hover:text-indigo-200">Iniciar Sesión</Link>
               <Link to="/registro" className="bg-white text-indigo-600 px-4 py-2 rounded-md hover:bg-indigo-100 text-sm font-medium">
                 Registrarse
